@@ -8,6 +8,23 @@ body {
 header {
 	margin-bottom: 1rem;
 }
+input[type="text"],
+input[type="number"],
+input[type="string"] {
+	border: 1px solid #ccc;
+	border-radius: 4px;
+	padding: 0.5rem;
+	font-size: 1rem;
+}
+button {
+	background: #656dff;
+	color: white;
+	border: none;
+	border-radius: 4px;
+	padding: 0.5rem 1rem;
+	font-size: 1rem;
+	cursor: pointer;
+}
 #controls {
 	display: flex;
 	gap: 0.75rem;
@@ -100,10 +117,12 @@ header {
 	border: none;
 	border-radius: 50%;
 	width: 1rem;
-	height: 1rem;
 	font-size: 0.8rem;
 	line-height: 1;
 	cursor: pointer;
+	display: flex;
+	align-items: center;
+	justify-content: center;
 }
 #elementList {
 	margin-top: 0.5rem;
@@ -117,4 +136,60 @@ header {
 	padding: 0.75rem;
 	border-radius: 6px;
 	min-height: 90px;
+}
+
+@media (prefers-color-scheme: dark) {
+	body {
+		background: #1a1a1a;
+		color: #e0e0e0;
+	}
+	input[type="text"],
+	input[type="number"],
+	input[type="string"] {
+		background: #2a2a2a;
+		color: #e0e0e0;
+		border-color: #555;
+	}
+	#gridWrapper {
+		border-color: #8a9dff;
+		background: #2a2a2a;
+	}
+	#grid {
+		background: #242424;
+	}
+	.cell {
+		border-color: #555;
+		background: #1e1e1e;
+		color: #e0e0e0;
+	}
+	.cell.assigned {
+		background: #1a2c4a;
+		border-color: #5a7fd9;
+		color: #a6d1ff;
+	}
+	.cell.preview {
+		outline-color: #4da8ff;
+		background-color: rgba(77, 168, 255, 0.2);
+	}
+	.cell.preview-conflict {
+		outline-color: #ff6b6b;
+		background-color: rgba(255, 107, 107, 0.2);
+	}
+	.area-block {
+		background: rgba(90, 130, 200, 0.25);
+		border-color: #5a82c8;
+		color: #a6d1ff;
+	}
+	.element-tag {
+		background: #2a2a3e;
+		border-color: #555;
+		color: #b8c8ff;
+	}
+	.deleteBtn {
+		background: #d63031;
+	}
+	#output pre {
+		background: #1a1a1a;
+		color: #a8d1ff;
+	}
 }
