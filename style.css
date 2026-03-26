@@ -45,7 +45,7 @@ button {
 }
 #grid {
 	display: grid;
-	min-height: 300px;
+	min-height: 400px;
 	background: #f9f9ff;
 }
 .cell {
