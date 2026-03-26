@@ -1,0 +1,54 @@
+<!doctype html>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<title>Grid Designer - Vanilla JS Starter</title>
+		<link rel="stylesheet" href="style.css" />
+	</head>
+	<body>
+		<header>
+			<h1>Grid Designer</h1>
+			<p>Drag/drop to design grid layouts and export CSS.</p>
+		</header>
+
+		<section id="controls">
+			<label>
+				Container id:
+				<input id="containerId" type="string" />
+			</label>
+			<label>
+				Columns:
+				<input id="colCount" type="number" min="1" value="4" />
+			</label>
+			<label>
+				Rows:
+				<input id="rowCount" type="number" min="1" value="4" />
+			</label>
+			<button id="buildGrid">Build Grid</button>
+			<button id="clearGrid">Clear</button>
+			<button id="exportCss">Export CSS</button>
+		</section>
+
+		<section id="elements">
+			<label for=""
+				>Add element
+				<input type="text" name="" id="elementName" />
+			</label>
+			<button id="addElement">Add</button>
+
+			<div id="elementList"></div>
+		</section>
+
+		<section id="gridWrapper">
+			<div id="grid" class="grid"></div>
+		</section>
+
+		<section id="output">
+			<h2>Generated CSS</h2>
+			<pre id="cssCode"></pre>
+		</section>
+
+		<script src="script.js"></script>
+	</body>
+</html>

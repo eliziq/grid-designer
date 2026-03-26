@@ -1,0 +1,120 @@
+* {
+	box-sizing: border-box;
+}
+body {
+	font-family: Arial, sans-serif;
+	margin: 1rem;
+}
+header {
+	margin-bottom: 1rem;
+}
+#controls {
+	display: flex;
+	gap: 0.75rem;
+	align-items: center;
+	flex-wrap: wrap;
+	margin-bottom: 1rem;
+}
+#controls label {
+	display: flex;
+	gap: 0.5rem;
+	align-items: center;
+}
+#gridWrapper {
+	margin-bottom: 1rem;
+	border: 2px solid #656dff;
+	border-radius: 8px;
+	padding: 0.5rem;
+}
+#grid {
+	display: grid;
+	min-height: 300px;
+	background: #f9f9ff;
+}
+.cell {
+	border: 1px dashed #bbb;
+	background: #fff;
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	color: #333;
+	user-select: none;
+	position: relative;
+	overflow: hidden;
+}
+.cell.assigned {
+	background: #e6efff;
+	border: 2px solid #84a9ff;
+	color: #1f4ad1;
+	font-weight: 600;
+}
+.cell.preview {
+	outline: 2px dashed #51c43b;
+	background-color: rgba(81, 196, 59, 0.25);
+}
+.cell.preview-conflict {
+	outline: 2px dashed #ff4444;
+	background-color: rgba(255, 68, 68, 0.25);
+}
+.area-block {
+	position: absolute;
+	z-index: 10;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	background: rgba(100, 160, 255, 0.15);
+	border: 2px solid #3c6edc;
+	border-radius: 4px;
+	font-weight: 600;
+	color: #1a2b6f;
+	pointer-events: auto;
+	cursor: move;
+}
+.area-block.edge-top,
+.area-block.edge-bottom {
+	cursor: ns-resize;
+}
+.area-block.edge-left,
+.area-block.edge-right {
+	cursor: ew-resize;
+}
+.element-tag {
+	display: inline-flex;
+	align-items: center;
+	gap: 0.4rem;
+	margin: 0.2rem;
+	padding: 0.35rem 0.5rem;
+	background: #f0f0ff;
+	border: 1px solid #bbb;
+	border-radius: 999px;
+	font-size: 0.9rem;
+	cursor: grab;
+	user-select: none;
+}
+.element-tag:active {
+	cursor: grabbing;
+}
+.deleteBtn {
+	background: #ff5c5c;
+	color: white;
+	border: none;
+	border-radius: 50%;
+	width: 1rem;
+	height: 1rem;
+	font-size: 0.8rem;
+	line-height: 1;
+	cursor: pointer;
+}
+#elementList {
+	margin-top: 0.5rem;
+}
+
+#output pre {
+	white-space: pre-wrap;
+	word-break: break-word;
+	background: #1e1f25;
+	color: #d9e5ff;
+	padding: 0.75rem;
+	border-radius: 6px;
+	min-height: 90px;
+}
