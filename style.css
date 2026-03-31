@@ -10,11 +10,13 @@ header {
 }
 input[type="text"],
 input[type="number"],
-input[type="string"] {
+input[type=\"string\"],
+select {
 	border: 1px solid #ccc;
 	border-radius: 4px;
 	padding: 0.5rem;
 	font-size: 1rem;
+	min-width: 120px;
 }
 button {
 	background: #656dff;
@@ -24,11 +26,15 @@ button {
 	padding: 0.5rem 1rem;
 	font-size: 1rem;
 	cursor: pointer;
+	white-space: nowrap;
+}
+button:hover {
+	background: #535aff;
 }
 #controls {
 	display: flex;
-	gap: 0.75rem;
-	align-items: center;
+	gap: 1rem;
+	align-items: flex-start;
 	flex-wrap: wrap;
 	margin-bottom: 1rem;
 }
@@ -37,15 +43,48 @@ button {
 	gap: 0.5rem;
 	align-items: center;
 }
+#controls > label:first-child {
+	margin-top: 0.5rem;
+}
+#responsiveSettings {
+	border: 1px solid #ddd;
+	border-radius: 6px;
+	padding: 1rem;
+	background: #f5f5f5;
+	display: flex;
+	flex-direction: column;
+	gap: 0.75rem;
+}
+#responsiveSettings h3 {
+	margin: 0;
+	font-size: 0.95rem;
+	color: #333;
+}
+#responsiveSettings label {
+	display: flex;
+	gap: 0.5rem;
+	align-items: center;
+}
+input[readonly] {
+	background-color: #e8e8e8;
+	cursor: not-allowed;
+	color: #666;
+}
 #gridWrapper {
 	margin-bottom: 1rem;
 	border: 2px solid #656dff;
 	border-radius: 8px;
 	padding: 0.5rem;
+	overflow: auto;
+	display: inline-block;
+	min-width: fit-content;
+	transition: transform 0.3s ease;
+	transform-origin: top left;
+	transform: scale(var(--grid-scale, 1));
+	margin-left: var(--grid-margin, 0);
 }
 #grid {
 	display: grid;
-	min-height: 400px;
 	background: #f9f9ff;
 }
 .cell {
@@ -127,6 +166,23 @@ button {
 #elementList {
 	margin-top: 0.5rem;
 }
+#elements {
+	background: #f5f5f5;
+	border: 1px solid #ddd;
+	border-radius: 6px;
+	padding: 1rem;
+	margin-bottom: 1rem;
+}
+#elements label {
+	display: flex;
+	gap: 0.5rem;
+	align-items: center;
+	margin-bottom: 0.5rem;
+}
+#elements > button,
+#controls > button {
+	margin-top: 0.5rem;
+}
 
 #output pre {
 	white-space: pre-wrap;
@@ -145,10 +201,22 @@ button {
 	}
 	input[type="text"],
 	input[type="number"],
-	input[type="string"] {
+	input[type=\"string\"],
+	select {
 		background: #2a2a2a;
 		color: #e0e0e0;
 		border-color: #555;
+	}
+	#responsiveSettings {
+		background: #2a2a2a;
+		border-color: #444;
+	}
+	#responsiveSettings h3 {
+		color: #e0e0e0;
+	}
+	input[readonly] {
+		background-color: #1a1a1a;
+		color: #888;
 	}
 	#gridWrapper {
 		border-color: #8a9dff;

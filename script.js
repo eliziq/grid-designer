@@ -9,9 +9,12 @@ const cssCode = document.getElementById("cssCode");
 const elementNameInput = document.getElementById("elementName");
 const addElementButton = document.getElementById("addElement");
 const elementList = document.getElementById("elementList");
+const mainMaxWidthInput = document.getElementById("mainMaxWidth");
+const bannerWidthInput = document.getElementById("bannerWidth");
+const bannerHeightInput = document.getElementById("bannerHeight");
 
-let rows = parseInt(rowCountInput.value, 10) || 1;
-let cols = parseInt(colCountInput.value, 10) || 1;
+let rows = 4;
+let cols = 24;
 let gridMatrix = [];
 let elements = []; // [{id, name}]
 let areas = {}; // {id: {id,rowStart,rowEnd,colStart,colEnd}}
@@ -78,10 +81,20 @@ function assignArea(id, r0, c0, r1, c1) {
 
 function renderGrid() {
 	grid.innerHTML = "";
-	grid.style.gridTemplateColumns = `repeat(${cols}, minmax(80px, 1fr))`;
+	grid.style.gridTemplateColumns = `repeat(${cols}, 1fr)`;
 	grid.style.gridTemplateRows = `repeat(${rows}, minmax(60px, 1fr))`;
 	grid.style.position = "relative";
 	grid.style.gap = "8px";
+	grid.style.width = `${gridWidth}px`;
+	grid.style.height = `${gridHeight}px`;
+	grid.style.minHeight = "auto";
+
+	// Update grid wrapper to match grid size
+	const gridWrapper = document.getElementById("gridWrapper");
+	gridWrapper.style.width = `${gridWidth + 20}px`;
+	gridWrapper.style.height = `${gridHeight + 20}px`;
+	
+	updateGridScaling();
 
 	for (let r = 0; r < rows; r++) {
 		for (let c = 0; c < cols; c++) {
@@ -310,7 +323,7 @@ function updateCssPreview() {
 		lines.push(`    "${rowCells.join(" ")}"`);
 	}
 	const template = `grid-template-areas:\n${lines.join("\n")};`;
-	cssCode.textContent = `[id:${containerId}] {\n  display: grid;\n  grid-template-columns: repeat(${cols}, minmax(80px, 1fr));\n  grid-template-rows: repeat(${rows}, minmax(60px, 1fr));\n  gap: 8px;\n  ${template}\n}`;
+	cssCode.textContent = `[id:${containerId}] {\n  display: grid;\n  grid-template-columns: repeat(${cols}, 1fr);\n  grid-template-rows: repeat(${rows}, 1fr);\n  gap: 8px;\n  ${template}\n}`;
 }
 
 buildGridButton.addEventListener("click", () => {
@@ -346,11 +359,114 @@ elementNameInput.addEventListener("keydown", (e) => {
 	if (e.key === "Enter") addElement();
 });
 
-colCountInput.addEventListener("change", () => buildGridButton.click());
-rowCountInput.addEventListener("change", () => buildGridButton.click());
+let gridWidth = 1536;
+let gridHeight = 864;
+
+function calculateColumns() {
+	const mainMaxWidth = parseInt(mainMaxWidthInput.value, 10) || 1536;
+	const bannerWidthRatio = parseFloat(bannerWidthInput.value) || 1;
+	const bannerWidth = Math.round(mainMaxWidth * bannerWidthRatio);
+	const mainGridSize = 24;
+	const calculatedCols = Math.max(1, Math.round((bannerWidth / mainMaxWidth) * mainGridSize));
+	cols = calculatedCols;
+	colCountInput.value = calculatedCols;
+
+	// Calculate grid dimensions based on device and columns
+	calculateGridDimensions();
+	buildGridButton.click();
+}
+
+function updateDeviceSettings() {
+	updateBannerWidthOptions();
+	calculateColumns();
+}
+
+function updateBannerWidthOptions() {
+	const device = parseInt(mainMaxWidthInput.value, 10);
+	const options = bannerWidthInput.querySelectorAll("option");
+
+	if (device === 768) {
+		// Mobile - only full width
+		bannerWidthInput.innerHTML = '<option value="1">Full Width</option>';
+		bannerWidthInput.value = "1";
+	} else {
+		// Desktop and Tablet - all options
+		bannerWidthInput.innerHTML = `
+			<option value="1">Full Width</option>
+			<option value="0.67">2/3 Width</option>
+			<option value="0.5">1/2 Width</option>
+			<option value="0.33">1/3 Width</option>
+		`;
+	}
+}
+
+function calculateGridDimensions() {
+	const device = parseInt(mainMaxWidthInput.value, 10);
+
+	if (device === 1536) {
+		// Desktop
+		const cellWidth = 64;
+		gridWidth = cols * cellWidth;
+		if (cols === 8) {
+			gridHeight = 600; // 5/6 aspect ratio
+		} else if (cols === 12) {
+			gridHeight = 600;
+		} else if (cols === 24) {
+			gridHeight = 864; // 16/9 aspect ratio
+		}
+	} else if (device === 1024) {
+		// Tablet
+		const cellWidth = 44;
+		gridWidth = cols * cellWidth;
+		if (cols === 8 || cols === 12) {
+			gridHeight = 400;
+		} else if (cols === 24) {
+			gridHeight = 570;
+		}
+	} else if (device === 768) {
+		// Mobile
+		const cellWidth = 32;
+		gridWidth = cols * cellWidth;
+		gridHeight = 600;
+	}
+
+	bannerHeightInput.value = gridHeight;
+}
+
+function updateGridSize() {
+	gridHeight = parseInt(bannerHeightInput.value, 10) || gridHeight;
+	updateGridScaling();
+	renderGrid();
+	updateCssPreview();
+}
+
+function updateGridScaling() {
+	const viewportWidth = window.innerWidth - 40; // Account for padding
+	const gridWrapper = document.getElementById("gridWrapper");
+	const totalGridWidth = gridWidth + 20; // Include padding
+	
+	if (totalGridWidth > viewportWidth) {
+		const scale = viewportWidth / totalGridWidth;
+		const marginLeft = (viewportWidth - totalGridWidth * scale) / 2;
+		gridWrapper.style.setProperty('--grid-scale', scale);
+		gridWrapper.style.setProperty('--grid-margin', `${marginLeft}px`);
+	} else {
+		gridWrapper.style.setProperty('--grid-scale', '1');
+		gridWrapper.style.setProperty('--grid-margin', '0px');
+	}
+}
 
 window.addEventListener("pointerup", handlePointerUp);
 
 document.addEventListener("DOMContentLoaded", () => {
+	mainMaxWidthInput.addEventListener("change", updateDeviceSettings);
+	bannerWidthInput.addEventListener("change", calculateColumns);
+	bannerHeightInput.addEventListener("input", updateGridSize);
+	colCountInput.addEventListener("change", () => buildGridButton.click());
+	rowCountInput.addEventListener("change", () => buildGridButton.click());
+	
+	window.addEventListener("resize", updateGridScaling);
+
+	calculateColumns();
 	buildGridButton.click();
 });
