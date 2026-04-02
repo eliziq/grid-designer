@@ -32,11 +32,17 @@ button:hover {
 	background: #535aff;
 }
 #controls {
+	display: grid;
+	grid-template-columns: 1fr;
+	gap: 0.75rem;
+	align-items: start;
+	margin-bottom: 0.75rem;
+	max-width: 100%;
+}
+#controls .control-actions {
 	display: flex;
-	gap: 1rem;
-	align-items: flex-start;
+	gap: 0.5rem;
 	flex-wrap: wrap;
-	margin-bottom: 1rem;
 }
 #controls label {
 	display: flex;
@@ -52,7 +58,7 @@ button:hover {
 	padding: 1rem;
 	background: #f5f5f5;
 	display: flex;
-	flex-direction: column;
+	flex-wrap: wrap;
 	gap: 0.75rem;
 }
 #responsiveSettings h3 {
@@ -71,17 +77,19 @@ input[readonly] {
 	color: #666;
 }
 #gridWrapper {
-	margin-bottom: 1rem;
+	margin-bottom: 0.5rem;
 	border: 2px solid #656dff;
 	border-radius: 8px;
 	padding: 0.5rem;
 	overflow: auto;
+	max-width: 100vw;
 	display: inline-block;
 	min-width: fit-content;
 	transition: transform 0.3s ease;
 	transform-origin: top left;
 	transform: scale(var(--grid-scale, 1));
 	margin-left: var(--grid-margin, 0);
+	margin-top: var(--grid-margin-top, 0);
 }
 #grid {
 	display: grid;
@@ -184,6 +192,9 @@ input[readonly] {
 	margin-top: 0.5rem;
 }
 
+#output {
+	margin-top: 0.5rem;
+}
 #output pre {
 	white-space: pre-wrap;
 	word-break: break-word;
@@ -255,6 +266,21 @@ input[readonly] {
 	}
 	.deleteBtn {
 		background: #d63031;
+	}
+	#elements {
+		background: #222;
+		border-color: #444;
+	}
+	#elements label,
+	#elements input,
+	#elements button {
+		color: #e0e0e0;
+	}
+	#elements input[type="text"],
+	#elements input[type="number"] {
+		background: #2a2a2a;
+		border-color: #555;
+		color: #e0e0e0;
 	}
 	#output pre {
 		background: #1a1a1a;

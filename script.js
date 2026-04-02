@@ -442,17 +442,31 @@ function updateGridSize() {
 
 function updateGridScaling() {
 	const viewportWidth = window.innerWidth - 40; // Account for padding
+	const viewportHeight = window.innerHeight * 0.8; // 80% of viewport height
 	const gridWrapper = document.getElementById("gridWrapper");
 	const totalGridWidth = gridWidth + 20; // Include padding
+	const totalGridHeight = gridHeight + 20; // Include padding
 	
-	if (totalGridWidth > viewportWidth) {
-		const scale = viewportWidth / totalGridWidth;
-		const marginLeft = (viewportWidth - totalGridWidth * scale) / 2;
+	// Calculate scale factors for both width and height
+	const widthScale = totalGridWidth > viewportWidth ? viewportWidth / totalGridWidth : 1;
+	const heightScale = totalGridHeight > viewportHeight ? viewportHeight / totalGridHeight : 1;
+	
+	// Use the smaller scale to ensure it fits both dimensions
+	const scale = Math.min(widthScale, heightScale);
+	
+	if (scale < 1) {
+		const scaledWidth = totalGridWidth * scale;
+		const scaledHeight = totalGridHeight * scale;
+		const marginLeft = (viewportWidth - scaledWidth) / 2;
+		const marginTop = (viewportHeight - scaledHeight) / 2;
+		
 		gridWrapper.style.setProperty('--grid-scale', scale);
 		gridWrapper.style.setProperty('--grid-margin', `${marginLeft}px`);
+		gridWrapper.style.setProperty('--grid-margin-top', `${marginTop}px`);
 	} else {
 		gridWrapper.style.setProperty('--grid-scale', '1');
 		gridWrapper.style.setProperty('--grid-margin', '0px');
+		gridWrapper.style.setProperty('--grid-margin-top', '0px');
 	}
 }
 

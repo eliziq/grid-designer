@@ -19,7 +19,6 @@
 			</label>
 
 			<div id="responsiveSettings">
-				<h3>Responsive Sizing</h3>
 				<label>
 					Main Max Width:
 					<select id="mainMaxWidth">
@@ -55,17 +54,19 @@
 				</label>
 			</div>
 
-			<button id="buildGrid">Build Grid</button>
-			<button id="clearGrid">Clear</button>
-			<button id="exportCss">Export CSS</button>
+			<div class="control-actions">
+				<button id="buildGrid">Build Grid</button>
+				<button id="clearGrid">Clear</button>
+				<button id="exportCss">Export CSS</button>
+			</div>
 		</section>
 
 		<section id="elements">
 			<label for=""
 				>Add element
 				<input type="text" name="" id="elementName" />
+				<button id="addElement">Add</button>
 			</label>
-			<button id="addElement">Add</button>
 
 			<div id="elementList"></div>
 		</section>
