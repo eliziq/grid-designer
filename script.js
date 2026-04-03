@@ -113,10 +113,9 @@ function renderGrid() {
 }
 
 function renderAreas() {
-	const gridRect = grid.getBoundingClientRect();
 	const gap = 8;
-	const cellWidth = (gridRect.width - gap * (cols - 1)) / cols;
-	const cellHeight = (gridRect.height - gap * (rows - 1)) / rows;
+	const cellWidth = (gridWidth - gap * (cols - 1)) / cols;
+	const cellHeight = (gridHeight - gap * (rows - 1)) / rows;
 
 	Object.values(areas).forEach((area) => {
 		const element = elements.find((el) => el.id === area.id);
@@ -140,6 +139,17 @@ function renderAreas() {
 		block.style.boxShadow = `0 0 0 1px ${color}`;
 		block.textContent = element ? element.name : area.id;
 		block.addEventListener("pointerdown", handleAreaPointerDown);
+		block.addEventListener("pointermove", (e) => {
+			const edge = isEdgePosition(e, block);
+			if (edge.edge) {
+				block.style.cursor = edge.left || edge.right ? "ew-resize" : "ns-resize";
+			} else {
+				block.style.cursor = "move";
+			}
+		});
+		block.addEventListener("pointerleave", () => {
+			block.style.cursor = "move";
+		});
 		block.addEventListener("dragover", (e) => e.preventDefault());
 		block.addEventListener("drop", handleDrop);
 		grid.appendChild(block);
@@ -152,10 +162,21 @@ function cellToGridPos(clientX, clientY) {
 	const y = clientY - gridRect.top;
 	const computed = getComputedStyle(grid);
 	const gap = parseFloat(computed.gap) || 0;
-	const colSize = (gridRect.width - gap * (cols - 1)) / cols;
-	const rowSize = (gridRect.height - gap * (rows - 1)) / rows;
-	const col = Math.min(cols - 1, Math.max(0, Math.floor(x / (colSize + gap))));
-	const row = Math.min(rows - 1, Math.max(0, Math.floor(y / (rowSize + gap))));
+	
+	// Get the current scale factor from the wrapper
+	const gridWrapper = document.getElementById("gridWrapper");
+	const scale = parseFloat(getComputedStyle(gridWrapper).getPropertyValue('--grid-scale') || '1');
+	
+	// Use original grid dimensions, accounting for scale
+	const colSize = (gridWidth - gap * (cols - 1)) / cols;
+	const rowSize = (gridHeight - gap * (rows - 1)) / rows;
+	
+	// Adjust mouse position for scaling
+	const scaledX = x / scale;
+	const scaledY = y / scale;
+	
+	const col = Math.min(cols - 1, Math.max(0, Math.floor(scaledX / (colSize + gap))));
+	const row = Math.min(rows - 1, Math.max(0, Math.floor(scaledY / (rowSize + gap))));
 	return { row, col };
 }
 
