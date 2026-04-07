@@ -19,6 +19,7 @@ let gridMatrix = [];
 let elements = []; // [{id, name}]
 let areas = {}; // {id: {id,rowStart,rowEnd,colStart,colEnd}}
 let areaColors = {}; // id->hsl color
+let rowHeights = []; // Array of height values for each row, default "1fr"
 let resizeState = null;
 
 function generateAreaColor(id) {
@@ -82,9 +83,7 @@ function assignArea(id, r0, c0, r1, c1) {
 function renderGrid() {
 	grid.innerHTML = "";
 	grid.style.gridTemplateColumns = `repeat(${cols}, 1fr)`;
-	grid.style.gridTemplateRows = `repeat(${rows}, minmax(60px, 1fr))`;
-	grid.style.position = "relative";
-	grid.style.gap = "8px";
+	grid.style.gridTemplateRows = `repeat(${rows}, minmax(60px, 1fr))`; // Use consistent height for visual display
 	grid.style.width = `${gridWidth}px`;
 	grid.style.height = `${gridHeight}px`;
 	grid.style.minHeight = "auto";
@@ -284,28 +283,59 @@ function handleDrop(event) {
 	updateCssPreview();
 }
 
-function renderElementList() {
-	elementList.innerHTML = "";
-	elements.forEach((element) => {
-		const tag = document.createElement("div");
-		tag.className = "element-tag";
-		tag.draggable = true;
-		tag.textContent = element.name;
-		if (!areaColors[element.id]) areaColors[element.id] = generateAreaColor(element.id);
-		tag.style.borderColor = areaColors[element.id];
-		tag.addEventListener("dragstart", (e) => {
-			e.dataTransfer.setData("text/plain", element.id);
+function renderRowControls() {
+	const existingControls = document.getElementById("rowControls");
+	if (existingControls) {
+		existingControls.remove();
+	}
+	
+	const controlsContainer = document.createElement("div");
+	controlsContainer.id = "rowControls";
+	
+	const title = document.createElement("h3");
+	title.textContent = "Row Heights";
+	controlsContainer.appendChild(title);
+	
+	for (let i = 0; i < rows; i++) {
+		const rowControl = document.createElement("label");
+		
+		const label = document.createElement("span");
+		label.textContent = `Row ${i + 1}:`;
+		
+		const select = document.createElement("select");
+		select.dataset.rowIndex = i;
+		
+		const options = [
+			{ value: "1fr", label: "Flexible (1fr)" },
+			{ value: "max-content", label: "Content height" },
+			{ value: "min-content", label: "Min content" },
+			{ value: "auto", label: "Auto" }
+		];
+		
+		options.forEach(option => {
+			const optionEl = document.createElement("option");
+			optionEl.value = option.value;
+			optionEl.textContent = option.label;
+			if (rowHeights[i] === option.value) {
+				optionEl.selected = true;
+			}
+			select.appendChild(optionEl);
 		});
-
-		const deleteBtn = document.createElement("button");
-		deleteBtn.type = "button";
-		deleteBtn.className = "deleteBtn";
-		deleteBtn.textContent = "×";
-		deleteBtn.addEventListener("click", () => removeElement(element.id));
-
-		tag.appendChild(deleteBtn);
-		elementList.appendChild(tag);
-	});
+		
+		select.addEventListener("change", (e) => {
+			const rowIndex = parseInt(e.target.dataset.rowIndex);
+			rowHeights[rowIndex] = e.target.value;
+			updateCssPreview(); // Only update CSS, not visual grid
+		});
+		
+		rowControl.appendChild(label);
+		rowControl.appendChild(select);
+		controlsContainer.appendChild(rowControl);
+	}
+	
+	// Insert after the responsive settings
+	const controlsSection = document.getElementById("controls");
+	controlsSection.appendChild(controlsContainer);
 }
 
 function addElement() {
@@ -344,16 +374,48 @@ function updateCssPreview() {
 		lines.push(`    "${rowCells.join(" ")}"`);
 	}
 	const template = `grid-template-areas:\n${lines.join("\n")};`;
-	cssCode.textContent = `[id:${containerId}] {\n  display: grid;\n  grid-template-columns: repeat(${cols}, 1fr);\n  grid-template-rows: repeat(${rows}, 1fr);\n  gap: 8px;\n  ${template}\n}`;
+	const rowTemplate = rowHeights.join(" ");
+	cssCode.textContent = `[id:${containerId}] {\n  display: grid;\n  grid-template-columns: repeat(${cols}, 1fr);\n  grid-template-rows: ${rowTemplate};\n  gap: 8px;\n  ${template}\n}`;
+}
+
+function renderElementList() {
+	elementList.innerHTML = "";
+	elements.forEach((element) => {
+		const tag = document.createElement("div");
+		tag.className = "element-tag";
+		tag.draggable = true;
+		tag.textContent = element.name;
+		if (!areaColors[element.id]) areaColors[element.id] = generateAreaColor(element.id);
+		tag.style.borderColor = areaColors[element.id];
+		tag.addEventListener("dragstart", (e) => {
+			e.dataTransfer.setData("text/plain", element.id);
+		});
+
+		const deleteBtn = document.createElement("button");
+		deleteBtn.type = "button";
+		deleteBtn.className = "deleteBtn";
+		deleteBtn.textContent = "×";
+		deleteBtn.addEventListener("click", () => removeElement(element.id));
+
+		tag.appendChild(deleteBtn);
+		elementList.appendChild(tag);
+	});
 }
 
 buildGridButton.addEventListener("click", () => {
 	cols = Math.max(1, parseInt(colCountInput.value, 10) || 1);
 	rows = Math.max(1, parseInt(rowCountInput.value, 10) || 1);
+	
+	// Initialize row heights if not already set or if rows changed
+	if (rowHeights.length !== rows) {
+		rowHeights = Array(rows).fill("1fr");
+	}
+	
 	initMatrix();
 	areas = {};
 	renderGrid();
 	renderElementList();
+	renderRowControls();
 	updateCssPreview();
 });
 
@@ -498,10 +560,34 @@ document.addEventListener("DOMContentLoaded", () => {
 	bannerWidthInput.addEventListener("change", calculateColumns);
 	bannerHeightInput.addEventListener("input", updateGridSize);
 	colCountInput.addEventListener("change", () => buildGridButton.click());
-	rowCountInput.addEventListener("change", () => buildGridButton.click());
+	rowCountInput.addEventListener("change", () => {
+		const newRows = Math.max(1, parseInt(rowCountInput.value, 10) || 1);
+		if (newRows !== rows) {
+			rows = newRows;
+			// Resize rowHeights array, preserving existing values
+			const oldRowHeights = [...rowHeights];
+			rowHeights = Array(rows).fill("1fr");
+			for (let i = 0; i < Math.min(oldRowHeights.length, rows); i++) {
+				rowHeights[i] = oldRowHeights[i];
+			}
+		}
+		buildGridButton.click();
+	});
 	
 	window.addEventListener("resize", updateGridScaling);
 
+	// Initialize the grid directly instead of using click()
 	calculateColumns();
-	buildGridButton.click();
+	cols = Math.max(1, parseInt(colCountInput.value, 10) || 24);
+	rows = Math.max(1, parseInt(rowCountInput.value, 10) || 4);
+	
+	// Initialize row heights
+	rowHeights = Array(rows).fill("1fr");
+	
+	initMatrix();
+	areas = {};
+	renderGrid();
+	renderElementList();
+	renderRowControls();
+	updateCssPreview();
 });

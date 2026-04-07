@@ -93,6 +93,8 @@ input[readonly] {
 }
 #grid {
 	display: grid;
+	position: relative;
+	gap: 8px;
 	background: #f9f9ff;
 }
 .cell {
@@ -187,9 +189,33 @@ input[readonly] {
 	align-items: center;
 	margin-bottom: 0.5rem;
 }
-#elements > button,
-#controls > button {
-	margin-top: 0.5rem;
+#rowControls {
+	margin-top: 1rem;
+	padding: 1rem;
+	border: 1px solid #ddd;
+	border-radius: 6px;
+	background: #f5f5f5;
+}
+
+#rowControls h3 {
+	margin: 0 0 0.75rem 0;
+	font-size: 0.95rem;
+	color: #333;
+}
+
+#rowControls label {
+	display: flex;
+	gap: 0.5rem;
+	align-items: center;
+	margin-bottom: 0.5rem;
+}
+
+#rowControls label span {
+	min-width: 60px;
+}
+
+#rowControls select {
+	min-width: 120px;
 }
 
 #output {
@@ -224,6 +250,18 @@ input[readonly] {
 	}
 	#responsiveSettings h3 {
 		color: #e0e0e0;
+	}
+	#rowControls {
+		background: #2a2a2a;
+		border-color: #444;
+	}
+	#rowControls h3 {
+		color: #e0e0e0;
+	}
+	#rowControls select {
+		background: #2a2a2a;
+		color: #e0e0e0;
+		border-color: #555;
 	}
 	input[readonly] {
 		background-color: #1a1a1a;
