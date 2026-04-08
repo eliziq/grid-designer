@@ -363,19 +363,48 @@ function removeElement(id) {
 	updateCssPreview();
 }
 
+function getCssMediaQuery(width) {
+	if (width === 768) {
+		return "@media (max-width: 768px)";
+	}
+	if (width === 1024) {
+		return "@media (min-width: 769px) and (max-width: 1024px)";
+	}
+	if (width === 1536) {
+		return "@media (min-width: 1536px)";
+	}
+	return `@media (min-width: ${width}px)`;
+}
+
 function updateCssPreview() {
 	const containerId = containerIdInput.value.trim() || "grid";
+	const mainMaxWidth = parseInt(mainMaxWidthInput.value, 10) || 1536;
+	const bannerWidthRatio = parseFloat(bannerWidthInput.value) || 1;
+	const bannerMinWidth = Math.round(mainMaxWidth * bannerWidthRatio);
+	const mediaQuery = getCssMediaQuery(mainMaxWidth);
+
 	const lines = [];
 	for (let r = 0; r < rows; r++) {
 		const rowCells = [];
 		for (let c = 0; c < cols; c++) {
 			rowCells.push(gridMatrix[r][c] || ".");
 		}
-		lines.push(`    "${rowCells.join(" ")}"`);
+		lines.push(`            "${rowCells.join(" ")}"`);
 	}
 	const template = `grid-template-areas:\n${lines.join("\n")};`;
 	const rowTemplate = rowHeights.join(" ");
-	cssCode.textContent = `[id:${containerId}] {\n  display: grid;\n  grid-template-columns: repeat(${cols}, 1fr);\n  grid-template-rows: ${rowTemplate};\n  gap: 8px;\n  ${template}\n}`;
+
+	cssCode.textContent = `${mediaQuery}{\n` +
+		`    @container box (min-width: ${bannerMinWidth}px){\n` +
+		`        [id:${containerId}] {\n` +
+		`            display: grid;\n` +
+		`            grid-template-columns: repeat(${cols}, 1fr);\n` +
+		`            grid-template-rows: ${rowTemplate};\n` +
+		`            gap: 8px;\n` +
+		`            ${template}\n` +
+		`        }\n` +
+		`    }\n` +
+		`}`;
 }
 
 function renderElementList() {
