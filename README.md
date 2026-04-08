@@ -5,9 +5,9 @@ Simple vanilla JavaScript grid designer for quickly prototyping CSS grid layouts
 ## Quick start
 
 1. Open `index.html` in your browser.
-2. Set columns/rows and click `Build Grid`.
-3. Click cells to toggle active state.
-4. Click `Export CSS` to download a CSS file for your layout.
+2. Set banner id and banner dimentions and click `Build Grid`.
+3. REsize and move cells
+4. Click `Export CSS` to download a CSS file.
 
 ## Project files
 
