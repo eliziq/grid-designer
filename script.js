@@ -5,6 +5,8 @@ const rowCountInput = document.getElementById("rowCount");
 const buildGridButton = document.getElementById("buildGrid");
 const clearGridButton = document.getElementById("clearGrid");
 const exportCssButton = document.getElementById("exportCss");
+const savePatternButton = document.getElementById("savePattern");
+const deletePatternButton = document.getElementById("deletePattern");
 const cssCode = document.getElementById("cssCode");
 const elementNameInput = document.getElementById("elementName");
 const addElementButton = document.getElementById("addElement");
@@ -21,6 +23,7 @@ let areas = {}; // {id: {id,rowStart,rowEnd,colStart,colEnd}}
 let areaColors = {}; // id->hsl color
 let rowHeights = []; // Array of height values for each row, default "1fr"
 let resizeState = null;
+let savedPatterns = {}; // Store saved patterns by key: "screenWidth-bannerWidth"
 
 function generateAreaColor(id) {
 	const hue = (Array.from(id).reduce((acc, ch) => acc + ch.charCodeAt(0), 0) * 7) % 360;
@@ -33,6 +36,77 @@ function sanitizeId(raw) {
 		.toLowerCase()
 		.replace(/\s+/g, "_")
 		.replace(/[^a-z0-9_]/g, "");
+}
+
+// Pattern management functions
+function getCurrentPatternKey() {
+	const screenWidth = mainMaxWidthInput.value;
+	const bannerWidth = bannerWidthInput.value;
+	return `${screenWidth}-${bannerWidth}`;
+}
+
+function savePattern() {
+	const key = getCurrentPatternKey();
+	const pattern = {
+		rows,
+		cols,
+		gridMatrix: gridMatrix.map((row) => [...row]),
+		elements: [...elements],
+		areas: JSON.parse(JSON.stringify(areas)),
+		rowHeights: [...rowHeights],
+		bannerHeight: bannerHeightInput.value,
+	};
+	savedPatterns[key] = pattern;
+	localStorage.setItem("gridDesignerPatterns", JSON.stringify(savedPatterns));
+	updatePatternButtons();
+	updateCssPreview();
+}
+
+function loadPattern(key) {
+	const pattern = savedPatterns[key];
+	if (!pattern) return false;
+
+	rows = pattern.rows;
+	cols = pattern.cols;
+	gridMatrix = pattern.gridMatrix.map((row) => [...row]);
+	elements = [...pattern.elements];
+	areas = JSON.parse(JSON.stringify(pattern.areas));
+	rowHeights = [...pattern.rowHeights];
+	bannerHeightInput.value = pattern.bannerHeight;
+
+	// Rebuild area colors for loaded elements
+	elements.forEach((element) => {
+		if (!areaColors[element.id]) {
+			areaColors[element.id] = generateAreaColor(element.id);
+		}
+	});
+
+	renderGrid();
+	renderElementList();
+	renderRowControls();
+	updateCssPreview();
+	return true;
+}
+
+function deletePattern() {
+	const key = getCurrentPatternKey();
+	delete savedPatterns[key];
+	localStorage.setItem("gridDesignerPatterns", JSON.stringify(savedPatterns));
+	updatePatternButtons();
+	updateCssPreview();
+}
+
+function updatePatternButtons() {
+	const key = getCurrentPatternKey();
+	const hasPattern = savedPatterns[key];
+	deletePatternButton.style.display = hasPattern ? "inline-block" : "none";
+}
+
+function loadSavedPatterns() {
+	const stored = localStorage.getItem("gridDesignerPatterns");
+	if (stored) {
+		savedPatterns = JSON.parse(stored);
+	}
 }
 
 function initMatrix() {
@@ -92,7 +166,7 @@ function renderGrid() {
 	const gridWrapper = document.getElementById("gridWrapper");
 	gridWrapper.style.width = `${gridWidth + 20}px`;
 	gridWrapper.style.height = `${gridHeight + 20}px`;
-	
+
 	updateGridScaling();
 
 	for (let r = 0; r < rows; r++) {
@@ -161,19 +235,19 @@ function cellToGridPos(clientX, clientY) {
 	const y = clientY - gridRect.top;
 	const computed = getComputedStyle(grid);
 	const gap = parseFloat(computed.gap) || 0;
-	
+
 	// Get the current scale factor from the wrapper
 	const gridWrapper = document.getElementById("gridWrapper");
-	const scale = parseFloat(getComputedStyle(gridWrapper).getPropertyValue('--grid-scale') || '1');
-	
+	const scale = parseFloat(getComputedStyle(gridWrapper).getPropertyValue("--grid-scale") || "1");
+
 	// Use original grid dimensions, accounting for scale
 	const colSize = (gridWidth - gap * (cols - 1)) / cols;
 	const rowSize = (gridHeight - gap * (rows - 1)) / rows;
-	
+
 	// Adjust mouse position for scaling
 	const scaledX = x / scale;
 	const scaledY = y / scale;
-	
+
 	const col = Math.min(cols - 1, Math.max(0, Math.floor(scaledX / (colSize + gap))));
 	const row = Math.min(rows - 1, Math.max(0, Math.floor(scaledY / (rowSize + gap))));
 	return { row, col };
@@ -288,31 +362,31 @@ function renderRowControls() {
 	if (existingControls) {
 		existingControls.remove();
 	}
-	
+
 	const controlsContainer = document.createElement("div");
 	controlsContainer.id = "rowControls";
-	
+
 	const title = document.createElement("h3");
 	title.textContent = "Row Heights";
 	controlsContainer.appendChild(title);
-	
+
 	for (let i = 0; i < rows; i++) {
 		const rowControl = document.createElement("label");
-		
+
 		const label = document.createElement("span");
 		label.textContent = `Row ${i + 1}:`;
-		
+
 		const select = document.createElement("select");
 		select.dataset.rowIndex = i;
-		
+
 		const options = [
 			{ value: "1fr", label: "Flexible (1fr)" },
 			{ value: "max-content", label: "Content height" },
 			{ value: "min-content", label: "Min content" },
-			{ value: "auto", label: "Auto" }
+			{ value: "auto", label: "Auto" },
 		];
-		
-		options.forEach(option => {
+
+		options.forEach((option) => {
 			const optionEl = document.createElement("option");
 			optionEl.value = option.value;
 			optionEl.textContent = option.label;
@@ -321,18 +395,18 @@ function renderRowControls() {
 			}
 			select.appendChild(optionEl);
 		});
-		
+
 		select.addEventListener("change", (e) => {
 			const rowIndex = parseInt(e.target.dataset.rowIndex);
 			rowHeights[rowIndex] = e.target.value;
 			updateCssPreview(); // Only update CSS, not visual grid
 		});
-		
+
 		rowControl.appendChild(label);
 		rowControl.appendChild(select);
 		controlsContainer.appendChild(rowControl);
 	}
-	
+
 	// Insert after the responsive settings
 	const controlsSection = document.getElementById("controls");
 	controlsSection.appendChild(controlsContainer);
@@ -394,7 +468,8 @@ function updateCssPreview() {
 	const template = `grid-template-areas:\n${lines.join("\n")};`;
 	const rowTemplate = rowHeights.join(" ");
 
-	cssCode.textContent = `${mediaQuery}{\n` +
+	let cssContent =
+		`${mediaQuery}{\n` +
 		`    @container box (min-width: ${bannerMinWidth}px){\n` +
 		`        [id:${containerId}] {\n` +
 		`            display: grid;\n` +
@@ -405,6 +480,45 @@ function updateCssPreview() {
 		`        }\n` +
 		`    }\n` +
 		`}`;
+
+	// Add all saved patterns to the CSS
+	const allPatterns = Object.keys(savedPatterns).map((key) => {
+		const [screenWidth, bannerWidth] = key.split("-");
+		const pattern = savedPatterns[key];
+		const patternMediaQuery = getCssMediaQuery(parseInt(screenWidth));
+		const patternBannerMinWidth = Math.round(parseInt(screenWidth) * parseFloat(bannerWidth));
+
+		const patternLines = [];
+		for (let r = 0; r < pattern.rows; r++) {
+			const rowCells = [];
+			for (let c = 0; c < pattern.cols; c++) {
+				rowCells.push(pattern.gridMatrix[r][c] || ".");
+			}
+			patternLines.push(`            "${rowCells.join(" ")}"`);
+		}
+		const patternTemplate = `grid-template-areas:\n${patternLines.join("\n")};`;
+		const patternRowTemplate = pattern.rowHeights.join(" ");
+
+		return (
+			`${patternMediaQuery}{\n` +
+			`    @container box (min-width: ${patternBannerMinWidth}px){\n` +
+			`        [id:${containerId}] {\n` +
+			`            display: grid;\n` +
+			`            grid-template-columns: repeat(${pattern.cols}, 1fr);\n` +
+			`            grid-template-rows: ${patternRowTemplate};\n` +
+			`            gap: 8px;\n` +
+			`            ${patternTemplate}\n` +
+			`        }\n` +
+			`    }\n` +
+			`}`
+		);
+	});
+
+	if (allPatterns.length > 0) {
+		cssContent = allPatterns.join("\n\n") + "\n\n" + cssContent;
+	}
+
+	cssCode.textContent = cssContent;
 }
 
 function renderElementList() {
@@ -434,12 +548,12 @@ function renderElementList() {
 buildGridButton.addEventListener("click", () => {
 	cols = Math.max(1, parseInt(colCountInput.value, 10) || 1);
 	rows = Math.max(1, parseInt(rowCountInput.value, 10) || 1);
-	
+
 	// Initialize row heights if not already set or if rows changed
 	if (rowHeights.length !== rows) {
 		rowHeights = Array(rows).fill("1fr");
 	}
-	
+
 	initMatrix();
 	areas = {};
 	renderGrid();
@@ -466,6 +580,9 @@ exportCssButton.addEventListener("click", () => {
 	link.remove();
 });
 
+savePatternButton.addEventListener("click", savePattern);
+deletePatternButton.addEventListener("click", deletePattern);
+
 addElementButton.addEventListener("click", addElement);
 elementNameInput.addEventListener("keydown", (e) => {
 	if (e.key === "Enter") addElement();
@@ -491,6 +608,13 @@ function calculateColumns() {
 function updateDeviceSettings() {
 	updateBannerWidthOptions();
 	calculateColumns();
+
+	// Check if there's a saved pattern for these settings
+	const key = getCurrentPatternKey();
+	if (savedPatterns[key]) {
+		loadPattern(key);
+	}
+	updatePatternButtons();
 }
 
 function updateBannerWidthOptions() {
@@ -558,27 +682,27 @@ function updateGridScaling() {
 	const gridWrapper = document.getElementById("gridWrapper");
 	const totalGridWidth = gridWidth + 20; // Include padding
 	const totalGridHeight = gridHeight + 20; // Include padding
-	
+
 	// Calculate scale factors for both width and height
 	const widthScale = totalGridWidth > viewportWidth ? viewportWidth / totalGridWidth : 1;
 	const heightScale = totalGridHeight > viewportHeight ? viewportHeight / totalGridHeight : 1;
-	
+
 	// Use the smaller scale to ensure it fits both dimensions
 	const scale = Math.min(widthScale, heightScale);
-	
+
 	if (scale < 1) {
 		const scaledWidth = totalGridWidth * scale;
 		const scaledHeight = totalGridHeight * scale;
 		const marginLeft = (viewportWidth - scaledWidth) / 2;
 		const marginTop = (viewportHeight - scaledHeight) / 2;
-		
-		gridWrapper.style.setProperty('--grid-scale', scale);
-		gridWrapper.style.setProperty('--grid-margin', `${marginLeft}px`);
-		gridWrapper.style.setProperty('--grid-margin-top', `${marginTop}px`);
+
+		gridWrapper.style.setProperty("--grid-scale", scale);
+		gridWrapper.style.setProperty("--grid-margin", `${marginLeft}px`);
+		gridWrapper.style.setProperty("--grid-margin-top", `${marginTop}px`);
 	} else {
-		gridWrapper.style.setProperty('--grid-scale', '1');
-		gridWrapper.style.setProperty('--grid-margin', '0px');
-		gridWrapper.style.setProperty('--grid-margin-top', '0px');
+		gridWrapper.style.setProperty("--grid-scale", "1");
+		gridWrapper.style.setProperty("--grid-margin", "0px");
+		gridWrapper.style.setProperty("--grid-margin-top", "0px");
 	}
 }
 
@@ -602,17 +726,17 @@ document.addEventListener("DOMContentLoaded", () => {
 		}
 		buildGridButton.click();
 	});
-	
+
 	window.addEventListener("resize", updateGridScaling);
 
 	// Initialize the grid directly instead of using click()
 	calculateColumns();
 	cols = Math.max(1, parseInt(colCountInput.value, 10) || 24);
 	rows = Math.max(1, parseInt(rowCountInput.value, 10) || 4);
-	
+
 	// Initialize row heights
 	rowHeights = Array(rows).fill("1fr");
-	
+
 	initMatrix();
 	areas = {};
 	renderGrid();

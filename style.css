@@ -31,6 +31,18 @@ button {
 button:hover {
 	background: #535aff;
 }
+#savePattern {
+	background: #28a745;
+}
+#savePattern:hover {
+	background: #218838;
+}
+#deletePattern {
+	background: #dc3545;
+}
+#deletePattern:hover {
+	background: #c82333;
+}
 #controls {
 	display: grid;
 	grid-template-columns: 1fr;
