@@ -640,18 +640,16 @@ function calculateGridDimensions() {
 	const device = parseInt(mainMaxWidthInput.value, 10);
 
 	if (device === 1536) {
-		// Desktop
 		const cellWidth = 64;
 		gridWidth = cols * cellWidth;
 		if (cols === 8) {
-			gridHeight = 600; // 5/6 aspect ratio
+			gridHeight = 600;
 		} else if (cols === 12) {
 			gridHeight = 600;
 		} else if (cols === 24) {
-			gridHeight = 864; // 16/9 aspect ratio
+			gridHeight = 864;
 		}
 	} else if (device === 1024) {
-		// Tablet
 		const cellWidth = 44;
 		gridWidth = cols * cellWidth;
 		if (cols === 8 || cols === 12) {
@@ -660,7 +658,6 @@ function calculateGridDimensions() {
 			gridHeight = 570;
 		}
 	} else if (device === 768) {
-		// Mobile
 		const cellWidth = 32;
 		gridWidth = cols * cellWidth;
 		gridHeight = 600;
@@ -677,11 +674,11 @@ function updateGridSize() {
 }
 
 function updateGridScaling() {
-	const viewportWidth = window.innerWidth - 40; // Account for padding
-	const viewportHeight = window.innerHeight * 0.8; // 80% of viewport height
+	const viewportWidth = window.innerWidth - 40;
+	const viewportHeight = window.innerHeight * 0.8;
 	const gridWrapper = document.getElementById("gridWrapper");
-	const totalGridWidth = gridWidth + 20; // Include padding
-	const totalGridHeight = gridHeight + 20; // Include padding
+	const totalGridWidth = gridWidth + 20;
+	const totalGridHeight = gridHeight + 20;
 
 	// Calculate scale factors for both width and height
 	const widthScale = totalGridWidth > viewportWidth ? viewportWidth / totalGridWidth : 1;
@@ -708,7 +705,8 @@ function updateGridScaling() {
 
 window.addEventListener("pointerup", handlePointerUp);
 
-document.addEventListener("DOMContentLoaded", () => {
+function initGridDesigner() {
+	loadSavedPatterns();
 	mainMaxWidthInput.addEventListener("change", updateDeviceSettings);
 	bannerWidthInput.addEventListener("change", calculateColumns);
 	bannerHeightInput.addEventListener("input", updateGridSize);
@@ -729,12 +727,10 @@ document.addEventListener("DOMContentLoaded", () => {
 
 	window.addEventListener("resize", updateGridScaling);
 
-	// Initialize the grid directly instead of using click()
 	calculateColumns();
 	cols = Math.max(1, parseInt(colCountInput.value, 10) || 24);
 	rows = Math.max(1, parseInt(rowCountInput.value, 10) || 4);
 
-	// Initialize row heights
 	rowHeights = Array(rows).fill("1fr");
 
 	initMatrix();
@@ -743,4 +739,6 @@ document.addEventListener("DOMContentLoaded", () => {
 	renderElementList();
 	renderRowControls();
 	updateCssPreview();
-});
+}
+
+document.addEventListener("DOMContentLoaded", initGridDesigner); //remove this to init from parent view
