@@ -1,926 +1,953 @@
-﻿const grid = document.getElementById("grid");
-const colCountInput = document.getElementById("colCount");
-const rowCountInput = document.getElementById("rowCount");
-const buildGridButton = document.getElementById("buildGrid");
-const clearGridButton = document.getElementById("clearGrid");
-const exportCssButton = document.getElementById("exportCss");
-const savePatternButton = document.getElementById("savePattern");
-const deletePatternButton = document.getElementById("deletePattern");
-const cssCode = document.getElementById("cssCode");
-const elementNameInput = document.getElementById("elementName");
-const elementList = document.getElementById("elementList");
+﻿class GridDesigner {
+	constructor(container, editorCardId = "grid", resolutions = [], tags = [], state = {}) {
+		this.containerElement = this.resolveContainer(container);
+		this.editorCardId = String(editorCardId != null ? editorCardId : "grid");
+		this.attachInstanceIdentifier();
 
-let rows = 4;
-let cols = 24;
-let gridMatrix = [];
-let elements = []; // [{id, name}]
-let areas = {}; // {id: {id,rowStart,rowEnd,colStart,colEnd}}
-let areaColors = {}; // id->hsl color
-let rowHeights = []; // Array of height values for each row, default "1fr"
-let resizeState = null;
-let savedPatterns = {}; // Store saved patterns by key: "cardId-resolutionIndex"
-let currentResolution = null;
-let currentResolutionIndex = 0;
-let resolutionStates = [];
+		this.state = {
+			rows: 4,
+			cols: 24,
+			areas: {},
+			rowHeights: Array(4).fill("1fr"),
+			gridMatrix: [],
+			resolutionStates: [],
+			elements: [],
+			currentResolutionIndex: 0,
+		};
 
-function generateAreaColor(id) {
-	const hue = (Array.from(id).reduce((acc, ch) => acc + ch.charCodeAt(0), 0) * 7) % 360;
-	return `hsl(${hue}, 70%, 60%)`;
-}
+		this.resolutions = [];
+		this.currentResolution = null;
+		this.gridWidth = 1536;
+		this.gridHeight = 864;
+		this.savedPatterns = {};
+		this.areaColors = {};
+		this.resizeState = null;
+		this.editorReady = false;
+		this.allowedTags = [];
 
-function sanitizeId(raw) {
-	return raw
-		.trim()
-		.toLowerCase()
-		.replace(/\s+/g, "_")
-		.replace(/[^a-z0-9_]/g, "");
-}
-
-let editorCardId = null;
-let editorReady = false;
-let allowedTags = [];
-
-function normalizeResolution(res) {
-	const width = Number(res?.width) || 0;
-	const height = Number(res?.height) || 0;
-	return {
-		width,
-		height,
-		label: res?.label || res?.name || `${width}x${height}`,
-	};
-}
-
-function normalizeResolutions(resolutions) {
-	if (!Array.isArray(resolutions) || resolutions.length === 0) {
-		return window.resolutions || [];
+		this.cacheDomElements();
+		this.loadSavedPatterns();
+		this.init(editorCardId, resolutions, tags, state);
 	}
-	return resolutions
-		.map((res) => normalizeResolution(res))
-		.filter((res) => res.width > 0 && res.height > 0);
-}
 
-function normalizeTag(tag, index) {
-	if (tag && typeof tag === "object") {
-		const name = String(tag.name || tag.label || tag.id || `Tag ${index + 1}`);
+	resolveContainer(container) {
+		if (container instanceof HTMLElement) return container;
+		if (typeof container === "string") {
+			return document.getElementById(container) || document;
+		}
+		return document;
+	}
+
+	attachInstanceIdentifier() {
+		const sanitizedId = GridDesigner.sanitizeId(this.editorCardId) || "grid-designer";
+		if (this.containerElement !== document) {
+			this.containerElement.dataset.gridDesigner = sanitizedId;
+		}
+		this.rootSelector =
+			this.containerElement !== document
+				? `[data-grid-designer="${sanitizedId}"]`
+				: `#${GridDesigner.sanitizeId(this.editorCardId)}`;
+	}
+
+	cacheDomElements() {
+		this.grid = this.q("grid");
+		this.colCountInput = this.q("colCount");
+		this.rowCountInput = this.q("rowCount");
+		this.buildGridButton = this.q("buildGrid");
+		this.clearGridButton = this.q("clearGrid");
+		this.exportCssButton = this.q("exportCss");
+		this.savePatternButton = this.q("savePattern");
+		this.deletePatternButton = this.q("deletePattern");
+		this.cssCode = this.q("cssCode");
+		this.elementList = this.q("elementList");
+		this.gridWrapper = this.q("gridWrapper");
+		this.resolutionTabs = this.q("resolutionTabs");
+	}
+
+	q(id) {
+		return this.containerElement.querySelector(`#${id}`);
+	}
+
+	static sanitizeId(raw) {
+		return String(raw || "")
+			.trim()
+			.toLowerCase()
+			.replace(/\s+/g, "_")
+			.replace(/[^a-z0-9_\-]/g, "");
+	}
+
+	static normalizeResolution(res) {
+		const width = Number(res?.width) || 0;
+		const height = Number(res?.height) || 0;
 		return {
-			id: sanitizeId(tag.id || name) || `tag_${index + 1}`,
-			name,
+			width,
+			height,
+			label: res?.label || res?.name || `${width}x${height}`,
 		};
 	}
-	return null;
-}
 
-function normalizeTags(tags) {
-	if (!Array.isArray(tags)) return [];
-	return tags.map((tag, index) => normalizeTag(tag, index)).filter(Boolean);
-}
-
-function populateMatrixFromAreas() {
-	initMatrix();
-	Object.values(areas).forEach((area) => {
-		for (let r = area.rowStart; r <= area.rowEnd; r++) {
-			for (let c = area.colStart; c <= area.colEnd; c++) {
-				if (r >= 0 && r < rows && c >= 0 && c < cols) {
-					gridMatrix[r][c] = area.id;
-				}
-			}
+	static normalizeResolutions(resolutions) {
+		if (!Array.isArray(resolutions) || resolutions.length === 0) {
+			return [];
 		}
-	});
-}
+		return resolutions
+			.map((res) => GridDesigner.normalizeResolution(res))
+			.filter((res) => res.width > 0 && res.height > 0);
+	}
 
-function getStateFromEditor() {
-	saveResolutionState(currentResolutionIndex);
-	return {
-		id: editorCardId,
-		containerId: editorCardId || "",
-		resolutions: window.resolutions.map((res) => ({
-			width: res.width,
-			height: res.height,
-			label: res.label,
-		})),
-		currentResolutionIndex,
-		elements: JSON.parse(JSON.stringify(elements)),
-		resolutionStates: window.resolutions.map((_, index) => {
-			const state = getResolutionState(index);
-			if (state) {
-				return {
-					rows: state.rows,
-					cols: state.cols,
-					rowHeights: [...state.rowHeights],
-					areas: JSON.parse(JSON.stringify(state.areas)),
-					gridMatrix: state.gridMatrix.map((row) => [...row]),
-				};
-			}
-			const tempResolution = window.resolutions[index];
-			const defaultCols =
-				tempResolution.width > 1500 ? 24 : tempResolution.width > 1000 ? 16 : 12;
+	static normalizeTag(tag, index) {
+		if (tag && typeof tag === "object") {
+			const name = String(tag.name || tag.label || tag.id || `Tag ${index + 1}`);
 			return {
-				rows: 4,
-				cols: defaultCols,
-				rowHeights: Array(4).fill("1fr"),
-				areas: {},
-				gridMatrix: Array.from({ length: 4 }, () => Array(defaultCols).fill(null)),
+				id: GridDesigner.sanitizeId(tag.id || name) || `tag_${index + 1}`,
+				name,
 			};
-		}),
-	};
-}
+		}
+		return null;
+	}
 
-// Pattern management functions
-function getCurrentPatternKey() {
-	const cardId = editorCardId != null ? editorCardId : "default";
-	const resolutionIndex = Number.isInteger(currentResolutionIndex) ? currentResolutionIndex : 0;
-	return `${cardId}-${resolutionIndex}`;
-}
+	static normalizeTags(tags) {
+		if (!Array.isArray(tags)) return [];
+		return tags.map((tag, index) => GridDesigner.normalizeTag(tag, index)).filter(Boolean);
+	}
 
-function setResolutionState(index, state) {
-	resolutionStates[index] = {
-		rows: Math.max(1, state.rows || 1),
-		cols: Math.max(1, state.cols || 1),
-		rowHeights: Array.isArray(state.rowHeights)
-			? state.rowHeights.map((row) => row || "1fr")
-			: Array(Math.max(1, state.rows || 1)).fill("1fr"),
-		areas: state.areas ? JSON.parse(JSON.stringify(state.areas)) : {},
-		gridMatrix: Array.isArray(state.gridMatrix)
-			? state.gridMatrix.map((row) => [...row])
-			: Array.from({ length: Math.max(1, state.rows || 1) }, () =>
-					Array(Math.max(1, state.cols || 1)).fill(null),
+	static sanitizeStateValue(value, fallback) {
+		return value == null ? fallback : value;
+	}
+
+	init(editorCardId, resolutions = [], tags = [], state = {}) {
+		this.editorCardId = String(editorCardId != null ? editorCardId : this.editorCardId);
+		this.resolutions = GridDesigner.normalizeResolutions(resolutions);
+		this.allowedTags = GridDesigner.normalizeTags(tags);
+		if (this.allowedTags.length) {
+			this.state.elements = [...this.allowedTags];
+		}
+
+		this.loadEditorState(state);
+		this.ensureCurrentResolutionState();
+		this.initializeMatrixFromState();
+		this.attachEditorListeners();
+		this.createResolutionTabs();
+
+		const defaultResolution =
+			this.resolutions[this.state.currentResolutionIndex] || this.resolutions[0];
+		if (defaultResolution) {
+			this.setCurrentResolution(defaultResolution);
+		} else {
+			this.currentResolution = { width: 1536, height: 864 };
+			this.calculateGridDimensions();
+			this.activateFirstResolutionTab();
+			this.renderGrid();
+			this.renderElementList();
+			this.renderRowControls();
+			this.updateCssPreview();
+		}
+	}
+
+	ensureCurrentResolutionState() {
+		if (
+			!Array.isArray(this.state.resolutionStates) ||
+			this.state.resolutionStates.length === 0
+		) {
+			const resolution = this.resolutions[this.state.currentResolutionIndex] || {
+				width: 1536,
+				height: 864,
+			};
+			this.state.resolutionStates = [this.createDefaultResolutionState(resolution)];
+		}
+	}
+
+	initializeMatrixFromState() {
+		const current = this.getResolutionState(this.state.currentResolutionIndex);
+		if (current) {
+			this.applyResolutionState(current);
+		} else {
+			this.applyResolutionState(
+				this.createDefaultResolutionState(
+					this.resolutions[0] || { width: 1536, height: 864 },
 				),
-	};
-}
-
-function getResolutionState(index) {
-	return resolutionStates[index] || null;
-}
-
-function defaultResolutionState(res) {
-	const cols = res.width > 1500 ? 24 : res.width > 1000 ? 16 : 12;
-	return {
-		rows: 4,
-		cols,
-		rowHeights: Array(4).fill("1fr"),
-		areas: {},
-		gridMatrix: Array.from({ length: 4 }, () => Array(cols).fill(null)),
-	};
-}
-
-function applyResolutionState(state) {
-	rows = Math.max(1, state.rows || 1);
-	cols = Math.max(1, state.cols || 1);
-	rowHeights = Array.isArray(state.rowHeights)
-		? state.rowHeights.map((row) => row || "1fr")
-		: Array(rows).fill("1fr");
-	areas = state.areas ? JSON.parse(JSON.stringify(state.areas)) : {};
-	gridMatrix = Array.isArray(state.gridMatrix)
-		? state.gridMatrix.map((row) => [...row])
-		: Array.from({ length: rows }, () => Array(cols).fill(null));
-	colCountInput.value = cols;
-	rowCountInput.value = rows;
-}
-
-function saveResolutionState(index) {
-	if (!Number.isInteger(index) || index < 0) return;
-	setResolutionState(index, {
-		rows,
-		cols,
-		rowHeights,
-		areas,
-		gridMatrix,
-	});
-}
-
-function savePattern() {
-	saveResolutionState(currentResolutionIndex);
-	const key = getCurrentPatternKey();
-	const pattern = {
-		rows,
-		cols,
-		gridMatrix: gridMatrix.map((row) => [...row]),
-		elements: [...elements],
-		areas: JSON.parse(JSON.stringify(areas)),
-		rowHeights: [...rowHeights],
-	};
-	savedPatterns[key] = pattern;
-	localStorage.setItem("gridDesignerPatterns", JSON.stringify(savedPatterns));
-	updatePatternButtons();
-	updateCssPreview();
-}
-
-function loadPattern(key) {
-	const pattern = savedPatterns[key];
-	if (!pattern) return false;
-
-	rows = pattern.rows;
-	cols = pattern.cols;
-	gridMatrix = pattern.gridMatrix.map((row) => [...row]);
-	elements = [...pattern.elements];
-	areas = JSON.parse(JSON.stringify(pattern.areas));
-	rowHeights = [...pattern.rowHeights];
-	colCountInput.value = cols;
-	rowCountInput.value = rows;
-	calculateGridDimensions();
-
-	// Rebuild area colors for loaded elements
-	elements.forEach((element) => {
-		if (!areaColors[element.id]) {
-			areaColors[element.id] = generateAreaColor(element.id);
-		}
-	});
-
-	renderGrid();
-	renderElementList();
-	renderRowControls();
-	updateCssPreview();
-	return true;
-}
-
-function deletePattern() {
-	const key = getCurrentPatternKey();
-	delete savedPatterns[key];
-	localStorage.setItem("gridDesignerPatterns", JSON.stringify(savedPatterns));
-	updatePatternButtons();
-	updateCssPreview();
-}
-
-function updatePatternButtons() {
-	const key = getCurrentPatternKey();
-	const hasPattern = savedPatterns[key];
-	deletePatternButton.style.display = hasPattern ? "inline-block" : "none";
-}
-
-function loadSavedPatterns() {
-	const stored = localStorage.getItem("gridDesignerPatterns");
-	if (stored) {
-		savedPatterns = JSON.parse(stored);
-	}
-}
-
-function initMatrix() {
-	gridMatrix = Array.from({ length: rows }, () => Array(cols).fill(null));
-}
-
-function hasConflict(r0, c0, r1, c1, id = null) {
-	for (let r = r0; r <= r1; r++) {
-		for (let c = c0; c <= c1; c++) {
-			if (r < 0 || r >= rows || c < 0 || c >= cols) return true;
-			const current = gridMatrix[r][c];
-			if (current && current !== id) return true;
-		}
-	}
-	return false;
-}
-
-function removeArea(id) {
-	const area = areas[id];
-	if (!area) return;
-	for (let r = area.rowStart; r <= area.rowEnd; r++) {
-		for (let c = area.colStart; c <= area.colEnd; c++) {
-			if (gridMatrix[r][c] === id) {
-				gridMatrix[r][c] = null;
-			}
-		}
-	}
-	delete areas[id];
-}
-
-function assignArea(id, r0, c0, r1, c1) {
-	const rowStart = Math.min(r0, r1);
-	const rowEnd = Math.max(r0, r1);
-	const colStart = Math.min(c0, c1);
-	const colEnd = Math.max(c0, c1);
-
-	if (hasConflict(rowStart, colStart, rowEnd, colEnd, id)) return false;
-	removeArea(id);
-	areas[id] = { id, rowStart, rowEnd, colStart, colEnd };
-	for (let r = rowStart; r <= rowEnd; r++) {
-		for (let c = colStart; c <= colEnd; c++) {
-			gridMatrix[r][c] = id;
-		}
-	}
-	return true;
-}
-
-function renderGrid() {
-	grid.innerHTML = "";
-	grid.style.gridTemplateColumns = `repeat(${cols}, 1fr)`;
-	grid.style.gridTemplateRows = `repeat(${rows}, minmax(60px, 1fr))`; // Use consistent height for visual display
-	grid.style.width = `${gridWidth}px`;
-	grid.style.height = `${gridHeight}px`;
-	grid.style.minHeight = "auto";
-
-	// Update grid wrapper to match grid size
-	const gridWrapper = document.getElementById("gridWrapper");
-	gridWrapper.style.width = `${gridWidth + 20}px`;
-	gridWrapper.style.height = `${gridHeight + 20}px`;
-
-	updateGridScaling();
-
-	for (let r = 0; r < rows; r++) {
-		for (let c = 0; c < cols; c++) {
-			const cell = document.createElement("div");
-			cell.className = "cell";
-			cell.dataset.row = r;
-			cell.dataset.col = c;
-			cell.draggable = false;
-			cell.addEventListener("dragover", (e) => e.preventDefault());
-			cell.addEventListener("drop", handleDrop);
-			grid.appendChild(cell);
+			);
 		}
 	}
 
-	renderAreas();
-}
-
-function renderAreas() {
-	const gap = 8;
-	const cellWidth = (gridWidth - gap * (cols - 1)) / cols;
-	const cellHeight = (gridHeight - gap * (rows - 1)) / rows;
-
-	Object.values(areas).forEach((area) => {
-		const element = elements.find((el) => el.id === area.id);
-		const block = document.createElement("div");
-		block.className = "area-block";
-		block.dataset.areaId = area.id;
-		const x = area.colStart * (cellWidth + gap);
-		const y = area.rowStart * (cellHeight + gap);
-		const width =
-			(area.colEnd - area.colStart + 1) * cellWidth + (area.colEnd - area.colStart) * gap;
-		const height =
-			(area.rowEnd - area.rowStart + 1) * cellHeight + (area.rowEnd - area.rowStart) * gap;
-		block.style.left = `${x}px`;
-		block.style.top = `${y}px`;
-		block.style.width = `${width}px`;
-		block.style.height = `${height}px`;
-
-		const color = areaColors[area.id] || (areaColors[area.id] = generateAreaColor(area.id));
-		block.style.borderColor = color;
-		block.style.background = `rgba(100, 160, 255, 0.2)`;
-		block.style.boxShadow = `0 0 0 1px ${color}`;
-		block.textContent = element ? element.name : area.id;
-		block.addEventListener("pointerdown", handleAreaPointerDown);
-		block.addEventListener("pointermove", (e) => {
-			const edge = isEdgePosition(e, block);
-			if (edge.edge) {
-				block.style.cursor = edge.left || edge.right ? "ew-resize" : "ns-resize";
-			} else {
-				block.style.cursor = "move";
-			}
-		});
-		block.addEventListener("pointerleave", () => {
-			block.style.cursor = "move";
-		});
-		block.addEventListener("dragover", (e) => e.preventDefault());
-		block.addEventListener("drop", handleDrop);
-		grid.appendChild(block);
-	});
-}
-
-function cellToGridPos(clientX, clientY) {
-	const gridRect = grid.getBoundingClientRect();
-	const x = clientX - gridRect.left;
-	const y = clientY - gridRect.top;
-	const computed = getComputedStyle(grid);
-	const gap = parseFloat(computed.gap) || 0;
-
-	// Get the current scale factor from the wrapper
-	const gridWrapper = document.getElementById("gridWrapper");
-	const scale = parseFloat(getComputedStyle(gridWrapper).getPropertyValue("--grid-scale") || "1");
-
-	// Use original grid dimensions, accounting for scale
-	const colSize = (gridWidth - gap * (cols - 1)) / cols;
-	const rowSize = (gridHeight - gap * (rows - 1)) / rows;
-
-	// Adjust mouse position for scaling
-	const scaledX = x / scale;
-	const scaledY = y / scale;
-
-	const col = Math.min(cols - 1, Math.max(0, Math.floor(scaledX / (colSize + gap))));
-	const row = Math.min(rows - 1, Math.max(0, Math.floor(scaledY / (rowSize + gap))));
-	return { row, col };
-}
-
-function isEdgePosition(event, block) {
-	const rect = block.getBoundingClientRect();
-	const threshold = 8;
-	const x = event.clientX - rect.left;
-	const y = event.clientY - rect.top;
-	const right = x >= rect.width - threshold;
-	const bottom = y >= rect.height - threshold;
-	const left = x <= threshold;
-	const top = y <= threshold;
-	return { top, bottom, left, right, edge: top || bottom || left || right };
-}
-
-function handleAreaPointerDown(event) {
-	event.stopPropagation();
-	if (event.button !== 0) return;
-	const block = event.currentTarget;
-	const id = block.dataset.areaId;
-	const area = areas[id];
-	if (!area) return;
-	const edge = isEdgePosition(event, block);
-	if (!edge.edge) return;
-
-	block.classList.toggle("edge-top", edge.top);
-	block.classList.toggle("edge-bottom", edge.bottom);
-	block.classList.toggle("edge-left", edge.left);
-	block.classList.toggle("edge-right", edge.right);
-
-	resizeState = {
-		id,
-		edge,
-		startArea: { ...area },
-		dragging: true,
-	};
-	window.addEventListener("pointermove", handlePointerMove);
-	window.addEventListener("pointerup", handlePointerUp);
-	document.body.style.cursor =
-		edge.top || edge.bottom ? "ns-resize" : edge.left || edge.right ? "ew-resize" : "move";
-}
-
-function handlePointerMove(event) {
-	if (!resizeState || !resizeState.dragging) return;
-	const { row, col } = cellToGridPos(event.clientX, event.clientY);
-	const { id, edge, startArea } = resizeState;
-	let { rowStart, rowEnd, colStart, colEnd } = startArea;
-
-	if (edge.top) rowStart = Math.min(row, rowEnd);
-	if (edge.bottom) rowEnd = Math.max(row, rowStart);
-	if (edge.left) colStart = Math.min(col, colEnd);
-	if (edge.right) colEnd = Math.max(col, colStart);
-
-	if (hasConflict(rowStart, colStart, rowEnd, colEnd, id)) {
-		return;
+	attachEditorListeners() {
+		if (this.editorReady) return;
+		if (this.buildGridButton)
+			this.buildGridButton.addEventListener("click", this.handleBuildGrid.bind(this));
+		if (this.clearGridButton)
+			this.clearGridButton.addEventListener("click", this.handleClearGrid.bind(this));
+		if (this.exportCssButton)
+			this.exportCssButton.addEventListener("click", this.handleExportCss.bind(this));
+		if (this.savePatternButton)
+			this.savePatternButton.addEventListener("click", this.handleSavePattern.bind(this));
+		if (this.deletePatternButton)
+			this.deletePatternButton.addEventListener("click", this.handleDeletePattern.bind(this));
+		window.addEventListener("resize", this.handleResize.bind(this));
+		window.addEventListener("pointerup", this.handlePointerUp.bind(this));
+		this.editorReady = true;
 	}
 
-	areas[id] = { id, rowStart, rowEnd, colStart, colEnd };
-	initMatrix();
-	Object.values(areas).forEach((a) => {
-		for (let rr = a.rowStart; rr <= a.rowEnd; rr++) {
-			for (let cc = a.colStart; cc <= a.colEnd; cc++) {
-				gridMatrix[rr][cc] = a.id;
-			}
+	handleBuildGrid() {
+		this.state.cols = Math.max(1, parseInt(this.colCountInput?.value, 10) || 1);
+		this.state.rows = Math.max(1, parseInt(this.rowCountInput?.value, 10) || 1);
+		if (this.state.rowHeights.length !== this.state.rows) {
+			this.state.rowHeights = Array(this.state.rows).fill("1fr");
 		}
-	});
-	renderGrid();
-	updateCssPreview();
-}
-
-function handlePointerUp() {
-	if (!resizeState) return;
-	resizeState.dragging = false;
-	resizeState = null;
-	window.removeEventListener("pointermove", handlePointerMove);
-	window.removeEventListener("pointerup", handlePointerUp);
-	document.body.style.cursor = "default";
-	Array.from(document.querySelectorAll(".area-block")).forEach((block) => {
-		block.classList.remove("edge-top", "edge-bottom", "edge-left", "edge-right");
-	});
-	updateCssPreview();
-}
-
-function handleDrop(event) {
-	event.preventDefault();
-	const elementId = event.dataTransfer.getData("text/plain");
-	if (!elementId) return;
-
-	let r, c;
-	if (event.currentTarget.classList.contains("cell")) {
-		const cell = event.currentTarget;
-		r = Number(cell.dataset.row);
-		c = Number(cell.dataset.col);
-	} else {
-		const pos = cellToGridPos(event.clientX, event.clientY);
-		r = pos.row;
-		c = pos.col;
+		this.initMatrix();
+		this.state.areas = {};
+		this.renderGrid();
+		this.renderElementList();
+		this.renderRowControls();
+		this.updateCssPreview();
 	}
 
-	if (!assignArea(elementId, r, c, r, c)) {
-		alert("Cannot place here; overlap existing area.");
-		return;
-	}
-	renderGrid();
-	updateCssPreview();
-}
-
-function renderRowControls() {
-	const existingControls = document.getElementById("rowControls");
-	if (existingControls) {
-		existingControls.remove();
+	handleClearGrid() {
+		this.initMatrix();
+		this.state.areas = {};
+		this.renderGrid();
+		this.updateCssPreview();
 	}
 
-	const controlsContainer = document.createElement("div");
-	controlsContainer.id = "rowControls";
-
-	const title = document.createElement("h3");
-	title.textContent = "Row Heights";
-	controlsContainer.appendChild(title);
-
-	for (let i = 0; i < rows; i++) {
-		const rowControl = document.createElement("label");
-
-		const label = document.createElement("span");
-		label.textContent = `Row ${i + 1}:`;
-
-		const select = document.createElement("select");
-		select.dataset.rowIndex = i;
-
-		const options = [
-			{ value: "1fr", label: "Flexible (1fr)" },
-			{ value: "max-content", label: "Content height" },
-			{ value: "min-content", label: "Min content" },
-			{ value: "auto", label: "Auto" },
-		];
-
-		options.forEach((option) => {
-			const optionEl = document.createElement("option");
-			optionEl.value = option.value;
-			optionEl.textContent = option.label;
-			if (rowHeights[i] === option.value) {
-				optionEl.selected = true;
-			}
-			select.appendChild(optionEl);
-		});
-
-		select.addEventListener("change", (e) => {
-			const rowIndex = parseInt(e.target.dataset.rowIndex);
-			rowHeights[rowIndex] = e.target.value;
-			updateCssPreview(); // Only update CSS, not visual grid
-		});
-
-		rowControl.appendChild(label);
-		rowControl.appendChild(select);
-		controlsContainer.appendChild(rowControl);
-	}
-
-	const controlsSection = document.getElementById("controls");
-	controlsSection.appendChild(controlsContainer);
-}
-
-function getCssMediaQuery(width) {
-	if (width === 768) {
-		return "@media (max-width: 768px)";
-	}
-	if (width === 1024) {
-		return "@media (min-width: 769px) and (max-width: 1024px)";
-	}
-	if (width === 1536) {
-		return "@media (min-width: 1536px)";
-	}
-	return `@media (min-width: ${width}px)`;
-}
-
-function generateCss() {
-	const cid = editorCardId || "grid";
-	const allResolutionsCss = window.resolutions.map((res, index) => {
-		const state = getResolutionState(index) || defaultResolutionState(res);
-		const rowTemplate = state.rowHeights.join(" ");
-		const lines = [];
-		for (let r = 0; r < state.rows; r++) {
-			const rowCells = [];
-			for (let c = 0; c < state.cols; c++) {
-				rowCells.push(state.gridMatrix[r][c] || ".");
-			}
-			lines.push(`            "${rowCells.join(" ")}"`);
-		}
-		const template = `grid-template-areas:\n${lines.join("\n")};`;
-		return (
-			`    @container box (min-width: ${res.width}px){\n` +
-			`        [id:${cid}] {\n` +
-			`            display: grid;\n` +
-			`            grid-template-columns: repeat(${state.cols}, 1fr);\n` +
-			`            grid-template-rows: ${rowTemplate};\n` +
-			`            gap: 8px;\n` +
-			`            ${template}\n` +
-			`        }\n` +
-			`    }\n`
-		);
-	});
-	return allResolutionsCss.join("\n\n");
-}
-
-function updateCssPreview() {
-	cssCode.textContent = generateCss();
-}
-
-function renderElementList() {
-	elementList.innerHTML = "";
-	elements.forEach((element) => {
-		const tag = document.createElement("div");
-		tag.className = "element-tag";
-		tag.draggable = true;
-		tag.textContent = element.name;
-		if (!areaColors[element.id]) areaColors[element.id] = generateAreaColor(element.id);
-		tag.style.borderColor = areaColors[element.id];
-		tag.addEventListener("dragstart", (e) => {
-			e.dataTransfer.setData("text/plain", element.id);
-		});
-
-		elementList.appendChild(tag);
-	});
-}
-
-let gridWidth = 1536;
-let gridHeight = 864;
-
-function calculateColumns() {
-	const mainMaxWidth = currentResolution.width;
-	let calculatedCols;
-	if (mainMaxWidth > 1500) {
-		calculatedCols = 24;
-	} else if (mainMaxWidth > 1000) {
-		calculatedCols = 16;
-	} else {
-		calculatedCols = 12;
-	}
-	cols = calculatedCols;
-	colCountInput.value = calculatedCols;
-
-	calculateGridDimensions();
-}
-
-function updateDeviceSettings() {
-	calculateColumns();
-
-	// Check if there's a saved pattern for these settings
-	const key = getCurrentPatternKey();
-	if (savedPatterns[key]) {
-		loadPattern(key);
-	}
-	updatePatternButtons();
-}
-
-function calculateGridDimensions() {
-	gridWidth = currentResolution.width;
-	gridHeight = currentResolution.height;
-}
-
-function updateGridScaling() {
-	const viewportWidth = window.innerWidth - 40;
-	const viewportHeight = window.innerHeight * 0.8;
-	const gridWrapper = document.getElementById("gridWrapper");
-	const totalGridWidth = gridWidth + 20;
-	const totalGridHeight = gridHeight + 20;
-
-	// Calculate scale factors for both width and height
-	const widthScale = totalGridWidth > viewportWidth ? viewportWidth / totalGridWidth : 1;
-	const heightScale = totalGridHeight > viewportHeight ? viewportHeight / totalGridHeight : 1;
-
-	// Use the smaller scale to ensure it fits both dimensions
-	const scale = Math.min(widthScale, heightScale);
-
-	if (scale < 1) {
-		const scaledWidth = totalGridWidth * scale;
-		const scaledHeight = totalGridHeight * scale;
-		const marginLeft = (viewportWidth - scaledWidth) / 2;
-		const marginTop = (viewportHeight - scaledHeight) / 2;
-
-		gridWrapper.style.setProperty("--grid-scale", scale);
-		gridWrapper.style.setProperty("--grid-margin", `${marginLeft}px`);
-		gridWrapper.style.setProperty("--grid-margin-top", `${marginTop}px`);
-	} else {
-		gridWrapper.style.setProperty("--grid-scale", "1");
-		gridWrapper.style.setProperty("--grid-margin", "0px");
-		gridWrapper.style.setProperty("--grid-margin-top", "0px");
-	}
-}
-
-function setCurrentResolution(res) {
-	if (!res) return;
-	const previousIndex = currentResolutionIndex;
-	if (Number.isInteger(previousIndex) && previousIndex >= 0) {
-		saveResolutionState(previousIndex);
-	}
-
-	currentResolution = res;
-	currentResolutionIndex = window.resolutions.indexOf(res);
-
-	const radios = document.querySelectorAll("#resolutionTabs input[type='radio']");
-	const labels = document.querySelectorAll("#resolutionTabs label");
-	const index = currentResolutionIndex;
-	if (index >= 0) {
-		radios[index].checked = true;
-	}
-	labels.forEach((label, labelIndex) => {
-		label.classList.toggle("active", labelIndex === index);
-	});
-
-	const resolvedState = getResolutionState(index);
-	const patternKey = getCurrentPatternKey();
-	if (resolvedState) {
-		applyResolutionState(resolvedState);
-		calculateGridDimensions();
-	} else if (savedPatterns[patternKey]) {
-		loadPattern(patternKey);
-		setResolutionState(index, {
-			rows,
-			cols,
-			rowHeights,
-			areas,
-			gridMatrix,
-		});
-		updatePatternButtons();
-		return;
-	} else {
-		const defaultState = defaultResolutionState(currentResolution);
-		applyResolutionState(defaultState);
-		calculateGridDimensions();
-		areas = {};
-		initMatrix();
-	}
-
-	renderGrid();
-	renderElementList();
-	renderRowControls();
-	updateCssPreview();
-	updatePatternButtons();
-}
-
-function loadEditorState(state) {
-	if (!state || typeof state !== "object") return;
-
-	if (Array.isArray(state.elements) && state.elements.length > 0) {
-		elements = state.elements.map((element, index) => normalizeTag(element, index));
-	}
-
-	currentResolutionIndex =
-		Number.isInteger(state.currentResolutionIndex) && state.currentResolutionIndex >= 0
-			? state.currentResolutionIndex
-			: 0;
-
-	if (Array.isArray(state.resolutionStates) && state.resolutionStates.length > 0) {
-		resolutionStates = state.resolutionStates.map((rs, index) => ({
-			rows: Math.max(1, rs.rows || 1),
-			cols: Math.max(1, rs.cols || 1),
-			rowHeights: Array.isArray(rs.rowHeights)
-				? rs.rowHeights.map((row) => row || "1fr")
-				: Array(Math.max(1, rs.rows || 1)).fill("1fr"),
-			areas: rs.areas ? JSON.parse(JSON.stringify(rs.areas)) : {},
-			gridMatrix: Array.isArray(rs.gridMatrix)
-				? rs.gridMatrix.map((row) => [...row])
-				: Array.from({ length: Math.max(1, rs.rows || 1) }, () =>
-						Array(Math.max(1, rs.cols || 1)).fill(null),
-					),
-		}));
-	} else {
-		const rootState = {
-			rows: typeof state.rows === "number" ? Math.max(1, state.rows) : 4,
-			cols: typeof state.cols === "number" ? Math.max(1, state.cols) : 24,
-			rowHeights: Array.isArray(state.rowHeights)
-				? state.rowHeights.map((height) => height || "1fr")
-				: Array(Math.max(1, state.rows || 4)).fill("1fr"),
-			areas:
-				state.areas && typeof state.areas === "object"
-					? JSON.parse(JSON.stringify(state.areas))
-					: {},
-			gridMatrix: Array.isArray(state.gridMatrix)
-				? state.gridMatrix.map((row) => [...row])
-				: Array.from({ length: Math.max(1, state.rows || 4) }, () =>
-						Array(Math.max(1, state.cols || 24)).fill(null),
-					),
-		};
-		resolutionStates[currentResolutionIndex] = rootState;
-	}
-}
-
-function attachEditorListeners() {
-	if (editorReady) return;
-	buildGridButton.addEventListener("click", () => {
-		cols = Math.max(1, parseInt(colCountInput.value, 10) || 1);
-		rows = Math.max(1, parseInt(rowCountInput.value, 10) || 1);
-
-		if (rowHeights.length !== rows) {
-			rowHeights = Array(rows).fill("1fr");
-		}
-
-		initMatrix();
-		areas = {};
-		renderGrid();
-		renderElementList();
-		renderRowControls();
-		updateCssPreview();
-	});
-
-	clearGridButton.addEventListener("click", () => {
-		initMatrix();
-		areas = {};
-		renderGrid();
-		updateCssPreview();
-	});
-
-	exportCssButton.addEventListener("click", () => {
-		updateCssPreview();
-		const blob = new Blob([cssCode.textContent], { type: "text/css" });
+	handleExportCss() {
+		this.updateCssPreview();
+		if (!this.cssCode) return;
+		const blob = new Blob([this.cssCode.textContent], { type: "text/css" });
 		const link = document.createElement("a");
 		link.href = URL.createObjectURL(blob);
 		link.download = "grid-designer.css";
 		document.body.appendChild(link);
 		link.click();
 		link.remove();
-	});
+	}
 
-	savePatternButton.addEventListener("click", savePattern);
-	deletePatternButton.addEventListener("click", deletePattern);
+	handleSavePattern() {
+		this.saveResolutionState(this.state.currentResolutionIndex);
+		const key = this.getCurrentPatternKey();
+		const pattern = {
+			rows: this.state.rows,
+			cols: this.state.cols,
+			gridMatrix: this.state.gridMatrix.map((row) => [...row]),
+			elements: [...this.state.elements],
+			areas: JSON.parse(JSON.stringify(this.state.areas)),
+			rowHeights: [...this.state.rowHeights],
+		};
+		this.savedPatterns[key] = pattern;
+		this.savePatternsToStorage();
+		this.updatePatternButtons();
+		this.updateCssPreview();
+	}
 
-	window.addEventListener("resize", updateGridScaling);
-	window.addEventListener("pointerup", handlePointerUp);
-	editorReady = true;
-}
+	handleDeletePattern() {
+		const key = this.getCurrentPatternKey();
+		delete this.savedPatterns[key];
+		this.savePatternsToStorage();
+		this.updatePatternButtons();
+		this.updateCssPreview();
+	}
 
-function createResolutionTabs() {
-	const tabsContainer = document.getElementById("resolutionTabs");
-	tabsContainer.innerHTML = "";
+	handleResize() {
+		this.updateGridScaling();
+	}
 
-	window.resolutions.forEach((res, index) => {
-		const label = document.createElement("label");
-		const radio = document.createElement("input");
-		radio.type = "radio";
-		radio.name = "resolution";
-		radio.value = index;
-		radio.addEventListener("change", () => {
-			document
-				.querySelectorAll("#resolutionTabs label")
-				.forEach((l) => l.classList.remove("active"));
-			label.classList.add("active");
-			setCurrentResolution(res);
+	handlePointerUp() {
+		if (!this.resizeState) return;
+		this.resizeState.dragging = false;
+		this.resizeState = null;
+		if (this.handlePointerMoveBound) {
+			window.removeEventListener("pointermove", this.handlePointerMoveBound);
+			this.handlePointerMoveBound = null;
+		}
+		document.body.style.cursor = "default";
+		Array.from(this.containerElement.querySelectorAll(".area-block")).forEach((block) => {
+			block.classList.remove("edge-top", "edge-bottom", "edge-left", "edge-right");
 		});
-		label.appendChild(radio);
-		label.appendChild(document.createTextNode(` ${res.width}x${res.height}`));
-		tabsContainer.appendChild(label);
-	});
-}
-
-function Init(id, resolutions = [], tags = [], state = {}) {
-	editorCardId = id;
-	window.resolutions = normalizeResolutions(resolutions);
-	allowedTags = normalizeTags(tags);
-	if (allowedTags.length > 0) {
-		elements = [...allowedTags];
-	} else {
-		elements = [];
+		this.updateCssPreview();
 	}
 
-	loadEditorState(state);
-
-	const hasStateGridMatrix = Array.isArray(state.gridMatrix) && state.gridMatrix.length > 0;
-	if (hasStateGridMatrix) {
-		gridMatrix = state.gridMatrix.map((row) => [...row]);
-	} else if (Object.keys(areas).length > 0) {
-		populateMatrixFromAreas();
-	} else {
-		initMatrix();
+	handlePointerMove(event) {
+		if (!this.resizeState || !this.resizeState.dragging) return;
+		const { row, col } = this.cellToGridPos(event.clientX, event.clientY);
+		const { id, edge, startArea } = this.resizeState;
+		let { rowStart, rowEnd, colStart, colEnd } = startArea;
+		if (edge.top) rowStart = Math.min(row, rowEnd);
+		if (edge.bottom) rowEnd = Math.max(row, rowStart);
+		if (edge.left) colStart = Math.min(col, colEnd);
+		if (edge.right) colEnd = Math.max(col, colStart);
+		if (this.hasConflict(rowStart, colStart, rowEnd, colEnd, id)) {
+			return;
+		}
+		this.state.areas[id] = { id, rowStart, rowEnd, colStart, colEnd };
+		this.initMatrix();
+		Object.values(this.state.areas).forEach((area) => {
+			for (let rr = area.rowStart; rr <= area.rowEnd; rr++) {
+				for (let cc = area.colStart; cc <= area.colEnd; cc++) {
+					this.state.gridMatrix[rr][cc] = area.id;
+				}
+			}
+		});
+		this.renderGrid();
+		this.updateCssPreview();
 	}
 
-	attachEditorListeners();
-	createResolutionTabs();
+	handleDrop(event) {
+		event.preventDefault();
+		const elementId = event.dataTransfer.getData("text/plain");
+		if (!elementId) return;
+		let r, c;
+		if (event.currentTarget.classList.contains("cell")) {
+			const cell = event.currentTarget;
+			r = Number(cell.dataset.row);
+			c = Number(cell.dataset.col);
+		} else {
+			const pos = this.cellToGridPos(event.clientX, event.clientY);
+			r = pos.row;
+			c = pos.col;
+		}
+		if (!this.assignArea(elementId, r, c, r, c)) {
+			alert("Cannot place here; overlap existing area.");
+			return;
+		}
+		this.renderGrid();
+		this.updateCssPreview();
+	}
 
-	const defaultResolution =
-		typeof state.currentResolutionIndex === "number" &&
-		window.resolutions[state.currentResolutionIndex]
-			? window.resolutions[state.currentResolutionIndex]
-			: window.resolutions[0];
+	createResolutionTabs() {
+		if (!this.resolutionTabs) return;
+		this.resolutionTabs.innerHTML = "";
+		this.resolutions.forEach((res, index) => {
+			const label = document.createElement("label");
+			const radio = document.createElement("input");
+			radio.type = "radio";
+			radio.name = "resolution";
+			radio.value = index;
+			radio.addEventListener("change", () => {
+				this.containerElement
+					.querySelectorAll("#resolutionTabs label")
+					.forEach((l) => l.classList.remove("active"));
+				label.classList.add("active");
+				this.setCurrentResolution(res);
+			});
+			label.appendChild(radio);
+			label.appendChild(document.createTextNode(` ${res.width}x${res.height}`));
+			this.resolutionTabs.appendChild(label);
+		});
+	}
 
-	if (defaultResolution) {
-		setCurrentResolution(defaultResolution);
-	} else if (window.resolutions.length > 0) {
-		currentResolution = window.resolutions[0];
-		calculateGridDimensions();
-		const firstLabel = document.querySelector("#resolutionTabs label");
+	activateFirstResolutionTab() {
+		if (!this.resolutionTabs) return;
+		const firstLabel = this.resolutionTabs.querySelector("label");
 		if (firstLabel) {
 			firstLabel.classList.add("active");
 			const firstRadio = firstLabel.querySelector("input[type='radio']");
-			if (firstRadio) {
-				firstRadio.checked = true;
+			if (firstRadio) firstRadio.checked = true;
+		}
+	}
+
+	setCurrentResolution(res) {
+		if (!res) return;
+		this.saveResolutionState(this.state.currentResolutionIndex);
+		this.currentResolution = res;
+		this.state.currentResolutionIndex = this.resolutions.indexOf(res);
+		const radios = this.containerElement.querySelectorAll(
+			"#resolutionTabs input[type='radio']",
+		);
+		const labels = this.containerElement.querySelectorAll("#resolutionTabs label");
+		const index = this.state.currentResolutionIndex;
+		if (index >= 0 && radios[index]) radios[index].checked = true;
+		labels.forEach((label, labelIndex) => {
+			label.classList.toggle("active", labelIndex === index);
+		});
+		const resolvedState = this.getResolutionState(index);
+		const patternKey = this.getCurrentPatternKey();
+		if (resolvedState) {
+			this.applyResolutionState(resolvedState);
+			this.calculateGridDimensions();
+		} else if (this.savedPatterns[patternKey]) {
+			this.loadPattern(patternKey);
+			this.saveResolutionState(index);
+			this.updatePatternButtons();
+			return;
+		} else {
+			this.applyResolutionState(this.createDefaultResolutionState(this.currentResolution));
+			this.calculateGridDimensions();
+			this.state.areas = {};
+			this.initMatrix();
+		}
+		this.renderGrid();
+		this.renderElementList();
+		this.renderRowControls();
+		this.updateCssPreview();
+		this.updatePatternButtons();
+	}
+
+	loadEditorState(state) {
+		if (!state || typeof state !== "object") return;
+		if (Array.isArray(state.elements) && state.elements.length > 0) {
+			this.state.elements = state.elements.map((element, index) =>
+				GridDesigner.normalizeTag(element, index),
+			);
+		}
+		this.state.currentResolutionIndex =
+			Number.isInteger(state.currentResolutionIndex) && state.currentResolutionIndex >= 0
+				? state.currentResolutionIndex
+				: 0;
+		if (Array.isArray(state.resolutionStates) && state.resolutionStates.length > 0) {
+			this.state.resolutionStates = state.resolutionStates.map((rs) => ({
+				rows: Math.max(1, rs.rows || 1),
+				cols: Math.max(1, rs.cols || 1),
+				rowHeights: Array.isArray(rs.rowHeights)
+					? rs.rowHeights.map((row) => row || "1fr")
+					: Array(Math.max(1, rs.rows || 1)).fill("1fr"),
+				areas: rs.areas ? JSON.parse(JSON.stringify(rs.areas)) : {},
+				gridMatrix: Array.isArray(rs.gridMatrix)
+					? rs.gridMatrix.map((row) => [...row])
+					: Array.from({ length: Math.max(1, rs.rows || 1) }, () =>
+							Array(Math.max(1, rs.cols || 1)).fill(null),
+						),
+			}));
+		} else {
+			const rootState = {
+				rows: typeof state.rows === "number" ? Math.max(1, state.rows) : 4,
+				cols: typeof state.cols === "number" ? Math.max(1, state.cols) : 24,
+				rowHeights: Array.isArray(state.rowHeights)
+					? state.rowHeights.map((height) => height || "1fr")
+					: Array(Math.max(1, state.rows || 4)).fill("1fr"),
+				areas:
+					state.areas && typeof state.areas === "object"
+						? JSON.parse(JSON.stringify(state.areas))
+						: {},
+				gridMatrix: Array.isArray(state.gridMatrix)
+					? state.gridMatrix.map((row) => [...row])
+					: Array.from({ length: Math.max(1, state.rows || 4) }, () =>
+							Array(Math.max(1, state.cols || 24)).fill(null),
+						),
+			};
+			this.state.resolutionStates[this.state.currentResolutionIndex] = rootState;
+		}
+	}
+
+	createDefaultResolutionState(res) {
+		const cols = res.width > 1500 ? 24 : res.width > 1000 ? 16 : 12;
+		return {
+			rows: 4,
+			cols,
+			rowHeights: Array(4).fill("1fr"),
+			areas: {},
+			gridMatrix: Array.from({ length: 4 }, () => Array(cols).fill(null)),
+		};
+	}
+
+	getCurrentPatternKey() {
+		const cardId = this.editorCardId != null ? this.editorCardId : "default";
+		const resolutionIndex = Number.isInteger(this.state.currentResolutionIndex)
+			? this.state.currentResolutionIndex
+			: 0;
+		return `${cardId}-${resolutionIndex}`;
+	}
+
+	setResolutionState(index, state) {
+		this.state.resolutionStates[index] = {
+			rows: Math.max(1, state.rows || 1),
+			cols: Math.max(1, state.cols || 1),
+			rowHeights: Array.isArray(state.rowHeights)
+				? state.rowHeights.map((row) => row || "1fr")
+				: Array(Math.max(1, state.rows || 1)).fill("1fr"),
+			areas: state.areas ? JSON.parse(JSON.stringify(state.areas)) : {},
+			gridMatrix: Array.isArray(state.gridMatrix)
+				? state.gridMatrix.map((row) => [...row])
+				: Array.from({ length: Math.max(1, state.rows || 1) }, () =>
+						Array(Math.max(1, state.cols || 1)).fill(null),
+					),
+		};
+	}
+
+	loadPattern(patternKey) {
+		const pattern = this.savedPatterns[patternKey];
+		if (!pattern) return;
+		this.state.rows = Math.max(1, pattern.rows || this.state.rows);
+		this.state.cols = Math.max(1, pattern.cols || this.state.cols);
+		this.state.rowHeights = Array.isArray(pattern.rowHeights)
+			? [...pattern.rowHeights]
+			: Array(this.state.rows).fill("1fr");
+		this.state.areas = pattern.areas ? JSON.parse(JSON.stringify(pattern.areas)) : {};
+		this.state.gridMatrix = Array.isArray(pattern.gridMatrix)
+			? pattern.gridMatrix.map((row) => [...row])
+			: Array.from({ length: this.state.rows }, () => Array(this.state.cols).fill(null));
+		if (this.colCountInput) this.colCountInput.value = this.state.cols;
+		if (this.rowCountInput) this.rowCountInput.value = this.state.rows;
+	}
+
+	getResolutionState(index) {
+		return this.state.resolutionStates[index] || null;
+	}
+
+	applyResolutionState(state) {
+		this.state.rows = Math.max(1, state.rows || 1);
+		this.state.cols = Math.max(1, state.cols || 1);
+		this.state.rowHeights = Array.isArray(state.rowHeights)
+			? state.rowHeights.map((row) => row || "1fr")
+			: Array(this.state.rows).fill("1fr");
+		this.state.areas = state.areas ? JSON.parse(JSON.stringify(state.areas)) : {};
+		this.state.gridMatrix = Array.isArray(state.gridMatrix)
+			? state.gridMatrix.map((row) => [...row])
+			: Array.from({ length: this.state.rows }, () => Array(this.state.cols).fill(null));
+		if (this.colCountInput) this.colCountInput.value = this.state.cols;
+		if (this.rowCountInput) this.rowCountInput.value = this.state.rows;
+	}
+
+	saveResolutionState(index) {
+		if (!Number.isInteger(index) || index < 0) return;
+		this.setResolutionState(index, {
+			rows: this.state.rows,
+			cols: this.state.cols,
+			rowHeights: this.state.rowHeights,
+			areas: this.state.areas,
+			gridMatrix: this.state.gridMatrix,
+		});
+	}
+
+	loadSavedPatterns() {
+		const stored = localStorage.getItem(
+			`gridDesignerPatterns-${GridDesigner.sanitizeId(this.editorCardId)}`,
+		);
+		if (stored) {
+			this.savedPatterns = JSON.parse(stored);
+		}
+	}
+
+	savePatternsToStorage() {
+		localStorage.setItem(
+			`gridDesignerPatterns-${GridDesigner.sanitizeId(this.editorCardId)}`,
+			JSON.stringify(this.savedPatterns),
+		);
+	}
+
+	initMatrix() {
+		this.state.gridMatrix = Array.from({ length: this.state.rows }, () =>
+			Array(this.state.cols).fill(null),
+		);
+	}
+	updatePatternButtons() {
+		const patternKey = this.getCurrentPatternKey();
+		const hasSavedPattern = Boolean(this.savedPatterns[patternKey]);
+		if (this.deletePatternButton) {
+			this.deletePatternButton.style.display = hasSavedPattern ? "" : "none";
+		}
+		if (this.savePatternButton) {
+			this.savePatternButton.textContent = hasSavedPattern
+				? "Update Pattern"
+				: "Save Pattern";
+		}
+	}
+	hasConflict(r0, c0, r1, c1, id = null) {
+		for (let r = r0; r <= r1; r++) {
+			for (let c = c0; c <= c1; c++) {
+				if (r < 0 || r >= this.state.rows || c < 0 || c >= this.state.cols) return true;
+				const current = this.state.gridMatrix[r][c];
+				if (current && current !== id) return true;
 			}
 		}
-		renderGrid();
-		renderElementList();
-		renderRowControls();
-		updateCssPreview();
-	} else {
-		currentResolution = { width: 1536, height: 864 };
-		calculateGridDimensions();
-		renderGrid();
-		renderElementList();
-		renderRowControls();
-		updateCssPreview();
+		return false;
+	}
+
+	removeArea(id) {
+		const area = this.state.areas[id];
+		if (!area) return;
+		for (let r = area.rowStart; r <= area.rowEnd; r++) {
+			for (let c = area.colStart; c <= area.colEnd; c++) {
+				if (this.state.gridMatrix[r][c] === id) {
+					this.state.gridMatrix[r][c] = null;
+				}
+			}
+		}
+		delete this.state.areas[id];
+	}
+
+	assignArea(id, r0, c0, r1, c1) {
+		const rowStart = Math.min(r0, r1);
+		const rowEnd = Math.max(r0, r1);
+		const colStart = Math.min(c0, c1);
+		const colEnd = Math.max(c0, c1);
+		if (this.hasConflict(rowStart, colStart, rowEnd, colEnd, id)) return false;
+		this.removeArea(id);
+		this.state.areas[id] = { id, rowStart, rowEnd, colStart, colEnd };
+		for (let r = rowStart; r <= rowEnd; r++) {
+			for (let c = colStart; c <= colEnd; c++) {
+				this.state.gridMatrix[r][c] = id;
+			}
+		}
+		return true;
+	}
+
+	renderGrid() {
+		if (!this.grid) return;
+		this.grid.innerHTML = "";
+		this.grid.style.gridTemplateColumns = `repeat(${this.state.cols}, 1fr)`;
+		this.grid.style.gridTemplateRows = `repeat(${this.state.rows}, minmax(60px, 1fr))`;
+		this.grid.style.width = `${this.gridWidth}px`;
+		this.grid.style.height = `${this.gridHeight}px`;
+		this.grid.style.minHeight = "auto";
+		if (this.gridWrapper) {
+			this.gridWrapper.style.width = `${this.gridWidth + 20}px`;
+			this.gridWrapper.style.height = `${this.gridHeight + 20}px`;
+		}
+		this.updateGridScaling();
+		for (let r = 0; r < this.state.rows; r++) {
+			for (let c = 0; c < this.state.cols; c++) {
+				const cell = document.createElement("div");
+				cell.className = "cell";
+				cell.dataset.row = r;
+				cell.dataset.col = c;
+				cell.draggable = false;
+				cell.addEventListener("dragover", (e) => e.preventDefault());
+				cell.addEventListener("drop", this.handleDrop.bind(this));
+				this.grid.appendChild(cell);
+			}
+		}
+		this.renderAreas();
+	}
+
+	renderAreas() {
+		if (!this.grid) return;
+		const gap = 8;
+		const cellWidth = (this.gridWidth - gap * (this.state.cols - 1)) / this.state.cols;
+		const cellHeight = (this.gridHeight - gap * (this.state.rows - 1)) / this.state.rows;
+		Object.values(this.state.areas).forEach((area) => {
+			const element = this.state.elements.find((el) => el.id === area.id);
+			const block = document.createElement("div");
+			block.className = "area-block";
+			block.dataset.areaId = area.id;
+			const x = area.colStart * (cellWidth + gap);
+			const y = area.rowStart * (cellHeight + gap);
+			const width =
+				(area.colEnd - area.colStart + 1) * cellWidth + (area.colEnd - area.colStart) * gap;
+			const height =
+				(area.rowEnd - area.rowStart + 1) * cellHeight +
+				(area.rowEnd - area.rowStart) * gap;
+			block.style.left = `${x}px`;
+			block.style.top = `${y}px`;
+			block.style.width = `${width}px`;
+			block.style.height = `${height}px`;
+			const color =
+				this.areaColors[area.id] ||
+				(this.areaColors[area.id] = GridDesigner.generateAreaColor(area.id));
+			block.style.borderColor = color;
+			block.style.background = `rgba(100, 160, 255, 0.2)`;
+			block.style.boxShadow = `0 0 0 1px ${color}`;
+			block.textContent = element ? element.name : area.id;
+			block.addEventListener("pointerdown", this.handleAreaPointerDown.bind(this));
+			block.addEventListener("pointermove", (e) => {
+				const edge = this.isEdgePosition(e, block);
+				if (edge.edge) {
+					block.style.cursor = edge.left || edge.right ? "ew-resize" : "ns-resize";
+				} else {
+					block.style.cursor = "move";
+				}
+			});
+			block.addEventListener("pointerleave", () => {
+				block.style.cursor = "move";
+			});
+			block.addEventListener("dragover", (e) => e.preventDefault());
+			block.addEventListener("drop", this.handleDrop.bind(this));
+			this.grid.appendChild(block);
+		});
+	}
+
+	static generateAreaColor(id) {
+		const hue =
+			(Array.from(String(id)).reduce((acc, ch) => acc + ch.charCodeAt(0), 0) * 7) % 360;
+		return `hsl(${hue}, 70%, 60%)`;
+	}
+
+	cellToGridPos(clientX, clientY) {
+		const gridRect = this.grid.getBoundingClientRect();
+		const x = clientX - gridRect.left;
+		const y = clientY - gridRect.top;
+		const computed = getComputedStyle(this.grid);
+		const gap = parseFloat(computed.gap) || 0;
+		const scale = parseFloat(
+			getComputedStyle(this.gridWrapper).getPropertyValue("--grid-scale") || "1",
+		);
+		const colSize = (this.gridWidth - gap * (this.state.cols - 1)) / this.state.cols;
+		const rowSize = (this.gridHeight - gap * (this.state.rows - 1)) / this.state.rows;
+		const scaledX = x / scale;
+		const scaledY = y / scale;
+		const col = Math.min(
+			this.state.cols - 1,
+			Math.max(0, Math.floor(scaledX / (colSize + gap))),
+		);
+		const row = Math.min(
+			this.state.rows - 1,
+			Math.max(0, Math.floor(scaledY / (rowSize + gap))),
+		);
+		return { row, col };
+	}
+
+	isEdgePosition(event, block) {
+		const rect = block.getBoundingClientRect();
+		const threshold = 8;
+		const x = event.clientX - rect.left;
+		const y = event.clientY - rect.top;
+		const right = x >= rect.width - threshold;
+		const bottom = y >= rect.height - threshold;
+		const left = x <= threshold;
+		const top = y <= threshold;
+		return { top, bottom, left, right, edge: top || bottom || left || right };
+	}
+
+	handleAreaPointerDown(event) {
+		event.stopPropagation();
+		if (event.button !== 0) return;
+		const block = event.currentTarget;
+		const id = block.dataset.areaId;
+		const area = this.state.areas[id];
+		if (!area) return;
+		const edge = this.isEdgePosition(event, block);
+		if (!edge.edge) return;
+		block.classList.toggle("edge-top", edge.top);
+		block.classList.toggle("edge-bottom", edge.bottom);
+		block.classList.toggle("edge-left", edge.left);
+		block.classList.toggle("edge-right", edge.right);
+		this.resizeState = {
+			id,
+			edge,
+			startArea: { ...area },
+			dragging: true,
+		};
+		this.handlePointerMoveBound = this.handlePointerMove.bind(this);
+		window.addEventListener("pointermove", this.handlePointerMoveBound);
+		window.addEventListener("pointerup", this.handlePointerUp.bind(this));
+		document.body.style.cursor =
+			edge.top || edge.bottom ? "ns-resize" : edge.left || edge.right ? "ew-resize" : "move";
+	}
+
+	renderRowControls() {
+		const existingControls = this.q("rowControls");
+		if (existingControls) existingControls.remove();
+		const controlsContainer = document.createElement("div");
+		controlsContainer.id = "rowControls";
+		const title = document.createElement("h3");
+		title.textContent = "Row Heights";
+		controlsContainer.appendChild(title);
+		for (let i = 0; i < this.state.rows; i++) {
+			const rowControl = document.createElement("label");
+			const label = document.createElement("span");
+			label.textContent = `Row ${i + 1}:`;
+			const select = document.createElement("select");
+			select.dataset.rowIndex = i;
+			const options = [
+				{ value: "1fr", label: "Flexible (1fr)" },
+				{ value: "max-content", label: "Content height" },
+				{ value: "min-content", label: "Min content" },
+				{ value: "auto", label: "Auto" },
+			];
+			options.forEach((option) => {
+				const optionEl = document.createElement("option");
+				optionEl.value = option.value;
+				optionEl.textContent = option.label;
+				if (this.state.rowHeights[i] === option.value) {
+					optionEl.selected = true;
+				}
+				select.appendChild(optionEl);
+			});
+			select.addEventListener("change", (e) => {
+				const rowIndex = parseInt(e.target.dataset.rowIndex, 10);
+				this.state.rowHeights[rowIndex] = e.target.value;
+				this.updateCssPreview();
+			});
+			rowControl.appendChild(label);
+			rowControl.appendChild(select);
+			controlsContainer.appendChild(rowControl);
+		}
+		const controlsSection = this.q("controls");
+		if (controlsSection) controlsSection.appendChild(controlsContainer);
+	}
+
+	updateGridScaling() {
+		if (!this.gridWrapper) return;
+		const viewportWidth = window.innerWidth - 40;
+		const viewportHeight = window.innerHeight * 0.8;
+		const totalGridWidth = this.gridWidth + 20;
+		const totalGridHeight = this.gridHeight + 20;
+		const widthScale = totalGridWidth > viewportWidth ? viewportWidth / totalGridWidth : 1;
+		const heightScale = totalGridHeight > viewportHeight ? viewportHeight / totalGridHeight : 1;
+		const scale = Math.min(widthScale, heightScale);
+		if (scale < 1) {
+			this.gridWrapper.style.setProperty("--grid-scale", scale);
+			this.gridWrapper.style.setProperty(
+				"--grid-margin",
+				`${(viewportWidth - totalGridWidth * scale) / 2}px`,
+			);
+			this.gridWrapper.style.setProperty(
+				"--grid-margin-top",
+				`${(viewportHeight - totalGridHeight * scale) / 2}px`,
+			);
+		} else {
+			this.gridWrapper.style.setProperty("--grid-scale", "1");
+			this.gridWrapper.style.setProperty("--grid-margin", "0px");
+			this.gridWrapper.style.setProperty("--grid-margin-top", "0px");
+		}
+	}
+
+	calculateGridDimensions() {
+		this.gridWidth = this.currentResolution?.width || 1536;
+		this.gridHeight = this.currentResolution?.height || 864;
+	}
+
+	getCssMediaQuery(width) {
+		if (width === 768) return "@media (max-width: 768px)";
+		if (width === 1024) return "@media (min-width: 769px) and (max-width: 1024px)";
+		if (width === 1536) return "@media (min-width: 1536px)";
+		return `@media (min-width: ${width}px)`;
+	}
+
+	generateCss() {
+		const rootSelector =
+			this.containerElement !== document
+				? this.rootSelector
+				: `#${GridDesigner.sanitizeId(this.editorCardId)}`;
+		const allResolutionsCss = this.resolutions.map((res, index) => {
+			const state = this.getResolutionState(index) || this.createDefaultResolutionState(res);
+			const rowTemplate = state.rowHeights.join(" ");
+			const lines = [];
+			for (let r = 0; r < state.rows; r++) {
+				const rowCells = [];
+				for (let c = 0; c < state.cols; c++) {
+					rowCells.push(state.gridMatrix[r][c] || ".");
+				}
+				lines.push(`            "${rowCells.join(" ")}"`);
+			}
+			const template = `grid-template-areas:\n${lines.join("\n")};`;
+			return (
+				`    @container box (min-width: ${res.width}px){\n` +
+				`        ${rootSelector} #grid {\n` +
+				`            display: grid;\n` +
+				`            grid-template-columns: repeat(${state.cols}, 1fr);\n` +
+				`            grid-template-rows: ${rowTemplate};\n` +
+				`            gap: 8px;\n` +
+				`            ${template}\n` +
+				`        }\n` +
+				`    }\n`
+			);
+		});
+		return allResolutionsCss.join("\n\n");
+	}
+
+	updateCssPreview() {
+		if (!this.cssCode) return;
+		this.cssCode.textContent = this.generateCss();
+	}
+
+	renderElementList() {
+		if (!this.elementList) return;
+		this.elementList.innerHTML = "";
+		this.state.elements.forEach((element) => {
+			const tag = document.createElement("div");
+			tag.className = "element-tag";
+			tag.draggable = true;
+			tag.textContent = element.name;
+			if (!this.areaColors[element.id])
+				this.areaColors[element.id] = GridDesigner.generateAreaColor(element.id);
+			tag.style.borderColor = this.areaColors[element.id];
+			tag.addEventListener("dragstart", (e) => {
+				e.dataTransfer.setData("text/plain", element.id);
+			});
+			this.elementList.appendChild(tag);
+		});
+	}
+
+	getState() {
+		this.saveResolutionState(this.state.currentResolutionIndex);
+		return {
+			id: this.editorCardId,
+			resolutions: this.resolutions.map((res) => ({
+				width: res.width,
+				height: res.height,
+				label: res.label,
+			})),
+			currentResolutionIndex: this.state.currentResolutionIndex,
+			elements: JSON.parse(JSON.stringify(this.state.elements)),
+			resolutionStates: this.resolutions.map((_, index) => {
+				const state = this.getResolutionState(index);
+				if (state) {
+					return {
+						rows: state.rows,
+						cols: state.cols,
+						rowHeights: [...state.rowHeights],
+						areas: JSON.parse(JSON.stringify(state.areas)),
+						gridMatrix: state.gridMatrix.map((row) => [...row]),
+					};
+				}
+				const tempResolution = this.resolutions[index];
+				const defaultCols =
+					tempResolution.width > 1500 ? 24 : tempResolution.width > 1000 ? 16 : 12;
+				return {
+					rows: 4,
+					cols: defaultCols,
+					rowHeights: Array(4).fill("1fr"),
+					areas: {},
+					gridMatrix: Array.from({ length: 4 }, () => Array(defaultCols).fill(null)),
+				};
+			}),
+		};
+	}
+
+	getCss() {
+		return this.generateCss();
 	}
 }
 
-function GetCss() {
-	return generateCss();
-}
-
-function GetState() {
-	return getStateFromEditor();
-}
-
 window.GridDesigner = {
-	Init,
-	GetCss,
-	GetState,
+	Init(containerOrCardId, cardIdOrResolutions, resolutionsOrTags, tagsOrState, maybeState) {
+		let container = document;
+		let editorCardId;
+		let resolutions = [];
+		let tags = [];
+		let state = {};
+		if (containerOrCardId instanceof HTMLElement || typeof containerOrCardId === "string") {
+			if (
+				containerOrCardId instanceof HTMLElement ||
+				document.getElementById(containerOrCardId)
+			) {
+				container =
+					containerOrCardId instanceof HTMLElement
+						? containerOrCardId
+						: document.getElementById(containerOrCardId) || document;
+				editorCardId = cardIdOrResolutions;
+				resolutions = resolutionsOrTags || [];
+				tags = tagsOrState || [];
+				state = maybeState || {};
+			} else {
+				container = document;
+				editorCardId = containerOrCardId;
+				resolutions = cardIdOrResolutions || [];
+				tags = resolutionsOrTags || [];
+				state = tagsOrState || {};
+			}
+		} else {
+			container = document;
+			editorCardId = containerOrCardId;
+			resolutions = cardIdOrResolutions || [];
+			tags = resolutionsOrTags || [];
+			state = tagsOrState || {};
+		}
+		window.GridDesignerInstance = new GridDesigner(
+			container,
+			editorCardId,
+			resolutions,
+			tags,
+			state,
+		);
+		return window.GridDesignerInstance;
+	},
+	GetCss() {
+		return window.GridDesignerInstance?.getCss?.() || "";
+	},
+	GetState() {
+		return window.GridDesignerInstance?.getState?.() || null;
+	},
 };
 
-//usage example - this would be called by the parent view that includes this script, passing in the desired resolutions to support
 const resolutions = [
 	{ width: 360, height: 800 },
 	{ width: 600, height: 400 },
@@ -930,16 +957,13 @@ const resolutions = [
 ];
 
 const templateId = 123;
-
 const tags = [
 	{ id: "title", name: "Title" },
 	{ id: "desc", name: "Desc" },
 	{ id: "button", name: "Button" },
 ];
-
 const state = {};
 
-//Temporary initialization for testing - in production, the parent view would call GridDesigner.Init with the appropriate parameters
 document.addEventListener("DOMContentLoaded", () =>
-	GridDesigner.Init(templateId, resolutions, tags, state),
+	window.GridDesigner.Init(templateId, resolutions, tags, state),
 );
