@@ -336,4 +336,36 @@ input[readonly] {
 		background: #1a1a1a;
 		color: #a8d1ff;
 	}
+	#resolutionTabs label {
+		background: #2a2a2a;
+		border-color: #555;
+		color: #e0e0e0;
+	}
+	#resolutionTabs label.active {
+		background: #0078d4;
+		border-color: #0078d4;
+	}
+}
+#resolutionTabs {
+	display: flex;
+	gap: 10px;
+	margin-bottom: 20px;
+}
+#resolutionTabs label {
+	display: inline-block;
+	padding: 10px 15px;
+	border: 2px solid #ccc;
+	background: #f9f9f9;
+	cursor: pointer;
+	border-radius: 4px;
+	transition: all 0.2s;
+}
+#resolutionTabs label.active {
+	background: #007acc;
+	color: white;
+	border-color: #007acc;
+	font-weight: bold;
+}
+#resolutionTabs input[type="radio"] {
+	display: none;
 }

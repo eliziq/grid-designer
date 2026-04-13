@@ -1,5 +1,4 @@
 ﻿const grid = document.getElementById("grid");
-const containerIdInput = document.getElementById("containerId");
 const colCountInput = document.getElementById("colCount");
 const rowCountInput = document.getElementById("rowCount");
 const buildGridButton = document.getElementById("buildGrid");
@@ -9,11 +8,7 @@ const savePatternButton = document.getElementById("savePattern");
 const deletePatternButton = document.getElementById("deletePattern");
 const cssCode = document.getElementById("cssCode");
 const elementNameInput = document.getElementById("elementName");
-const addElementButton = document.getElementById("addElement");
 const elementList = document.getElementById("elementList");
-const mainMaxWidthInput = document.getElementById("mainMaxWidth");
-const bannerWidthInput = document.getElementById("bannerWidth");
-const bannerHeightInput = document.getElementById("bannerHeight");
 
 let rows = 4;
 let cols = 24;
@@ -23,7 +18,10 @@ let areas = {}; // {id: {id,rowStart,rowEnd,colStart,colEnd}}
 let areaColors = {}; // id->hsl color
 let rowHeights = []; // Array of height values for each row, default "1fr"
 let resizeState = null;
-let savedPatterns = {}; // Store saved patterns by key: "screenWidth-bannerWidth"
+let savedPatterns = {}; // Store saved patterns by key: "cardId-resolutionIndex"
+let currentResolution = null;
+let currentResolutionIndex = 0;
+let resolutionStates = [];
 
 function generateAreaColor(id) {
 	const hue = (Array.from(id).reduce((acc, ch) => acc + ch.charCodeAt(0), 0) * 7) % 360;
@@ -38,14 +36,160 @@ function sanitizeId(raw) {
 		.replace(/[^a-z0-9_]/g, "");
 }
 
+let editorCardId = null;
+let editorReady = false;
+let allowedTags = [];
+
+function normalizeResolution(res) {
+	const width = Number(res?.width) || 0;
+	const height = Number(res?.height) || 0;
+	return {
+		width,
+		height,
+		label: res?.label || res?.name || `${width}x${height}`,
+	};
+}
+
+function normalizeResolutions(resolutions) {
+	if (!Array.isArray(resolutions) || resolutions.length === 0) {
+		return window.resolutions || [];
+	}
+	return resolutions
+		.map((res) => normalizeResolution(res))
+		.filter((res) => res.width > 0 && res.height > 0);
+}
+
+function normalizeTag(tag, index) {
+	if (tag && typeof tag === "object") {
+		const name = String(tag.name || tag.label || tag.id || `Tag ${index + 1}`);
+		return {
+			id: sanitizeId(tag.id || name) || `tag_${index + 1}`,
+			name,
+		};
+	}
+	return null;
+}
+
+function normalizeTags(tags) {
+	if (!Array.isArray(tags)) return [];
+	return tags.map((tag, index) => normalizeTag(tag, index)).filter(Boolean);
+}
+
+function populateMatrixFromAreas() {
+	initMatrix();
+	Object.values(areas).forEach((area) => {
+		for (let r = area.rowStart; r <= area.rowEnd; r++) {
+			for (let c = area.colStart; c <= area.colEnd; c++) {
+				if (r >= 0 && r < rows && c >= 0 && c < cols) {
+					gridMatrix[r][c] = area.id;
+				}
+			}
+		}
+	});
+}
+
+function getStateFromEditor() {
+	saveResolutionState(currentResolutionIndex);
+	return {
+		id: editorCardId,
+		containerId: editorCardId || "",
+		resolutions: window.resolutions.map((res) => ({
+			width: res.width,
+			height: res.height,
+			label: res.label,
+		})),
+		currentResolutionIndex,
+		elements: JSON.parse(JSON.stringify(elements)),
+		resolutionStates: window.resolutions.map((_, index) => {
+			const state = getResolutionState(index);
+			if (state) {
+				return {
+					rows: state.rows,
+					cols: state.cols,
+					rowHeights: [...state.rowHeights],
+					areas: JSON.parse(JSON.stringify(state.areas)),
+					gridMatrix: state.gridMatrix.map((row) => [...row]),
+				};
+			}
+			const tempResolution = window.resolutions[index];
+			const defaultCols =
+				tempResolution.width > 1500 ? 24 : tempResolution.width > 1000 ? 16 : 12;
+			return {
+				rows: 4,
+				cols: defaultCols,
+				rowHeights: Array(4).fill("1fr"),
+				areas: {},
+				gridMatrix: Array.from({ length: 4 }, () => Array(defaultCols).fill(null)),
+			};
+		}),
+	};
+}
+
 // Pattern management functions
 function getCurrentPatternKey() {
-	const screenWidth = mainMaxWidthInput.value;
-	const bannerWidth = bannerWidthInput.value;
-	return `${screenWidth}-${bannerWidth}`;
+	const cardId = editorCardId != null ? editorCardId : "default";
+	const resolutionIndex = Number.isInteger(currentResolutionIndex) ? currentResolutionIndex : 0;
+	return `${cardId}-${resolutionIndex}`;
+}
+
+function setResolutionState(index, state) {
+	resolutionStates[index] = {
+		rows: Math.max(1, state.rows || 1),
+		cols: Math.max(1, state.cols || 1),
+		rowHeights: Array.isArray(state.rowHeights)
+			? state.rowHeights.map((row) => row || "1fr")
+			: Array(Math.max(1, state.rows || 1)).fill("1fr"),
+		areas: state.areas ? JSON.parse(JSON.stringify(state.areas)) : {},
+		gridMatrix: Array.isArray(state.gridMatrix)
+			? state.gridMatrix.map((row) => [...row])
+			: Array.from({ length: Math.max(1, state.rows || 1) }, () =>
+					Array(Math.max(1, state.cols || 1)).fill(null),
+				),
+	};
+}
+
+function getResolutionState(index) {
+	return resolutionStates[index] || null;
+}
+
+function defaultResolutionState(res) {
+	const cols = res.width > 1500 ? 24 : res.width > 1000 ? 16 : 12;
+	return {
+		rows: 4,
+		cols,
+		rowHeights: Array(4).fill("1fr"),
+		areas: {},
+		gridMatrix: Array.from({ length: 4 }, () => Array(cols).fill(null)),
+	};
+}
+
+function applyResolutionState(state) {
+	rows = Math.max(1, state.rows || 1);
+	cols = Math.max(1, state.cols || 1);
+	rowHeights = Array.isArray(state.rowHeights)
+		? state.rowHeights.map((row) => row || "1fr")
+		: Array(rows).fill("1fr");
+	areas = state.areas ? JSON.parse(JSON.stringify(state.areas)) : {};
+	gridMatrix = Array.isArray(state.gridMatrix)
+		? state.gridMatrix.map((row) => [...row])
+		: Array.from({ length: rows }, () => Array(cols).fill(null));
+	colCountInput.value = cols;
+	rowCountInput.value = rows;
+}
+
+function saveResolutionState(index) {
+	if (!Number.isInteger(index) || index < 0) return;
+	setResolutionState(index, {
+		rows,
+		cols,
+		rowHeights,
+		areas,
+		gridMatrix,
+	});
 }
 
 function savePattern() {
+	saveResolutionState(currentResolutionIndex);
 	const key = getCurrentPatternKey();
 	const pattern = {
 		rows,
@@ -54,7 +198,6 @@ function savePattern() {
 		elements: [...elements],
 		areas: JSON.parse(JSON.stringify(areas)),
 		rowHeights: [...rowHeights],
-		bannerHeight: bannerHeightInput.value,
 	};
 	savedPatterns[key] = pattern;
 	localStorage.setItem("gridDesignerPatterns", JSON.stringify(savedPatterns));
@@ -72,7 +215,9 @@ function loadPattern(key) {
 	elements = [...pattern.elements];
 	areas = JSON.parse(JSON.stringify(pattern.areas));
 	rowHeights = [...pattern.rowHeights];
-	bannerHeightInput.value = pattern.bannerHeight;
+	colCountInput.value = cols;
+	rowCountInput.value = rows;
+	calculateGridDimensions();
 
 	// Rebuild area colors for loaded elements
 	elements.forEach((element) => {
@@ -407,34 +552,8 @@ function renderRowControls() {
 		controlsContainer.appendChild(rowControl);
 	}
 
-	// Insert after the responsive settings
 	const controlsSection = document.getElementById("controls");
 	controlsSection.appendChild(controlsContainer);
-}
-
-function addElement() {
-	const name = elementNameInput.value.trim();
-	if (!name) return;
-	const id = sanitizeId(name);
-	if (!id) {
-		alert("Element name must contain valid characters.");
-		return;
-	}
-	if (elements.some((el) => el.id === id)) {
-		alert("Element already exists");
-		return;
-	}
-	elements.push({ id, name });
-	elementNameInput.value = "";
-	renderElementList();
-}
-
-function removeElement(id) {
-	elements = elements.filter((el) => el.id !== id);
-	removeArea(id);
-	renderElementList();
-	renderGrid();
-	updateCssPreview();
 }
 
 function getCssMediaQuery(width) {
@@ -450,75 +569,37 @@ function getCssMediaQuery(width) {
 	return `@media (min-width: ${width}px)`;
 }
 
-function updateCssPreview() {
-	const containerId = containerIdInput.value.trim() || "grid";
-	const mainMaxWidth = parseInt(mainMaxWidthInput.value, 10) || 1536;
-	const bannerWidthRatio = parseFloat(bannerWidthInput.value) || 1;
-	const bannerMinWidth = Math.round(mainMaxWidth * bannerWidthRatio);
-	const mediaQuery = getCssMediaQuery(mainMaxWidth);
-
-	const lines = [];
-	for (let r = 0; r < rows; r++) {
-		const rowCells = [];
-		for (let c = 0; c < cols; c++) {
-			rowCells.push(gridMatrix[r][c] || ".");
-		}
-		lines.push(`            "${rowCells.join(" ")}"`);
-	}
-	const template = `grid-template-areas:\n${lines.join("\n")};`;
-	const rowTemplate = rowHeights.join(" ");
-
-	let cssContent =
-		`${mediaQuery}{\n` +
-		`    @container box (min-width: ${bannerMinWidth}px){\n` +
-		`        [id:${containerId}] {\n` +
-		`            display: grid;\n` +
-		`            grid-template-columns: repeat(${cols}, 1fr);\n` +
-		`            grid-template-rows: ${rowTemplate};\n` +
-		`            gap: 8px;\n` +
-		`            ${template}\n` +
-		`        }\n` +
-		`    }\n` +
-		`}`;
-
-	// Add all saved patterns to the CSS
-	const allPatterns = Object.keys(savedPatterns).map((key) => {
-		const [screenWidth, bannerWidth] = key.split("-");
-		const pattern = savedPatterns[key];
-		const patternMediaQuery = getCssMediaQuery(parseInt(screenWidth));
-		const patternBannerMinWidth = Math.round(parseInt(screenWidth) * parseFloat(bannerWidth));
-
-		const patternLines = [];
-		for (let r = 0; r < pattern.rows; r++) {
+function generateCss() {
+	const cid = editorCardId || "grid";
+	const allResolutionsCss = window.resolutions.map((res, index) => {
+		const state = getResolutionState(index) || defaultResolutionState(res);
+		const rowTemplate = state.rowHeights.join(" ");
+		const lines = [];
+		for (let r = 0; r < state.rows; r++) {
 			const rowCells = [];
-			for (let c = 0; c < pattern.cols; c++) {
-				rowCells.push(pattern.gridMatrix[r][c] || ".");
+			for (let c = 0; c < state.cols; c++) {
+				rowCells.push(state.gridMatrix[r][c] || ".");
 			}
-			patternLines.push(`            "${rowCells.join(" ")}"`);
+			lines.push(`            "${rowCells.join(" ")}"`);
 		}
-		const patternTemplate = `grid-template-areas:\n${patternLines.join("\n")};`;
-		const patternRowTemplate = pattern.rowHeights.join(" ");
-
+		const template = `grid-template-areas:\n${lines.join("\n")};`;
 		return (
-			`${patternMediaQuery}{\n` +
-			`    @container box (min-width: ${patternBannerMinWidth}px){\n` +
-			`        [id:${containerId}] {\n` +
+			`    @container box (min-width: ${res.width}px){\n` +
+			`        [id:${cid}] {\n` +
 			`            display: grid;\n` +
-			`            grid-template-columns: repeat(${pattern.cols}, 1fr);\n` +
-			`            grid-template-rows: ${patternRowTemplate};\n` +
+			`            grid-template-columns: repeat(${state.cols}, 1fr);\n` +
+			`            grid-template-rows: ${rowTemplate};\n` +
 			`            gap: 8px;\n` +
-			`            ${patternTemplate}\n` +
+			`            ${template}\n` +
 			`        }\n` +
-			`    }\n` +
-			`}`
+			`    }\n`
 		);
 	});
+	return allResolutionsCss.join("\n\n");
+}
 
-	if (allPatterns.length > 0) {
-		cssContent = allPatterns.join("\n\n") + "\n\n" + cssContent;
-	}
-
-	cssCode.textContent = cssContent;
+function updateCssPreview() {
+	cssCode.textContent = generateCss();
 }
 
 function renderElementList() {
@@ -534,79 +615,30 @@ function renderElementList() {
 			e.dataTransfer.setData("text/plain", element.id);
 		});
 
-		const deleteBtn = document.createElement("button");
-		deleteBtn.type = "button";
-		deleteBtn.className = "deleteBtn";
-		deleteBtn.textContent = "×";
-		deleteBtn.addEventListener("click", () => removeElement(element.id));
-
-		tag.appendChild(deleteBtn);
 		elementList.appendChild(tag);
 	});
 }
-
-buildGridButton.addEventListener("click", () => {
-	cols = Math.max(1, parseInt(colCountInput.value, 10) || 1);
-	rows = Math.max(1, parseInt(rowCountInput.value, 10) || 1);
-
-	// Initialize row heights if not already set or if rows changed
-	if (rowHeights.length !== rows) {
-		rowHeights = Array(rows).fill("1fr");
-	}
-
-	initMatrix();
-	areas = {};
-	renderGrid();
-	renderElementList();
-	renderRowControls();
-	updateCssPreview();
-});
-
-clearGridButton.addEventListener("click", () => {
-	initMatrix();
-	areas = {};
-	renderGrid();
-	updateCssPreview();
-});
-
-exportCssButton.addEventListener("click", () => {
-	updateCssPreview();
-	const blob = new Blob([cssCode.textContent], { type: "text/css" });
-	const link = document.createElement("a");
-	link.href = URL.createObjectURL(blob);
-	link.download = "grid-designer.css";
-	document.body.appendChild(link);
-	link.click();
-	link.remove();
-});
-
-savePatternButton.addEventListener("click", savePattern);
-deletePatternButton.addEventListener("click", deletePattern);
-
-addElementButton.addEventListener("click", addElement);
-elementNameInput.addEventListener("keydown", (e) => {
-	if (e.key === "Enter") addElement();
-});
 
 let gridWidth = 1536;
 let gridHeight = 864;
 
 function calculateColumns() {
-	const mainMaxWidth = parseInt(mainMaxWidthInput.value, 10) || 1536;
-	const bannerWidthRatio = parseFloat(bannerWidthInput.value) || 1;
-	const bannerWidth = Math.round(mainMaxWidth * bannerWidthRatio);
-	const mainGridSize = 24;
-	const calculatedCols = Math.max(1, Math.round((bannerWidth / mainMaxWidth) * mainGridSize));
+	const mainMaxWidth = currentResolution.width;
+	let calculatedCols;
+	if (mainMaxWidth > 1500) {
+		calculatedCols = 24;
+	} else if (mainMaxWidth > 1000) {
+		calculatedCols = 16;
+	} else {
+		calculatedCols = 12;
+	}
 	cols = calculatedCols;
 	colCountInput.value = calculatedCols;
 
-	// Calculate grid dimensions based on device and columns
 	calculateGridDimensions();
-	buildGridButton.click();
 }
 
 function updateDeviceSettings() {
-	updateBannerWidthOptions();
 	calculateColumns();
 
 	// Check if there's a saved pattern for these settings
@@ -617,60 +649,9 @@ function updateDeviceSettings() {
 	updatePatternButtons();
 }
 
-function updateBannerWidthOptions() {
-	const device = parseInt(mainMaxWidthInput.value, 10);
-	const options = bannerWidthInput.querySelectorAll("option");
-
-	if (device === 768) {
-		// Mobile - only full width
-		bannerWidthInput.innerHTML = '<option value="1">Full Width</option>';
-		bannerWidthInput.value = "1";
-	} else {
-		// Desktop and Tablet - all options
-		bannerWidthInput.innerHTML = `
-			<option value="1">Full Width</option>
-			<option value="0.67">2/3 Width</option>
-			<option value="0.5">1/2 Width</option>
-			<option value="0.33">1/3 Width</option>
-		`;
-	}
-}
-
 function calculateGridDimensions() {
-	const device = parseInt(mainMaxWidthInput.value, 10);
-
-	if (device === 1536) {
-		const cellWidth = 64;
-		gridWidth = cols * cellWidth;
-		if (cols === 8) {
-			gridHeight = 600;
-		} else if (cols === 12) {
-			gridHeight = 600;
-		} else if (cols === 24) {
-			gridHeight = 864;
-		}
-	} else if (device === 1024) {
-		const cellWidth = 44;
-		gridWidth = cols * cellWidth;
-		if (cols === 8 || cols === 12) {
-			gridHeight = 400;
-		} else if (cols === 24) {
-			gridHeight = 570;
-		}
-	} else if (device === 768) {
-		const cellWidth = 32;
-		gridWidth = cols * cellWidth;
-		gridHeight = 600;
-	}
-
-	bannerHeightInput.value = gridHeight;
-}
-
-function updateGridSize() {
-	gridHeight = parseInt(bannerHeightInput.value, 10) || gridHeight;
-	updateGridScaling();
-	renderGrid();
-	updateCssPreview();
+	gridWidth = currentResolution.width;
+	gridHeight = currentResolution.height;
 }
 
 function updateGridScaling() {
@@ -703,42 +684,262 @@ function updateGridScaling() {
 	}
 }
 
-window.addEventListener("pointerup", handlePointerUp);
+function setCurrentResolution(res) {
+	if (!res) return;
+	const previousIndex = currentResolutionIndex;
+	if (Number.isInteger(previousIndex) && previousIndex >= 0) {
+		saveResolutionState(previousIndex);
+	}
 
-function initGridDesigner() {
-	loadSavedPatterns();
-	mainMaxWidthInput.addEventListener("change", updateDeviceSettings);
-	bannerWidthInput.addEventListener("change", calculateColumns);
-	bannerHeightInput.addEventListener("input", updateGridSize);
-	colCountInput.addEventListener("change", () => buildGridButton.click());
-	rowCountInput.addEventListener("change", () => {
-		const newRows = Math.max(1, parseInt(rowCountInput.value, 10) || 1);
-		if (newRows !== rows) {
-			rows = newRows;
-			// Resize rowHeights array, preserving existing values
-			const oldRowHeights = [...rowHeights];
-			rowHeights = Array(rows).fill("1fr");
-			for (let i = 0; i < Math.min(oldRowHeights.length, rows); i++) {
-				rowHeights[i] = oldRowHeights[i];
-			}
-		}
-		buildGridButton.click();
+	currentResolution = res;
+	currentResolutionIndex = window.resolutions.indexOf(res);
+
+	const radios = document.querySelectorAll("#resolutionTabs input[type='radio']");
+	const labels = document.querySelectorAll("#resolutionTabs label");
+	const index = currentResolutionIndex;
+	if (index >= 0) {
+		radios[index].checked = true;
+	}
+	labels.forEach((label, labelIndex) => {
+		label.classList.toggle("active", labelIndex === index);
 	});
 
-	window.addEventListener("resize", updateGridScaling);
+	const resolvedState = getResolutionState(index);
+	const patternKey = getCurrentPatternKey();
+	if (resolvedState) {
+		applyResolutionState(resolvedState);
+		calculateGridDimensions();
+	} else if (savedPatterns[patternKey]) {
+		loadPattern(patternKey);
+		setResolutionState(index, {
+			rows,
+			cols,
+			rowHeights,
+			areas,
+			gridMatrix,
+		});
+		updatePatternButtons();
+		return;
+	} else {
+		const defaultState = defaultResolutionState(currentResolution);
+		applyResolutionState(defaultState);
+		calculateGridDimensions();
+		areas = {};
+		initMatrix();
+	}
 
-	calculateColumns();
-	cols = Math.max(1, parseInt(colCountInput.value, 10) || 24);
-	rows = Math.max(1, parseInt(rowCountInput.value, 10) || 4);
-
-	rowHeights = Array(rows).fill("1fr");
-
-	initMatrix();
-	areas = {};
 	renderGrid();
 	renderElementList();
 	renderRowControls();
 	updateCssPreview();
+	updatePatternButtons();
 }
 
-document.addEventListener("DOMContentLoaded", initGridDesigner); //remove this to init from parent view
+function loadEditorState(state) {
+	if (!state || typeof state !== "object") return;
+
+	if (Array.isArray(state.elements) && state.elements.length > 0) {
+		elements = state.elements.map((element, index) => normalizeTag(element, index));
+	}
+
+	currentResolutionIndex =
+		Number.isInteger(state.currentResolutionIndex) && state.currentResolutionIndex >= 0
+			? state.currentResolutionIndex
+			: 0;
+
+	if (Array.isArray(state.resolutionStates) && state.resolutionStates.length > 0) {
+		resolutionStates = state.resolutionStates.map((rs, index) => ({
+			rows: Math.max(1, rs.rows || 1),
+			cols: Math.max(1, rs.cols || 1),
+			rowHeights: Array.isArray(rs.rowHeights)
+				? rs.rowHeights.map((row) => row || "1fr")
+				: Array(Math.max(1, rs.rows || 1)).fill("1fr"),
+			areas: rs.areas ? JSON.parse(JSON.stringify(rs.areas)) : {},
+			gridMatrix: Array.isArray(rs.gridMatrix)
+				? rs.gridMatrix.map((row) => [...row])
+				: Array.from({ length: Math.max(1, rs.rows || 1) }, () =>
+						Array(Math.max(1, rs.cols || 1)).fill(null),
+					),
+		}));
+	} else {
+		const rootState = {
+			rows: typeof state.rows === "number" ? Math.max(1, state.rows) : 4,
+			cols: typeof state.cols === "number" ? Math.max(1, state.cols) : 24,
+			rowHeights: Array.isArray(state.rowHeights)
+				? state.rowHeights.map((height) => height || "1fr")
+				: Array(Math.max(1, state.rows || 4)).fill("1fr"),
+			areas:
+				state.areas && typeof state.areas === "object"
+					? JSON.parse(JSON.stringify(state.areas))
+					: {},
+			gridMatrix: Array.isArray(state.gridMatrix)
+				? state.gridMatrix.map((row) => [...row])
+				: Array.from({ length: Math.max(1, state.rows || 4) }, () =>
+						Array(Math.max(1, state.cols || 24)).fill(null),
+					),
+		};
+		resolutionStates[currentResolutionIndex] = rootState;
+	}
+}
+
+function attachEditorListeners() {
+	if (editorReady) return;
+	buildGridButton.addEventListener("click", () => {
+		cols = Math.max(1, parseInt(colCountInput.value, 10) || 1);
+		rows = Math.max(1, parseInt(rowCountInput.value, 10) || 1);
+
+		if (rowHeights.length !== rows) {
+			rowHeights = Array(rows).fill("1fr");
+		}
+
+		initMatrix();
+		areas = {};
+		renderGrid();
+		renderElementList();
+		renderRowControls();
+		updateCssPreview();
+	});
+
+	clearGridButton.addEventListener("click", () => {
+		initMatrix();
+		areas = {};
+		renderGrid();
+		updateCssPreview();
+	});
+
+	exportCssButton.addEventListener("click", () => {
+		updateCssPreview();
+		const blob = new Blob([cssCode.textContent], { type: "text/css" });
+		const link = document.createElement("a");
+		link.href = URL.createObjectURL(blob);
+		link.download = "grid-designer.css";
+		document.body.appendChild(link);
+		link.click();
+		link.remove();
+	});
+
+	savePatternButton.addEventListener("click", savePattern);
+	deletePatternButton.addEventListener("click", deletePattern);
+
+	window.addEventListener("resize", updateGridScaling);
+	window.addEventListener("pointerup", handlePointerUp);
+	editorReady = true;
+}
+
+function createResolutionTabs() {
+	const tabsContainer = document.getElementById("resolutionTabs");
+	tabsContainer.innerHTML = "";
+
+	window.resolutions.forEach((res, index) => {
+		const label = document.createElement("label");
+		const radio = document.createElement("input");
+		radio.type = "radio";
+		radio.name = "resolution";
+		radio.value = index;
+		radio.addEventListener("change", () => {
+			document
+				.querySelectorAll("#resolutionTabs label")
+				.forEach((l) => l.classList.remove("active"));
+			label.classList.add("active");
+			setCurrentResolution(res);
+		});
+		label.appendChild(radio);
+		label.appendChild(document.createTextNode(` ${res.width}x${res.height}`));
+		tabsContainer.appendChild(label);
+	});
+}
+
+function Init(id, resolutions = [], tags = [], state = {}) {
+	editorCardId = id;
+	window.resolutions = normalizeResolutions(resolutions);
+	allowedTags = normalizeTags(tags);
+	if (allowedTags.length > 0) {
+		elements = [...allowedTags];
+	} else {
+		elements = [];
+	}
+
+	loadEditorState(state);
+
+	const hasStateGridMatrix = Array.isArray(state.gridMatrix) && state.gridMatrix.length > 0;
+	if (hasStateGridMatrix) {
+		gridMatrix = state.gridMatrix.map((row) => [...row]);
+	} else if (Object.keys(areas).length > 0) {
+		populateMatrixFromAreas();
+	} else {
+		initMatrix();
+	}
+
+	attachEditorListeners();
+	createResolutionTabs();
+
+	const defaultResolution =
+		typeof state.currentResolutionIndex === "number" &&
+		window.resolutions[state.currentResolutionIndex]
+			? window.resolutions[state.currentResolutionIndex]
+			: window.resolutions[0];
+
+	if (defaultResolution) {
+		setCurrentResolution(defaultResolution);
+	} else if (window.resolutions.length > 0) {
+		currentResolution = window.resolutions[0];
+		calculateGridDimensions();
+		const firstLabel = document.querySelector("#resolutionTabs label");
+		if (firstLabel) {
+			firstLabel.classList.add("active");
+			const firstRadio = firstLabel.querySelector("input[type='radio']");
+			if (firstRadio) {
+				firstRadio.checked = true;
+			}
+		}
+		renderGrid();
+		renderElementList();
+		renderRowControls();
+		updateCssPreview();
+	} else {
+		currentResolution = { width: 1536, height: 864 };
+		calculateGridDimensions();
+		renderGrid();
+		renderElementList();
+		renderRowControls();
+		updateCssPreview();
+	}
+}
+
+function GetCss() {
+	return generateCss();
+}
+
+function GetState() {
+	return getStateFromEditor();
+}
+
+window.GridDesigner = {
+	Init,
+	GetCss,
+	GetState,
+};
+
+//usage example - this would be called by the parent view that includes this script, passing in the desired resolutions to support
+const resolutions = [
+	{ width: 360, height: 800 },
+	{ width: 600, height: 400 },
+	{ width: 768, height: 1024 },
+	{ width: 1024, height: 768 },
+	{ width: 1536, height: 864 },
+];
+
+const templateId = 123;
+
+const tags = [
+	{ id: "title", name: "Title" },
+	{ id: "desc", name: "Desc" },
+	{ id: "button", name: "Button" },
+];
+
+const state = {};
+
+//Temporary initialization for testing - in production, the parent view would call GridDesigner.Init with the appropriate parameters
+document.addEventListener("DOMContentLoaded", () =>
+	GridDesigner.Init(templateId, resolutions, tags, state),
+);
