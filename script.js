@@ -1,8 +1,10 @@
 ﻿class GridDesigner {
-	constructor(container, editorCardId = "grid", resolutions = [], tags = [], state = {}) {
-		this.containerElement = this.resolveContainer(container);
-		this.editorCardId = String(editorCardId != null ? editorCardId : "grid");
-		this.attachInstanceIdentifier();
+	constructor(editorCardId, resolutions = [], tags = [], state = {}) {
+		if (!editorCardId) return;
+
+		this.containerElement = document;
+		this.editorCardId = editorCardId;
+		this.rootSelector = `#${GridDesigner.sanitizeId(this.editorCardId)}`;
 
 		this.state = {
 			rows: 4,
@@ -26,27 +28,7 @@
 		this.allowedTags = [];
 
 		this.cacheDomElements();
-		this.loadSavedPatterns();
 		this.init(editorCardId, resolutions, tags, state);
-	}
-
-	resolveContainer(container) {
-		if (container instanceof HTMLElement) return container;
-		if (typeof container === "string") {
-			return document.getElementById(container) || document;
-		}
-		return document;
-	}
-
-	attachInstanceIdentifier() {
-		const sanitizedId = GridDesigner.sanitizeId(this.editorCardId) || "grid-designer";
-		if (this.containerElement !== document) {
-			this.containerElement.dataset.gridDesigner = sanitizedId;
-		}
-		this.rootSelector =
-			this.containerElement !== document
-				? `[data-grid-designer="${sanitizedId}"]`
-				: `#${GridDesigner.sanitizeId(this.editorCardId)}`;
 	}
 
 	cacheDomElements() {
@@ -114,10 +96,6 @@
 		return tags.map((tag, index) => GridDesigner.normalizeTag(tag, index)).filter(Boolean);
 	}
 
-	static sanitizeStateValue(value, fallback) {
-		return value == null ? fallback : value;
-	}
-
 	init(editorCardId, resolutions = [], tags = [], state = {}) {
 		this.editorCardId = String(editorCardId != null ? editorCardId : this.editorCardId);
 		this.resolutions = GridDesigner.normalizeResolutions(resolutions);
@@ -127,7 +105,6 @@
 		}
 
 		this.loadEditorState(state);
-		this.ensureCurrentResolutionState();
 		this.initializeMatrixFromState();
 		this.attachEditorListeners();
 		this.createResolutionTabs();
@@ -144,19 +121,6 @@
 			this.renderElementList();
 			this.renderRowControls();
 			this.updateCssPreview();
-		}
-	}
-
-	ensureCurrentResolutionState() {
-		if (
-			!Array.isArray(this.state.resolutionStates) ||
-			this.state.resolutionStates.length === 0
-		) {
-			const resolution = this.resolutions[this.state.currentResolutionIndex] || {
-				width: 1536,
-				height: 864,
-			};
-			this.state.resolutionStates = [this.createDefaultResolutionState(resolution)];
 		}
 	}
 
@@ -273,9 +237,14 @@
 			try {
 				const state = JSON.parse(e.target?.result || "{}");
 				this.loadEditorState(state);
+				this.createResolutionTabs();
 				const currentIndex = this.state.currentResolutionIndex || 0;
 				const resolution = this.resolutions[currentIndex];
 				if (resolution) {
+					const activeState = this.getResolutionState(currentIndex);
+					if (activeState) {
+						this.applyResolutionState(activeState);
+					}
 					this.setCurrentResolution(resolution);
 				} else {
 					this.renderGrid();
@@ -368,6 +337,8 @@
 			radio.type = "radio";
 			radio.name = "resolution";
 			radio.value = index;
+			radio.checked = index === this.state.currentResolutionIndex;
+			label.classList.toggle("active", index === this.state.currentResolutionIndex);
 			radio.addEventListener("change", () => {
 				this.containerElement
 					.querySelectorAll("#resolutionTabs label")
@@ -391,9 +362,11 @@
 		}
 	}
 
-	setCurrentResolution(res) {
+	setCurrentResolution(res, isInitialLoad = false) {
 		if (!res) return;
-		this.saveResolutionState(this.state.currentResolutionIndex);
+		if (!isInitialLoad) {
+			this.saveResolutionState(this.state.currentResolutionIndex);
+		}
 		this.currentResolution = res;
 		this.state.currentResolutionIndex = this.resolutions.indexOf(res);
 		const radios = this.containerElement.querySelectorAll(
@@ -435,24 +408,44 @@
 				GridDesigner.normalizeTag(element, index),
 			);
 		}
+		if (Array.isArray(state.resolutions) && state.resolutions.length > 0) {
+			this.resolutions = GridDesigner.normalizeResolutions(state.resolutions);
+		}
 		this.state.currentResolutionIndex =
 			Number.isInteger(state.currentResolutionIndex) && state.currentResolutionIndex >= 0
-				? state.currentResolutionIndex
+				? Math.min(state.currentResolutionIndex, Math.max(this.resolutions.length - 1, 0))
 				: 0;
+		if (!Array.isArray(this.state.resolutionStates)) {
+			this.state.resolutionStates = [];
+		}
 		if (Array.isArray(state.resolutionStates) && state.resolutionStates.length > 0) {
-			this.state.resolutionStates = state.resolutionStates.map((rs) => ({
-				rows: Math.max(1, rs.rows || 1),
-				cols: Math.max(1, rs.cols || 1),
-				rowHeights: Array.isArray(rs.rowHeights)
-					? rs.rowHeights.map((row) => row || "1fr")
-					: Array(Math.max(1, rs.rows || 1)).fill("1fr"),
-				areas: rs.areas ? JSON.parse(JSON.stringify(rs.areas)) : {},
-				gridMatrix: Array.isArray(rs.gridMatrix)
-					? rs.gridMatrix.map((row) => [...row])
-					: Array.from({ length: Math.max(1, rs.rows || 1) }, () =>
-							Array(Math.max(1, rs.cols || 1)).fill(null),
-						),
-			}));
+			this.state.resolutionStates = this.resolutions.map((res, index) => {
+				const rs = state.resolutionStates[index] || {};
+				return {
+					rows: Math.max(1, rs.rows || res.rows || 1),
+					cols: Math.max(1, rs.cols || res.cols || 1),
+					rowHeights: Array.isArray(rs.rowHeights)
+						? rs.rowHeights.map((row) => row || "1fr")
+						: Array(Math.max(1, rs.rows || 1)).fill("1fr"),
+					areas: rs.areas ? JSON.parse(JSON.stringify(rs.areas)) : {},
+					gridMatrix: Array.isArray(rs.gridMatrix)
+						? rs.gridMatrix.map((row) => [...row])
+						: Array.from({ length: Math.max(1, rs.rows || 1) }, () =>
+								Array(Math.max(1, rs.cols || 1)).fill(null),
+							),
+				};
+			});
+			if (this.state.resolutionStates.length < this.resolutions.length) {
+				for (
+					let i = this.state.resolutionStates.length;
+					i < this.resolutions.length;
+					i += 1
+				) {
+					this.state.resolutionStates[i] = this.createDefaultResolutionState(
+						this.resolutions[i],
+					);
+				}
+			}
 		} else {
 			const rootState = {
 				rows: typeof state.rows === "number" ? Math.max(1, state.rows) : 4,
@@ -470,12 +463,16 @@
 							Array(Math.max(1, state.cols || 24)).fill(null),
 						),
 			};
-			this.state.resolutionStates[this.state.currentResolutionIndex] = rootState;
+			this.state.resolutionStates = this.resolutions.map((res, index) =>
+				index === this.state.currentResolutionIndex
+					? rootState
+					: this.createDefaultResolutionState(res),
+			);
 		}
 	}
 
 	createDefaultResolutionState(res) {
-		const cols = res.width > 1500 ? 24 : res.width > 1000 ? 16 : 12;
+		const cols = res.width <= 768 ? 12 : res.width <= 1024 ? 16 : 24;
 		return {
 			rows: 4,
 			cols,
@@ -552,15 +549,6 @@
 			areas: this.state.areas,
 			gridMatrix: this.state.gridMatrix,
 		});
-	}
-
-	loadSavedPatterns() {
-		const stored = localStorage.getItem(
-			`gridDesignerPatterns-${GridDesigner.sanitizeId(this.editorCardId)}`,
-		);
-		if (stored) {
-			this.savedPatterns = JSON.parse(stored);
-		}
 	}
 
 	savePatternsToStorage() {
@@ -925,7 +913,7 @@
 				}
 				const tempResolution = this.resolutions[index];
 				const defaultCols =
-					tempResolution.width > 1500 ? 24 : tempResolution.width > 1000 ? 16 : 12;
+					tempResolution.width <= 768 ? 12 : tempResolution.width <= 1024 ? 16 : 24;
 				return {
 					rows: 4,
 					cols: defaultCols,
@@ -943,46 +931,8 @@
 }
 
 window.GridDesigner = {
-	Init(containerOrCardId, cardIdOrResolutions, resolutionsOrTags, tagsOrState, maybeState) {
-		let container = document;
-		let editorCardId;
-		let resolutions = [];
-		let tags = [];
-		let state = {};
-		if (containerOrCardId instanceof HTMLElement || typeof containerOrCardId === "string") {
-			if (
-				containerOrCardId instanceof HTMLElement ||
-				document.getElementById(containerOrCardId)
-			) {
-				container =
-					containerOrCardId instanceof HTMLElement
-						? containerOrCardId
-						: document.getElementById(containerOrCardId) || document;
-				editorCardId = cardIdOrResolutions;
-				resolutions = resolutionsOrTags || [];
-				tags = tagsOrState || [];
-				state = maybeState || {};
-			} else {
-				container = document;
-				editorCardId = containerOrCardId;
-				resolutions = cardIdOrResolutions || [];
-				tags = resolutionsOrTags || [];
-				state = tagsOrState || {};
-			}
-		} else {
-			container = document;
-			editorCardId = containerOrCardId;
-			resolutions = cardIdOrResolutions || [];
-			tags = resolutionsOrTags || [];
-			state = tagsOrState || {};
-		}
-		window.GridDesignerInstance = new GridDesigner(
-			container,
-			editorCardId,
-			resolutions,
-			tags,
-			state,
-		);
+	Init(id, resolutions, tags, state) {
+		window.GridDesignerInstance = new GridDesigner(id, resolutions, tags, state);
 		return window.GridDesignerInstance;
 	},
 	GetCss() {
