@@ -56,8 +56,11 @@
 		this.buildGridButton = this.q("buildGrid");
 		this.clearGridButton = this.q("clearGrid");
 		this.exportCssButton = this.q("exportCss");
+		this.exportJsonButton = this.q("exportJson");
 		this.savePatternButton = this.q("savePattern");
 		this.deletePatternButton = this.q("deletePattern");
+		this.loadDesignButton = this.q("loadDesign");
+		this.importStateInput = this.q("importState");
 		this.cssCode = this.q("cssCode");
 		this.elementList = this.q("elementList");
 		this.gridWrapper = this.q("gridWrapper");
@@ -178,10 +181,16 @@
 			this.clearGridButton.addEventListener("click", this.handleClearGrid.bind(this));
 		if (this.exportCssButton)
 			this.exportCssButton.addEventListener("click", this.handleExportCss.bind(this));
+		if (this.exportJsonButton)
+			this.exportJsonButton.addEventListener("click", this.handleExportJson.bind(this));
 		if (this.savePatternButton)
 			this.savePatternButton.addEventListener("click", this.handleSavePattern.bind(this));
 		if (this.deletePatternButton)
 			this.deletePatternButton.addEventListener("click", this.handleDeletePattern.bind(this));
+		if (this.loadDesignButton)
+			this.loadDesignButton.addEventListener("click", () => this.importStateInput?.click());
+		if (this.importStateInput)
+			this.importStateInput.addEventListener("change", this.handleImportJson.bind(this));
 		window.addEventListener("resize", this.handleResize.bind(this));
 		window.addEventListener("pointerup", this.handlePointerUp.bind(this));
 		this.editorReady = true;
@@ -220,6 +229,17 @@
 		link.remove();
 	}
 
+	handleExportJson() {
+		const state = this.getState();
+		const blob = new Blob([JSON.stringify(state, null, 2)], { type: "application/json" });
+		const link = document.createElement("a");
+		link.href = URL.createObjectURL(blob);
+		link.download = "grid-designer-state.json";
+		document.body.appendChild(link);
+		link.click();
+		link.remove();
+	}
+
 	handleSavePattern() {
 		this.saveResolutionState(this.state.currentResolutionIndex);
 		const key = this.getCurrentPatternKey();
@@ -243,6 +263,34 @@
 		this.savePatternsToStorage();
 		this.updatePatternButtons();
 		this.updateCssPreview();
+	}
+
+	handleImportJson(event) {
+		const file = event.target.files?.[0];
+		if (!file) return;
+		const reader = new FileReader();
+		reader.onload = (e) => {
+			try {
+				const state = JSON.parse(e.target?.result || "{}");
+				this.loadEditorState(state);
+				const currentIndex = this.state.currentResolutionIndex || 0;
+				const resolution = this.resolutions[currentIndex];
+				if (resolution) {
+					this.setCurrentResolution(resolution);
+				} else {
+					this.renderGrid();
+					this.renderElementList();
+					this.renderRowControls();
+					this.updateCssPreview();
+				}
+			} catch (error) {
+				alert("Error loading design file: " + error.message);
+			}
+		};
+		reader.readAsText(file);
+		if (this.importStateInput) {
+			this.importStateInput.value = "";
+		}
 	}
 
 	handleResize() {
@@ -802,10 +850,7 @@
 	}
 
 	generateCss() {
-		const rootSelector =
-			this.containerElement !== document
-				? this.rootSelector
-				: `#${GridDesigner.sanitizeId(this.editorCardId)}`;
+		const rootSelector = `#${GridDesigner.sanitizeId(this.editorCardId)}`;
 		const allResolutionsCss = this.resolutions.map((res, index) => {
 			const state = this.getResolutionState(index) || this.createDefaultResolutionState(res);
 			const rowTemplate = state.rowHeights.join(" ");
@@ -820,7 +865,7 @@
 			const template = `grid-template-areas:\n${lines.join("\n")};`;
 			return (
 				`    @container box (min-width: ${res.width}px){\n` +
-				`        ${rootSelector} #grid {\n` +
+				`        ${rootSelector} {\n` +
 				`            display: grid;\n` +
 				`            grid-template-columns: repeat(${state.cols}, 1fr);\n` +
 				`            grid-template-rows: ${rowTemplate};\n` +
