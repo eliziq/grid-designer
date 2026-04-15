@@ -835,10 +835,22 @@
 	}
 
 	getCssMediaQuery(width) {
-		if (width === 768) return "@media (max-width: 768px)";
-		if (width === 1024) return "@media (min-width: 769px) and (max-width: 1024px)";
-		if (width === 1536) return "@media (min-width: 1536px)";
-		return `@media (min-width: ${width}px)`;
+		const sorted = [...this.resolutions].sort((a, b) => a.width - b.width);
+		const index = sorted.findIndex((r) => r.width === width);
+
+		if (index === 0) {
+			//smallest resolution
+			return `@container box (max-width: ${width}px)`;
+		}
+
+		if (index === sorted.length - 1) {
+			//largest resolution
+			return `@container box (min-width: ${sorted[index - 1].width + 1}px)`;
+		}
+
+		const min = sorted[index - 1].width + 1;
+		const max = width;
+		return `@container box (min-width: ${min}px) and (max-width: ${max}px)`;
 	}
 
 	generateCss() {
@@ -856,7 +868,7 @@
 			}
 			const template = `grid-template-areas:\n${lines.join("\n")};`;
 			return (
-				`    @container box (min-width: ${res.width}px){\n` +
+				this.getCssMediaQuery(res.width) +
 				`        ${rootSelector} {\n` +
 				`            display: grid;\n` +
 				`            grid-template-columns: repeat(${state.cols}, 1fr);\n` +
