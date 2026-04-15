@@ -27,10 +27,6 @@
 		this.editorReady = false;
 		this.allowedTags = [];
 
-		this.boundResizeHandler = this.handleResize.bind(this);
-		this.boundPointerUpHandler = this.handlePointerUp.bind(this);
-		this.boundPointerMoveHandler = this.handlePointerMove.bind(this);
-
 		this.cacheDomElements();
 		this.init(editorCardId, resolutions, tags, state);
 	}
@@ -159,8 +155,8 @@
 			this.loadDesignButton.addEventListener("click", () => this.importStateInput?.click());
 		if (this.importStateInput)
 			this.importStateInput.addEventListener("change", this.handleImportJson.bind(this));
-		window.addEventListener("resize", this.boundResizeHandler);
-		window.addEventListener("pointerup", this.boundPointerUpHandler);
+		window.addEventListener("resize", this.handleResize.bind(this));
+		window.addEventListener("pointerup", this.handlePointerUp.bind(this));
 		this.editorReady = true;
 	}
 
@@ -274,10 +270,12 @@
 		if (!this.resizeState) return;
 		this.resizeState.dragging = false;
 		this.resizeState = null;
-		if (this.boundPointerMoveHandler) {
-			window.removeEventListener("pointermove", this.boundPointerMoveHandler);
-			this.boundPointerMoveHandler = null;
+
+		if (this.handlePointerMoveBound) {
+			window.removeEventListener("pointermove", this.handlePointerMoveBound);
+			this.handlePointerMoveBound = null;
 		}
+
 		document.body.style.cursor = "default";
 		Array.from(this.containerElement.querySelectorAll(".area-block")).forEach((block) => {
 			block.classList.remove("edge-top", "edge-bottom", "edge-left", "edge-right");
@@ -287,16 +285,21 @@
 
 	handlePointerMove(event) {
 		if (!this.resizeState || !this.resizeState.dragging) return;
+
 		const { row, col } = this.cellToGridPos(event.clientX, event.clientY);
 		const { id, edge, startArea } = this.resizeState;
+
 		let { rowStart, rowEnd, colStart, colEnd } = startArea;
+
 		if (edge.top) rowStart = Math.min(row, rowEnd);
 		if (edge.bottom) rowEnd = Math.max(row, rowStart);
 		if (edge.left) colStart = Math.min(col, colEnd);
 		if (edge.right) colEnd = Math.max(col, colStart);
+
 		if (this.hasConflict(rowStart, colStart, rowEnd, colEnd, id)) {
 			return;
 		}
+
 		this.state.areas[id] = { id, rowStart, rowEnd, colStart, colEnd };
 		this.initMatrix();
 		Object.values(this.state.areas).forEach((area) => {
@@ -407,72 +410,45 @@
 
 	loadEditorState(state) {
 		if (!state || typeof state !== "object") return;
-		if (Array.isArray(state.elements) && state.elements.length > 0) {
-			this.state.elements = state.elements.map((element, index) =>
-				GridDesigner.normalizeTag(element, index),
-			);
+
+		if (Array.isArray(state.elements)) {
+			this.state.elements = state.elements
+				.map((el, i) => GridDesigner.normalizeTag(el, i))
+				.filter(Boolean);
 		}
-		if (Array.isArray(state.resolutions) && state.resolutions.length > 0) {
+		if (Array.isArray(state.resolutions)) {
 			this.resolutions = GridDesigner.normalizeResolutions(state.resolutions);
 		}
-		this.state.currentResolutionIndex =
-			Number.isInteger(state.currentResolutionIndex) && state.currentResolutionIndex >= 0
-				? Math.min(state.currentResolutionIndex, Math.max(this.resolutions.length - 1, 0))
-				: 0;
-		if (!Array.isArray(this.state.resolutionStates)) {
-			this.state.resolutionStates = [];
-		}
-		if (Array.isArray(state.resolutionStates) && state.resolutionStates.length > 0) {
-			this.state.resolutionStates = this.resolutions.map((res, index) => {
-				const rs = state.resolutionStates[index] || {};
-				return {
-					rows: Math.max(1, rs.rows || res.rows || 1),
-					cols: Math.max(1, rs.cols || res.cols || 1),
-					rowHeights: Array.isArray(rs.rowHeights)
-						? rs.rowHeights.map((row) => row || "1fr")
-						: Array(Math.max(1, rs.rows || 1)).fill("1fr"),
-					areas: rs.areas ? JSON.parse(JSON.stringify(rs.areas)) : {},
-					gridMatrix: Array.isArray(rs.gridMatrix)
-						? rs.gridMatrix.map((row) => [...row])
-						: Array.from({ length: Math.max(1, rs.rows || 1) }, () =>
-								Array(Math.max(1, rs.cols || 1)).fill(null),
-							),
-				};
-			});
-			if (this.state.resolutionStates.length < this.resolutions.length) {
-				for (
-					let i = this.state.resolutionStates.length;
-					i < this.resolutions.length;
-					i += 1
-				) {
-					this.state.resolutionStates[i] = this.createDefaultResolutionState(
-						this.resolutions[i],
-					);
-				}
+
+		const maxIdx = Math.max(0, this.resolutions.length - 1);
+		this.state.currentResolutionIndex = Number.isInteger(state.currentResolutionIndex)
+			? Math.min(Math.max(0, state.currentResolutionIndex), maxIdx)
+			: 0;
+
+		this.state.resolutionStates = this.resolutions.map((res, index) => {
+			const incoming =
+				(state.resolutionStates && state.resolutionStates[index]) ||
+				(index === this.state.currentResolutionIndex ? state : null);
+
+			if (!incoming || (!incoming.rows && !incoming.areas)) {
+				return this.createDefaultResolutionState(res);
 			}
-		} else {
-			const rootState = {
-				rows: typeof state.rows === "number" ? Math.max(1, state.rows) : 4,
-				cols: typeof state.cols === "number" ? Math.max(1, state.cols) : 24,
-				rowHeights: Array.isArray(state.rowHeights)
-					? state.rowHeights.map((height) => height || "1fr")
-					: Array(Math.max(1, state.rows || 4)).fill("1fr"),
-				areas:
-					state.areas && typeof state.areas === "object"
-						? JSON.parse(JSON.stringify(state.areas))
-						: {},
-				gridMatrix: Array.isArray(state.gridMatrix)
-					? state.gridMatrix.map((row) => [...row])
-					: Array.from({ length: Math.max(1, state.rows || 4) }, () =>
-							Array(Math.max(1, state.cols || 24)).fill(null),
-						),
+
+			const rows = Math.max(1, incoming.rows || 1);
+			const cols = Math.max(1, incoming.cols || 1);
+
+			return {
+				rows,
+				cols,
+				rowHeights: Array.isArray(incoming.rowHeights)
+					? [...incoming.rowHeights]
+					: Array(rows).fill("1fr"),
+				areas: incoming.areas ? JSON.parse(JSON.stringify(incoming.areas)) : {},
+				gridMatrix: Array.isArray(incoming.gridMatrix)
+					? incoming.gridMatrix.map((row) => [...row])
+					: Array.from({ length: rows }, () => Array(cols).fill(null)),
 			};
-			this.state.resolutionStates = this.resolutions.map((res, index) =>
-				index === this.state.currentResolutionIndex
-					? rootState
-					: this.createDefaultResolutionState(res),
-			);
-		}
+		});
 	}
 
 	createDefaultResolutionState(res) {
@@ -755,8 +731,9 @@
 			dragging: true,
 		};
 
-		window.addEventListener("pointermove", this.boundPointerMoveHandler);
-		window.addEventListener("pointerup", this.boundPointerUpHandler);
+		this.handlePointerMoveBound = this.handlePointerMove.bind(this);
+		window.addEventListener("pointermove", this.handlePointerMoveBound);
+		window.addEventListener("pointerup", this.handlePointerUp.bind(this));
 		document.body.style.cursor =
 			edge.top || edge.bottom ? "ns-resize" : edge.left || edge.right ? "ew-resize" : "move";
 	}
@@ -944,24 +921,10 @@
 	getCss() {
 		return this.generateCss();
 	}
-
-	destroy() {
-		window.removeEventListener("resize", this.boundResizeHandler);
-		window.removeEventListener("pointerup", this.boundPointerUpHandler);
-
-		if (this.boundPointerMoveHandler) {
-			window.removeEventListener("pointermove", this.boundPointerMoveHandler);
-		}
-
-		this.editorReady = false;
-	}
 }
 
 window.GridDesigner = {
 	Init(id, resolutions, tags, state) {
-		if (window.GridDesignerInstance) {
-			window.GridDesignerInstance.destroy();
-		}
 		window.GridDesignerInstance = new GridDesigner(id, resolutions, tags, state);
 		return window.GridDesignerInstance;
 	},
