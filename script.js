@@ -27,6 +27,10 @@
 		this.editorReady = false;
 		this.allowedTags = [];
 
+		this.boundResizeHandler = this.handleResize.bind(this);
+		this.boundPointerUpHandler = this.handlePointerUp.bind(this);
+		this.boundPointerMoveHandler = this.handlePointerMove.bind(this);
+
 		this.cacheDomElements();
 		this.init(editorCardId, resolutions, tags, state);
 	}
@@ -155,8 +159,8 @@
 			this.loadDesignButton.addEventListener("click", () => this.importStateInput?.click());
 		if (this.importStateInput)
 			this.importStateInput.addEventListener("change", this.handleImportJson.bind(this));
-		window.addEventListener("resize", this.handleResize.bind(this));
-		window.addEventListener("pointerup", this.handlePointerUp.bind(this));
+		window.addEventListener("resize", this.boundResizeHandler);
+		window.addEventListener("pointerup", this.boundPointerUpHandler);
 		this.editorReady = true;
 	}
 
@@ -270,9 +274,9 @@
 		if (!this.resizeState) return;
 		this.resizeState.dragging = false;
 		this.resizeState = null;
-		if (this.handlePointerMoveBound) {
-			window.removeEventListener("pointermove", this.handlePointerMoveBound);
-			this.handlePointerMoveBound = null;
+		if (this.boundPointerMoveHandler) {
+			window.removeEventListener("pointermove", this.boundPointerMoveHandler);
+			this.boundPointerMoveHandler = null;
 		}
 		document.body.style.cursor = "default";
 		Array.from(this.containerElement.querySelectorAll(".area-block")).forEach((block) => {
@@ -750,9 +754,9 @@
 			startArea: { ...area },
 			dragging: true,
 		};
-		this.handlePointerMoveBound = this.handlePointerMove.bind(this);
-		window.addEventListener("pointermove", this.handlePointerMoveBound);
-		window.addEventListener("pointerup", this.handlePointerUp.bind(this));
+
+		window.addEventListener("pointermove", this.boundPointerMoveHandler);
+		window.addEventListener("pointerup", this.boundPointerUpHandler);
 		document.body.style.cursor =
 			edge.top || edge.bottom ? "ns-resize" : edge.left || edge.right ? "ew-resize" : "move";
 	}
@@ -928,10 +932,24 @@
 	getCss() {
 		return this.generateCss();
 	}
+
+	destroy() {
+		window.removeEventListener("resize", this.boundResizeHandler);
+		window.removeEventListener("pointerup", this.boundPointerUpHandler);
+
+		if (this.boundPointerMoveHandler) {
+			window.removeEventListener("pointermove", this.boundPointerMoveHandler);
+		}
+
+		this.editorReady = false;
+	}
 }
 
 window.GridDesigner = {
 	Init(id, resolutions, tags, state) {
+		if (window.GridDesignerInstance) {
+			window.GridDesignerInstance.destroy();
+		}
 		window.GridDesignerInstance = new GridDesigner(id, resolutions, tags, state);
 		return window.GridDesignerInstance;
 	},
