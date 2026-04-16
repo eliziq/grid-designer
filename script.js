@@ -47,6 +47,7 @@
 		this.elementList = this.q("elementList");
 		this.gridWrapper = this.q("gridWrapper");
 		this.resolutionTabs = this.q("resolutionTabs");
+		this.rowControls = this.q("controlsContainer");
 	}
 
 	q(id) {
@@ -739,25 +740,24 @@
 	}
 
 	renderRowControls() {
-		const existingControls = this.q("rowControls");
-		if (existingControls) existingControls.remove();
-		const controlsContainer = document.createElement("div");
-		controlsContainer.id = "rowControls";
-		const title = document.createElement("h3");
-		title.textContent = "Row Heights";
-		controlsContainer.appendChild(title);
+		const existingControls = this.rowControls.querySelectorAll("label");
+		if (existingControls) existingControls.forEach((el) => el.remove());
+		const controlsContainer = this.rowControls;
+
+		const options = [
+			{ value: "1fr", label: "Flexible (1fr)" },
+			{ value: "max-content", label: "Content height" },
+			{ value: "min-content", label: "Min content" },
+			{ value: "auto", label: "Auto" },
+		];
+
 		for (let i = 0; i < this.state.rows; i++) {
 			const rowControl = document.createElement("label");
 			const label = document.createElement("span");
 			label.textContent = `Row ${i + 1}:`;
 			const select = document.createElement("select");
 			select.dataset.rowIndex = i;
-			const options = [
-				{ value: "1fr", label: "Flexible (1fr)" },
-				{ value: "max-content", label: "Content height" },
-				{ value: "min-content", label: "Min content" },
-				{ value: "auto", label: "Auto" },
-			];
+
 			options.forEach((option) => {
 				const optionEl = document.createElement("option");
 				optionEl.value = option.value;
@@ -767,17 +767,17 @@
 				}
 				select.appendChild(optionEl);
 			});
+
 			select.addEventListener("change", (e) => {
 				const rowIndex = parseInt(e.target.dataset.rowIndex, 10);
 				this.state.rowHeights[rowIndex] = e.target.value;
 				this.updateCssPreview();
 			});
+
 			rowControl.appendChild(label);
 			rowControl.appendChild(select);
 			controlsContainer.appendChild(rowControl);
 		}
-		const controlsSection = this.q("controls");
-		if (controlsSection) controlsSection.appendChild(controlsContainer);
 	}
 
 	updateGridScaling() {
