@@ -1,5 +1,5 @@
 ﻿class GridDesigner {
-	constructor(editorCardId, resolutions = [], tags = [], state = {}) {
+	constructor(editorCardId, resolutions = {}, tags = [], state = {}) {
 		if (!editorCardId) return;
 
 		this.containerElement = document;
@@ -16,9 +16,10 @@
 			elements: [],
 			currentResolutionIndex: 0,
 		};
-
-		this.resolutions = [];
+		this.resolutions = resolutions;
+		this.state.currentPageWidth = Object.keys(resolutions)[0];
 		this.currentResolution = null;
+		this.sortedscreenWidths = [];
 		this.gridWidth = 1536;
 		this.gridHeight = 864;
 		this.savedPatterns = {};
@@ -48,6 +49,7 @@
 		this.gridWrapper = this.q("gridWrapper");
 		this.resolutionTabs = this.q("resolutionTabs");
 		this.rowControls = this.q("controlsContainer");
+		this.mainMaxWidthSelect = this.q("mainMaxWidth");
 	}
 
 	q(id) {
@@ -73,12 +75,29 @@
 	}
 
 	static normalizeResolutions(resolutions) {
-		if (!Array.isArray(resolutions) || resolutions.length === 0) {
-			return [];
+		if (!resolutions || typeof resolutions !== "object") {
+			console.warn("Invalid resolutions format. Expected an object.");
+			return {};
 		}
-		return resolutions
-			.map((res) => GridDesigner.normalizeResolution(res))
-			.filter((res) => res.width > 0 && res.height > 0);
+
+		const normalized = {};
+
+		Object.keys(resolutions).forEach((pageWidth) => {
+			const bannerSizes = resolutions[pageWidth];
+
+			if (Array.isArray(bannerSizes)) {
+				const validBanners = bannerSizes
+					.map((res) => this.normalizeResolution(res))
+					.filter((res) => res.width > 0 && res.height > 0)
+					.sort((a, b) => b.width - a.width || b.height - a.height);
+
+				if (validBanners.length > 0) {
+					normalized[pageWidth] = validBanners;
+				}
+			}
+		});
+
+		return normalized;
 	}
 
 	static normalizeTag(tag, index) {
@@ -97,7 +116,7 @@
 		return tags.map((tag, index) => GridDesigner.normalizeTag(tag, index)).filter(Boolean);
 	}
 
-	init(editorCardId, resolutions = [], tags = [], state = {}) {
+	init(editorCardId, resolutions = {}, tags = [], state = {}) {
 		this.editorCardId = String(editorCardId != null ? editorCardId : this.editorCardId);
 		this.resolutions = GridDesigner.normalizeResolutions(resolutions);
 		this.allowedTags = GridDesigner.normalizeTags(tags);
@@ -106,6 +125,7 @@
 		}
 
 		this.loadEditorState(state);
+		this.populatePageWidthSelect();
 		this.initializeMatrixFromState();
 		this.attachEditorListeners();
 		this.createResolutionTabs();
@@ -123,6 +143,33 @@
 			this.renderRowControls();
 			this.updateCssPreview();
 		}
+	}
+
+	populatePageWidthSelect() {
+		if (!this.mainMaxWidthSelect) return;
+		this.mainMaxWidthSelect.innerHTML = "";
+
+		Object.keys(this.resolutions).forEach((width) => {
+			const option = document.createElement("option");
+			option.value = width;
+			option.textContent = ` ${width}px`;
+			if (width === this.state.currentPageWidth) option.selected = true;
+			this.mainMaxWidthSelect.appendChild(option);
+		});
+
+		this.mainMaxWidthSelect.onchange = (e) => {
+			this.saveResolutionState(this.state.currentResolutionIndex);
+
+			this.state.currentPageWidth = e.target.value;
+			this.state.currentResolutionIndex = 0;
+
+			this.createResolutionTabs();
+
+			const group = this.resolutions[this.state.currentPageWidth];
+			if (group && group[0]) {
+				this.setCurrentResolution(group[0], true);
+			}
+		};
 	}
 
 	initializeMatrixFromState() {
@@ -339,14 +386,20 @@
 	createResolutionTabs() {
 		if (!this.resolutionTabs) return;
 		this.resolutionTabs.innerHTML = "";
-		this.resolutions.forEach((res, index) => {
+
+		const activeGroup = this.resolutions[this.state.currentPageWidth] || [];
+
+		activeGroup.forEach((res, index) => {
 			const label = document.createElement("label");
 			const radio = document.createElement("input");
+			const isActive = index === this.state.currentResolutionIndex;
+			label.classList.toggle("active", isActive);
+
 			radio.type = "radio";
 			radio.name = "resolution";
 			radio.value = index;
-			radio.checked = index === this.state.currentResolutionIndex;
-			label.classList.toggle("active", index === this.state.currentResolutionIndex);
+			radio.checked = index === isActive;
+
 			radio.addEventListener("change", () => {
 				this.containerElement
 					.querySelectorAll("#resolutionTabs label")
@@ -354,8 +407,10 @@
 				label.classList.add("active");
 				this.setCurrentResolution(res);
 			});
+
 			label.appendChild(radio);
 			label.appendChild(document.createTextNode(` ${res.width}x${res.height}`));
+
 			this.resolutionTabs.appendChild(label);
 		});
 	}
@@ -376,7 +431,8 @@
 			this.saveResolutionState(this.state.currentResolutionIndex);
 		}
 		this.currentResolution = res;
-		this.state.currentResolutionIndex = this.resolutions.indexOf(res);
+		this.state.currentResolutionIndex =
+			this.resolutions[this.state.currentPageWidth].indexOf(res);
 		const radios = this.containerElement.querySelectorAll(
 			"#resolutionTabs input[type='radio']",
 		);
@@ -417,38 +473,58 @@
 				.map((el, i) => GridDesigner.normalizeTag(el, i))
 				.filter(Boolean);
 		}
-		if (Array.isArray(state.resolutions)) {
-			this.resolutions = GridDesigner.normalizeResolutions(state.resolutions);
+
+		if (state.resolutionStructure) {
+			this.resolutions = GridDesigner.normalizeResolutions(state.resolutionStructure);
 		}
 
-		const maxIdx = Math.max(0, this.resolutions.length - 1);
+		const availableWidths = Object.keys(this.resolutions);
+		this.sortedScreenWidths = availableWidths.sort((a, b) => Number(b) - Number(a));
+
+		this.state.currentPageWidth =
+			state.currentPageWidth && availableWidths.includes(String(state.currentPageWidth))
+				? String(state.currentPageWidth)
+				: availableWidths[0];
+
+		const currentGroup = this.resolutions[this.state.currentPageWidth] || [];
+		const maxIdx = Math.max(0, currentGroup.length - 1);
 		this.state.currentResolutionIndex = Number.isInteger(state.currentResolutionIndex)
 			? Math.min(Math.max(0, state.currentResolutionIndex), maxIdx)
 			: 0;
 
-		this.state.resolutionStates = this.resolutions.map((res, index) => {
-			const incoming =
-				(state.resolutionStates && state.resolutionStates[index]) ||
-				(index === this.state.currentResolutionIndex ? state : null);
+		this.state.resolutionStates = {};
 
-			if (!incoming || (!incoming.rows && !incoming.areas)) {
-				return this.createDefaultResolutionState(res);
-			}
+		availableWidths.forEach((pageWidth) => {
+			const banners = this.resolutions[pageWidth];
 
-			const rows = Math.max(1, incoming.rows || 1);
-			const cols = Math.max(1, incoming.cols || 1);
+			this.state.resolutionStates[pageWidth] = banners.map((res, index) => {
+				const { resolutionStates, currentResolutionIndex } = state;
 
-			return {
-				rows,
-				cols,
-				rowHeights: Array.isArray(incoming.rowHeights)
-					? [...incoming.rowHeights]
-					: Array(rows).fill("1fr"),
-				areas: incoming.areas ? JSON.parse(JSON.stringify(incoming.areas)) : {},
-				gridMatrix: Array.isArray(incoming.gridMatrix)
-					? incoming.gridMatrix.map((row) => [...row])
-					: Array.from({ length: rows }, () => Array(cols).fill(null)),
-			};
+				const isCurrentlyActive =
+					pageWidth === this.state.currentPageWidth && index === currentResolutionIndex;
+
+				const incoming =
+					resolutionStates?.[pageWidth]?.[index] || (isCurrentlyActive ? state : null);
+
+				if (!incoming || (!incoming.rows && !incoming.areas)) {
+					return this.createDefaultResolutionState(res);
+				}
+
+				const rows = Math.max(1, incoming.rows || 1);
+				const cols = Math.max(1, incoming.cols || 1);
+
+				return {
+					rows,
+					cols,
+					rowHeights: Array.isArray(incoming.rowHeights)
+						? [...incoming.rowHeights]
+						: Array(rows).fill("1fr"),
+					areas: incoming.areas ? JSON.parse(JSON.stringify(incoming.areas)) : {},
+					gridMatrix: Array.isArray(incoming.gridMatrix)
+						? incoming.gridMatrix.map((row) => [...row])
+						: Array.from({ length: rows }, () => Array(cols).fill(null)),
+				};
+			});
 		});
 	}
 
@@ -464,15 +540,15 @@
 	}
 
 	getCurrentPatternKey() {
-		const cardId = this.editorCardId != null ? this.editorCardId : "default";
-		const resolutionIndex = Number.isInteger(this.state.currentResolutionIndex)
-			? this.state.currentResolutionIndex
-			: 0;
-		return `${cardId}-${resolutionIndex}`;
+		return `${this.editorCardId}-${this.state.currentPageWidth}-${this.state.currentResolutionIndex}`;
 	}
 
 	setResolutionState(index, state) {
-		this.state.resolutionStates[index] = {
+		if (!this.state.resolutionStates[this.state.currentPageWidth]) {
+			this.state.resolutionStates[this.state.currentPageWidth] = [];
+		}
+
+		this.state.resolutionStates[this.state.currentPageWidth][index] = {
 			rows: Math.max(1, state.rows || 1),
 			cols: Math.max(1, state.cols || 1),
 			rowHeights: Array.isArray(state.rowHeights)
@@ -504,7 +580,8 @@
 	}
 
 	getResolutionState(index) {
-		return this.state.resolutionStates[index] || null;
+		const group = this.state.resolutionStates[this.state.currentPageWidth];
+		return group ? group[index] : null;
 	}
 
 	applyResolutionState(state) {
@@ -811,52 +888,67 @@
 		this.gridHeight = this.currentResolution?.height || 864;
 	}
 
-	getCssMediaQuery(width) {
-		const sorted = [...this.resolutions].sort((a, b) => a.width - b.width);
-		const index = sorted.findIndex((r) => r.width === width);
+	getCssContainerQuery(screenWidth, bannerWidth) {
+		//resolutions are sorted in descending order
+		const resolutions = this.resolutions[screenWidth];
+		const index = resolutions.findIndex((r) => r.width === bannerWidth);
+
+		if (index === resolutions.length - 1) {
+			//smallest resolution
+			return `@container box (max-width: ${bannerWidth}px)`;
+		}
 
 		if (index === 0) {
-			//smallest resolution
-			return `@container box (max-width: ${width}px)`;
-		}
-
-		if (index === sorted.length - 1) {
 			//largest resolution
-			return `@container box (min-width: ${sorted[index - 1].width + 1}px)`;
+			return `@container box (min-width: ${resolutions[index + 1].width + 1}px)`;
 		}
 
-		const min = sorted[index - 1].width + 1;
-		const max = width;
+		const min = resolutions[index + 1].width + 1;
+		const max = bannerWidth;
 		return `@container box (min-width: ${min}px) and (max-width: ${max}px)`;
 	}
 
 	generateCss() {
 		const rootSelector = `#${GridDesigner.sanitizeId(this.editorCardId)}`;
-		const allResolutionsCss = this.resolutions.map((res, index) => {
-			const state = this.getResolutionState(index) || this.createDefaultResolutionState(res);
-			const rowTemplate = state.rowHeights.join(" ");
-			const lines = [];
-			for (let r = 0; r < state.rows; r++) {
-				const rowCells = [];
-				for (let c = 0; c < state.cols; c++) {
-					rowCells.push(state.gridMatrix[r][c] || ".");
+		let css = "";
+
+		this.sortedScreenWidths.forEach((pageWidth) => {
+			const banners = this.resolutions[pageWidth];
+			const states = this.state.resolutionStates[pageWidth] || [];
+
+			css += `@media (max-width: ${pageWidth}px) {\n`;
+
+			const currentScreenWidthCss = banners.map((res, index) => {
+				const state = states[index] || this.createDefaultResolutionState(res);
+
+				const rowTemplate = state.rowHeights.join(" ");
+				const lines = [];
+				for (let r = 0; r < state.rows; r++) {
+					const rowCells = [];
+					for (let c = 0; c < state.cols; c++) {
+						rowCells.push(state.gridMatrix[r][c] || ".");
+					}
+					lines.push(`                "${rowCells.join(" ")}"`);
 				}
-				lines.push(`            "${rowCells.join(" ")}"`);
-			}
-			const template = `grid-template-areas:\n${lines.join("\n")};`;
-			return (
-				this.getCssMediaQuery(res.width) +
-				`        ${rootSelector} {\n` +
-				`            display: grid;\n` +
-				`            grid-template-columns: repeat(${state.cols}, 1fr);\n` +
-				`            grid-template-rows: ${rowTemplate};\n` +
-				`            gap: 8px;\n` +
-				`            ${template}\n` +
-				`        }\n` +
-				`    }\n`
-			);
+				const template = `grid-template-areas:\n${lines.join("\n")};`;
+				return (
+					`${this.getCssContainerQuery(pageWidth, res.width)} {\n` +
+					`        ${rootSelector} {\n` +
+					`            display: grid;\n` +
+					`            grid-template-columns: repeat(${state.cols}, 1fr);\n` +
+					`            grid-template-rows: ${rowTemplate};\n` +
+					`            gap: 8px;\n` +
+					`            ${template}\n` +
+					`        }\n` +
+					`    }\n`
+				);
+			});
+
+			css += currentScreenWidthCss.join("\n");
+			css += `}\n\n`;
 		});
-		return allResolutionsCss.join("\n\n");
+
+		return css;
 	}
 
 	updateCssPreview() {
@@ -886,35 +978,11 @@
 		this.saveResolutionState(this.state.currentResolutionIndex);
 		return {
 			id: this.editorCardId,
-			resolutions: this.resolutions.map((res) => ({
-				width: res.width,
-				height: res.height,
-				label: res.label,
-			})),
+			currentPageWidth: this.state.currentPageWidth,
 			currentResolutionIndex: this.state.currentResolutionIndex,
 			elements: JSON.parse(JSON.stringify(this.state.elements)),
-			resolutionStates: this.resolutions.map((_, index) => {
-				const state = this.getResolutionState(index);
-				if (state) {
-					return {
-						rows: state.rows,
-						cols: state.cols,
-						rowHeights: [...state.rowHeights],
-						areas: JSON.parse(JSON.stringify(state.areas)),
-						gridMatrix: state.gridMatrix.map((row) => [...row]),
-					};
-				}
-				const tempResolution = this.resolutions[index];
-				const defaultCols =
-					tempResolution.width <= 768 ? 12 : tempResolution.width <= 1024 ? 16 : 24;
-				return {
-					rows: 4,
-					cols: defaultCols,
-					rowHeights: Array(4).fill("1fr"),
-					areas: {},
-					gridMatrix: Array.from({ length: 4 }, () => Array(defaultCols).fill(null)),
-				};
-			}),
+			resolutionStates: this.state.resolutionStates,
+			resolutionStructure: this.resolutions,
 		};
 	}
 

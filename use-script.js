@@ -1,11 +1,21 @@
 // usage
-const resolutions = [
-	{ width: 360, height: 800 },
-	{ width: 600, height: 400 },
-	{ width: 768, height: 1024 },
-	{ width: 1024, height: 768 },
-	{ width: 1536, height: 864 },
-];
+const resolutions = {
+	1536: [
+		{ width: 1536, height: 640 },
+
+		{ width: 768, height: 640 },
+
+		{ width: 512, height: 640 },
+
+		{ width: 1024, height: 640 },
+
+		{ width: 384, height: 640 },
+
+		{ width: 1152, height: 640 },
+	],
+
+	672: [{ width: 672, height: 336 }],
+};
 
 const cardId = 123;
 const tags = [
