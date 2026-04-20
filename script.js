@@ -127,11 +127,15 @@
 		this.loadEditorState(state);
 		this.populatePageWidthSelect();
 		this.initializeMatrixFromState();
-		this.attachEditorListeners();
 		this.createResolutionTabs();
+		this.attachEditorListeners();
+
+		const pageWidth = this.state.currentPageWidth || Object.keys(this.resolutions)[0];
 
 		const defaultResolution =
-			this.resolutions[this.state.currentResolutionIndex] || this.resolutions[0];
+			this.resolutions[pageWidth]?.[this.state.currentResolutionIndex] ||
+			this.resolutions[pageWidth]?.[0];
+
 		if (defaultResolution) {
 			this.setCurrentResolution(defaultResolution);
 		} else {
@@ -179,7 +183,7 @@
 		} else {
 			this.applyResolutionState(
 				this.createDefaultResolutionState(
-					this.resolutions[0] || { width: 1536, height: 864 },
+					this.resolutions[this.state.currentPageWidth]?.[0] || { width: 1536, height: 864 },
 				),
 			);
 		}
@@ -284,10 +288,11 @@
 		reader.onload = (e) => {
 			try {
 				const state = JSON.parse(e.target?.result || "{}");
+				const currentPageWidth = state.currentPageWidth;
 				this.loadEditorState(state);
 				this.createResolutionTabs();
 				const currentIndex = this.state.currentResolutionIndex || 0;
-				const resolution = this.resolutions[currentIndex];
+				const resolution = this.resolutions[currentPageWidth]?.[currentIndex];
 				if (resolution) {
 					const activeState = this.getResolutionState(currentIndex);
 					if (activeState) {
@@ -1003,5 +1008,3 @@ window.GridDesigner = {
 		return window.GridDesignerInstance?.getState?.() || null;
 	},
 };
-
-console.log(window.GridDesigner);
