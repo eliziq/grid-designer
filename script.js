@@ -401,12 +401,15 @@
 			const label = document.createElement("label");
 			const radio = document.createElement("input");
 			const isActive = index === this.state.currentResolutionIndex;
+			const resolutionState = this.getResolutionState(index);
+			const isFinished = Boolean(resolutionState?.finished);
 			label.classList.toggle("active", isActive);
+			label.classList.toggle("finished", isFinished);
 
 			radio.type = "radio";
 			radio.name = "resolution";
 			radio.value = index;
-			radio.checked = index === isActive;
+			radio.checked = isActive;
 
 			radio.addEventListener("change", () => {
 				this.containerElement
@@ -421,6 +424,8 @@
 
 			this.resolutionTabs.appendChild(label);
 		});
+
+		this.updateResolutionTabState();
 	}
 
 	activateFirstResolutionTab() {
@@ -470,6 +475,7 @@
 		this.renderElementList();
 		this.renderRowControls();
 		this.updateCssPreview();
+		this.updateResolutionTabState();
 		this.updatePatternButtons();
 	}
 
@@ -543,6 +549,7 @@
 			cols,
 			rowHeights: Array(4).fill("1fr"),
 			areas: {},
+			finished: false,
 			gridMatrix: Array.from({ length: 4 }, () => Array(cols).fill(null)),
 		};
 	}
@@ -558,7 +565,7 @@
 			this.state.resolutionStates[pageWidth] = [];
 		}
 
-		this.state.resolutionStates[pageWidth][index] = {
+		const normalizedState = {
 			rows: Math.max(1, state.rows || 1),
 			cols: Math.max(1, state.cols || 1),
 			rowHeights: Array.isArray(state.rowHeights)
@@ -571,6 +578,9 @@
 						Array(Math.max(1, state.cols || 1)).fill(null),
 					),
 		};
+
+		normalizedState.finished = this.isResolutionStateFinished(normalizedState);
+		this.state.resolutionStates[pageWidth][index] = normalizedState;
 	}
 
 	loadPattern(patternKey) {
@@ -642,6 +652,33 @@
 				? "Update Pattern"
 				: "Save Pattern";
 		}
+	}
+
+	isResolutionStateFinished(state) {
+		const requiredElementIds = (this.state.elements || []).map((element) => element.id);
+		if (!requiredElementIds.length) return false;
+
+		const areaIds = new Set(Object.keys(state?.areas || {}));
+		return requiredElementIds.every((id) => areaIds.has(id));
+	}
+
+	refreshFinishedStates() {
+		Object.keys(this.state.resolutionStates || {}).forEach((pageWidth) => {
+			const states = this.state.resolutionStates[pageWidth] || [];
+			states.forEach((state) => {
+				if (!state) return;
+				state.finished = this.isResolutionStateFinished(state);
+			});
+		});
+	}
+
+	updateResolutionTabState() {
+		if (!this.resolutionTabs) return;
+		const labels = this.resolutionTabs.querySelectorAll("label");
+		labels.forEach((label, index) => {
+			const resolutionState = this.getResolutionState(index);
+			label.classList.toggle("finished", Boolean(resolutionState?.finished));
+		});
 	}
 
 	hasConflict(r0, c0, r1, c1, id = null) {
@@ -929,43 +966,94 @@
 		return `@container box (min-width: ${min}px) and (max-width: ${max}px)`;
 	}
 
-	generateGridTemplate(state) {
-		const lines = state.gridMatrix.map(
-			(row) => `            "${row.map((cell) => cell || ".").join(" ")}"`,
-		);
+	getCssContainerQueryForFinished(finishedWidths, index) {
+		if (!Array.isArray(finishedWidths) || finishedWidths.length === 0) {
+			return "@container box";
+		}
 
-		return `display: grid;
-	    grid-template-columns: repeat(${state.cols}, 1fr);
-	    grid-template-rows: ${state.rowHeights.join(" ")};
-	    gap: 8px;
-	    grid-template-areas:
-	    ${lines.join("\n").trim()};`;
+		if (finishedWidths.length === 1) {
+			return "@container box";
+		}
+
+		if (index === 0) {
+			return `@container box (min-width: ${finishedWidths[0] + 1}px)`;
+		}
+
+		if (index === finishedWidths.length - 1) {
+			return `@container box (max-width: ${finishedWidths[index - 1]}px)`;
+		}
+
+		const min = finishedWidths[index] + 1;
+		const max = finishedWidths[index - 1];
+		return `@container box (min-width: ${min}px) and (max-width: ${max}px)`;
+	}
+
+	generateGridTemplate(state, indent = "") {
+		const cols = Math.max(1, Number(state?.cols) || 1);
+		const rowHeights = Array.isArray(state?.rowHeights) ? state.rowHeights : ["1fr"];
+		const inputRows = Array.isArray(state?.gridMatrix) ? state.gridMatrix : [];
+		const rows = inputRows.length > 0 ? inputRows : [Array.from({ length: cols }, () => ".")];
+
+		const areaLines = rows
+			.map((row) => {
+				const normalizedRow = Array.from(
+					{ length: cols },
+					(_, index) => (Array.isArray(row) ? row[index] : null) || ".",
+				);
+				return `${indent}  "${normalizedRow.join(" ")}"`;
+			})
+			.join("\n");
+
+		return [
+			`${indent}display: grid;`,
+			`${indent}grid-template-columns: repeat(${cols}, 1fr);`,
+			`${indent}grid-template-rows: ${rowHeights.join(" ")};`,
+			`${indent}gap: 8px;`,
+			`${indent}grid-template-areas:`,
+			`${areaLines};`,
+		].join("\n");
 	}
 
 	generateCss() {
 		const rootSelector = `.box[cardid="${GridDesigner.sanitizeId(this.editorCardId)}"] .stripe`;
+		this.refreshFinishedStates();
 
 		return this.sortedScreenWidths
 			.map((pageWidth) => {
 				const banners = this.resolutions[pageWidth];
 				const states = this.state.resolutionStates[pageWidth] || [];
+				const finishedEntries = banners
+					.map((res, idx) => ({ res, state: states[idx] }))
+					.filter(({ state }) => Boolean(state?.finished));
 
-				const innerContent = banners
-					.map(
-						(res, idx) => `    ${this.getCssContainerQuery(pageWidth, res.width)} {
-        ${rootSelector} {
-            ${this.generateGridTemplate(states[idx])}
-        }
-    }`,
-					)
-					.join("\n");
-				return `@media (max-width: ${pageWidth}px) {\n${innerContent}\n}\n`;
+				if (!finishedEntries.length) return "";
+
+				const finishedWidths = finishedEntries.map(({ res }) => res.width);
+
+				const innerContent = finishedEntries
+					.map(({ state }, idx) => {
+						const query = this.getCssContainerQueryForFinished(finishedWidths, idx);
+						return [
+							`  ${query} {`,
+							`    ${rootSelector} {`,
+							this.generateGridTemplate(state, "      "),
+							"    }",
+							"  }",
+						].join("\n");
+					})
+					.join("\n\n");
+
+				return [`@media (max-width: ${pageWidth}px) {`, innerContent, "}"].join("\n");
 			})
-			.join("\n");
+			.filter(Boolean)
+			.join("\n\n");
 	}
 
 	updateCssPreview() {
 		if (!this.cssCode) return;
+		this.saveResolutionState(this.state.currentResolutionIndex);
+		this.refreshFinishedStates();
+		this.updateResolutionTabState();
 		this.cssCode.textContent = this.generateCss();
 	}
 

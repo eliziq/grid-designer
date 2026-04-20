@@ -345,6 +345,13 @@ input[readonly] {
 		background: #0078d4;
 		border-color: #0078d4;
 	}
+	#resolutionTabs label.finished {
+		border-color: #2fbe5d;
+	}
+	#resolutionTabs label.finished.active {
+		border-color: #2fbe5d;
+		box-shadow: inset 0 0 0 1px #2fbe5d;
+	}
 }
 #resolutionTabs {
 	display: flex;
@@ -365,6 +372,13 @@ input[readonly] {
 	color: white;
 	border-color: #007acc;
 	font-weight: bold;
+}
+#resolutionTabs label.finished {
+	border-color: #2fb95a;
+}
+#resolutionTabs label.finished.active {
+	border-color: #2fb95a;
+	box-shadow: inset 0 0 0 1px #2fb95a;
 }
 #resolutionTabs input[type="radio"] {
 	display: none;
