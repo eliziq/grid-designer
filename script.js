@@ -183,7 +183,10 @@
 		} else {
 			this.applyResolutionState(
 				this.createDefaultResolutionState(
-					this.resolutions[this.state.currentPageWidth]?.[0] || { width: 1536, height: 864 },
+					this.resolutions[this.state.currentPageWidth]?.[0] || {
+						width: 1536,
+						height: 864,
+					},
 				),
 			);
 		}
@@ -549,11 +552,13 @@
 	}
 
 	setResolutionState(index, state) {
-		if (!this.state.resolutionStates[this.state.currentPageWidth]) {
-			this.state.resolutionStates[this.state.currentPageWidth] = [];
+		const pageWidth = this.state.currentPageWidth;
+
+		if (!this.state.resolutionStates[pageWidth]) {
+			this.state.resolutionStates[pageWidth] = [];
 		}
 
-		this.state.resolutionStates[this.state.currentPageWidth][index] = {
+		this.state.resolutionStates[pageWidth][index] = {
 			rows: Math.max(1, state.rows || 1),
 			cols: Math.max(1, state.cols || 1),
 			rowHeights: Array.isArray(state.rowHeights)
@@ -638,6 +643,7 @@
 				: "Save Pattern";
 		}
 	}
+
 	hasConflict(r0, c0, r1, c1, id = null) {
 		for (let r = r0; r <= r1; r++) {
 			for (let c = c0; c <= c1; c++) {
@@ -678,6 +684,15 @@
 		return true;
 	}
 
+	getGridMetrics() {
+		const gap = 8;
+		const { cols, rows } = this.state;
+		return {
+			gap,
+			colWidth: (this.gridWidth - gap * (cols - 1)) / cols,
+			rowHeight: (this.gridHeight - gap * (rows - 1)) / rows,
+		};
+	}
 	renderGrid() {
 		if (!this.grid) return;
 		this.grid.innerHTML = "";
@@ -709,8 +724,8 @@
 	renderAreas() {
 		if (!this.grid) return;
 		const gap = 8;
-		const cellWidth = (this.gridWidth - gap * (this.state.cols - 1)) / this.state.cols;
-		const cellHeight = (this.gridHeight - gap * (this.state.rows - 1)) / this.state.rows;
+		const { colWidth: cellWidth, rowHeight: cellHeight } = this.getGridMetrics();
+
 		Object.values(this.state.areas).forEach((area) => {
 			const element = this.state.elements.find((el) => el.id === area.id);
 			const block = document.createElement("div");
@@ -767,8 +782,9 @@
 		const scale = parseFloat(
 			getComputedStyle(this.gridWrapper).getPropertyValue("--grid-scale") || "1",
 		);
-		const colSize = (this.gridWidth - gap * (this.state.cols - 1)) / this.state.cols;
-		const rowSize = (this.gridHeight - gap * (this.state.rows - 1)) / this.state.rows;
+
+		const { colWidth: colSize, rowHeight: rowSize } = this.getGridMetrics();
+
 		const scaledX = x / scale;
 		const scaledY = y / scale;
 		const col = Math.min(
@@ -913,47 +929,39 @@
 		return `@container box (min-width: ${min}px) and (max-width: ${max}px)`;
 	}
 
+	generateGridTemplate(state) {
+		const lines = state.gridMatrix.map(
+			(row) => `            "${row.map((cell) => cell || ".").join(" ")}"`,
+		);
+
+		return `display: grid;
+	    grid-template-columns: repeat(${state.cols}, 1fr);
+	    grid-template-rows: ${state.rowHeights.join(" ")};
+	    gap: 8px;
+	    grid-template-areas:
+	    ${lines.join("\n").trim()};`;
+	}
+
 	generateCss() {
 		const rootSelector = `.box[cardid="${GridDesigner.sanitizeId(this.editorCardId)}"] .stripe`;
-		let css = "";
 
-		this.sortedScreenWidths.forEach((pageWidth) => {
-			const banners = this.resolutions[pageWidth];
-			const states = this.state.resolutionStates[pageWidth] || [];
+		return this.sortedScreenWidths
+			.map((pageWidth) => {
+				const banners = this.resolutions[pageWidth];
+				const states = this.state.resolutionStates[pageWidth] || [];
 
-			css += `@media (max-width: ${pageWidth}px) {\n`;
-
-			const currentScreenWidthCss = banners.map((res, index) => {
-				const state = states[index] || this.createDefaultResolutionState(res);
-
-				const rowTemplate = state.rowHeights.join(" ");
-				const lines = [];
-				for (let r = 0; r < state.rows; r++) {
-					const rowCells = [];
-					for (let c = 0; c < state.cols; c++) {
-						rowCells.push(state.gridMatrix[r][c] || ".");
-					}
-					lines.push(`                "${rowCells.join(" ")}"`);
-				}
-				const template = `grid-template-areas:\n${lines.join("\n")};`;
-				return (
-					`${this.getCssContainerQuery(pageWidth, res.width)} {\n` +
-					`        ${rootSelector} {\n` +
-					`            display: grid;\n` +
-					`            grid-template-columns: repeat(${state.cols}, 1fr);\n` +
-					`            grid-template-rows: ${rowTemplate};\n` +
-					`            gap: 8px;\n` +
-					`            ${template}\n` +
-					`        }\n` +
-					`    }\n`
-				);
-			});
-
-			css += currentScreenWidthCss.join("\n");
-			css += `}\n\n`;
-		});
-
-		return css;
+				const innerContent = banners
+					.map(
+						(res, idx) => `    ${this.getCssContainerQuery(pageWidth, res.width)} {
+        ${rootSelector} {
+            ${this.generateGridTemplate(states[idx])}
+        }
+    }`,
+					)
+					.join("\n");
+				return `@media (max-width: ${pageWidth}px) {\n${innerContent}\n}\n`;
+			})
+			.join("\n");
 	}
 
 	updateCssPreview() {
