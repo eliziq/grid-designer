@@ -909,7 +909,7 @@
 	}
 
 	generateCss() {
-		const rootSelector = `#${GridDesigner.sanitizeId(this.editorCardId)}`;
+		const rootSelector = `.box[cardid="${GridDesigner.sanitizeId(this.editorCardId)}"] .stripe`;
 		let css = "";
 
 		this.sortedScreenWidths.forEach((pageWidth) => {
@@ -1003,3 +1003,5 @@ window.GridDesigner = {
 		return window.GridDesignerInstance?.getState?.() || null;
 	},
 };
+
+console.log(window.GridDesigner);
