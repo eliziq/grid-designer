@@ -1,0 +1,652 @@
+{
+  "id": "123",
+  "currentPageWidth": "1536",
+  "currentResolutionIndex": 1,
+  "elements": [
+    {
+      "id": "title",
+      "name": "Title"
+    },
+    {
+      "id": "desc",
+      "name": "Desc"
+    },
+    {
+      "id": "button",
+      "name": "Button"
+    }
+  ],
+  "resolutionStates": {
+    "672": [
+      {
+        "rows": 4,
+        "cols": 12,
+        "rowHeights": [
+          "1fr",
+          "1fr",
+          "1fr",
+          "1fr"
+        ],
+        "areas": {
+          "title": {
+            "id": "title",
+            "rowStart": 0,
+            "rowEnd": 3,
+            "colStart": 2,
+            "colEnd": 7
+          }
+        },
+        "gridMatrix": [
+          [
+            null,
+            null,
+            "title",
+            "title",
+            "title",
+            "title",
+            "title",
+            "title",
+            null,
+            null,
+            null,
+            null
+          ],
+          [
+            null,
+            null,
+            "title",
+            "title",
+            "title",
+            "title",
+            "title",
+            "title",
+            null,
+            null,
+            null,
+            null
+          ],
+          [
+            null,
+            null,
+            "title",
+            "title",
+            "title",
+            "title",
+            "title",
+            "title",
+            null,
+            null,
+            null,
+            null
+          ],
+          [
+            null,
+            null,
+            "title",
+            "title",
+            "title",
+            "title",
+            "title",
+            "title",
+            null,
+            null,
+            null,
+            null
+          ]
+        ],
+        "finished": false
+      }
+    ],
+    "1536": [
+      {
+        "rows": 4,
+        "cols": 24,
+        "rowHeights": [
+          "1fr",
+          "1fr",
+          "1fr",
+          "1fr"
+        ],
+        "areas": {
+          "desc": {
+            "id": "desc",
+            "rowStart": 0,
+            "rowEnd": 0,
+            "colStart": 8,
+            "colEnd": 16
+          }
+        },
+        "gridMatrix": [
+          [
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            "desc",
+            "desc",
+            "desc",
+            "desc",
+            "desc",
+            "desc",
+            "desc",
+            "desc",
+            "desc",
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null
+          ],
+          [
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null
+          ],
+          [
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null
+          ],
+          [
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null
+          ]
+        ],
+        "finished": false
+      },
+      {
+        "rows": 4,
+        "cols": 24,
+        "rowHeights": [
+          "1fr",
+          "1fr",
+          "1fr",
+          "1fr"
+        ],
+        "areas": {
+          "button": {
+            "id": "button",
+            "rowStart": 1,
+            "rowEnd": 1,
+            "colStart": 6,
+            "colEnd": 18
+          },
+          "desc": {
+            "id": "desc",
+            "rowStart": 0,
+            "rowEnd": 0,
+            "colStart": 6,
+            "colEnd": 11
+          },
+          "title": {
+            "id": "title",
+            "rowStart": 2,
+            "rowEnd": 2,
+            "colStart": 6,
+            "colEnd": 14
+          }
+        },
+        "gridMatrix": [
+          [
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            "desc",
+            "desc",
+            "desc",
+            "desc",
+            "desc",
+            "desc",
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null
+          ],
+          [
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            "button",
+            "button",
+            "button",
+            "button",
+            "button",
+            "button",
+            "button",
+            "button",
+            "button",
+            "button",
+            "button",
+            "button",
+            "button",
+            null,
+            null,
+            null,
+            null,
+            null
+          ],
+          [
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            "title",
+            "title",
+            "title",
+            "title",
+            "title",
+            "title",
+            "title",
+            "title",
+            "title",
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null
+          ],
+          [
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null
+          ]
+        ],
+        "finished": true
+      },
+      {
+        "rows": 4,
+        "cols": 4,
+        "rowHeights": [
+          "1fr",
+          "1fr",
+          "1fr",
+          "1fr"
+        ],
+        "areas": {
+          "desc": {
+            "id": "desc",
+            "rowStart": 1,
+            "rowEnd": 1,
+            "colStart": 1,
+            "colEnd": 2
+          },
+          "title": {
+            "id": "title",
+            "rowStart": 0,
+            "rowEnd": 3,
+            "colStart": 0,
+            "colEnd": 0
+          },
+          "button": {
+            "id": "button",
+            "rowStart": 0,
+            "rowEnd": 0,
+            "colStart": 1,
+            "colEnd": 1
+          }
+        },
+        "gridMatrix": [
+          [
+            "title",
+            "button",
+            null,
+            null
+          ],
+          [
+            "title",
+            "desc",
+            "desc",
+            null
+          ],
+          [
+            "title",
+            null,
+            null,
+            null
+          ],
+          [
+            "title",
+            null,
+            null,
+            null
+          ]
+        ],
+        "finished": true
+      },
+      {
+        "rows": 2,
+        "cols": 2,
+        "rowHeights": [
+          "1fr",
+          "1fr"
+        ],
+        "areas": {
+          "title": {
+            "id": "title",
+            "rowStart": 0,
+            "rowEnd": 0,
+            "colStart": 0,
+            "colEnd": 0
+          },
+          "button": {
+            "id": "button",
+            "rowStart": 0,
+            "rowEnd": 0,
+            "colStart": 1,
+            "colEnd": 1
+          },
+          "desc": {
+            "id": "desc",
+            "rowStart": 1,
+            "rowEnd": 1,
+            "colStart": 0,
+            "colEnd": 0
+          }
+        },
+        "gridMatrix": [
+          [
+            "title",
+            "button"
+          ],
+          [
+            "desc",
+            null
+          ]
+        ],
+        "finished": true
+      },
+      {
+        "rows": 4,
+        "cols": 12,
+        "rowHeights": [
+          "1fr",
+          "1fr",
+          "1fr",
+          "1fr"
+        ],
+        "areas": {},
+        "gridMatrix": [
+          [
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null
+          ],
+          [
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null
+          ],
+          [
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null
+          ],
+          [
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null
+          ]
+        ],
+        "finished": false
+      },
+      {
+        "rows": 4,
+        "cols": 12,
+        "rowHeights": [
+          "1fr",
+          "1fr",
+          "1fr",
+          "1fr"
+        ],
+        "areas": {},
+        "gridMatrix": [
+          [
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null
+          ],
+          [
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null
+          ],
+          [
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null
+          ],
+          [
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null
+          ]
+        ],
+        "finished": false
+      }
+    ]
+  },
+  "resolutionStructure": {
+    "672": [
+      {
+        "width": 672,
+        "height": 336,
+        "label": "672x336"
+      }
+    ],
+    "1536": [
+      {
+        "width": 1536,
+        "height": 640,
+        "label": "1536x640"
+      },
+      {
+        "width": 1152,
+        "height": 640,
+        "label": "1152x640"
+      },
+      {
+        "width": 1024,
+        "height": 640,
+        "label": "1024x640"
+      },
+      {
+        "width": 768,
+        "height": 640,
+        "label": "768x640"
+      },
+      {
+        "width": 512,
+        "height": 640,
+        "label": "512x640"
+      },
+      {
+        "width": 384,
+        "height": 640,
+        "label": "384x640"
+      }
+    ]
+  }
+}

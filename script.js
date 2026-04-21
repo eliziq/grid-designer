@@ -540,6 +540,8 @@
 				};
 			});
 		});
+
+		this.syncStateWithTags();
 	}
 
 	createDefaultResolutionState(res) {
@@ -670,6 +672,94 @@
 				state.finished = this.isResolutionStateFinished(state);
 			});
 		});
+	}
+
+	syncStateWithTags() {
+		const tagIds = new Set((this.state.elements || []).map((el) => el.id));
+		if (!tagIds.size) return;
+
+		const allPageWidths = Object.keys(this.state.resolutionStates || {});
+
+		// Find any finished resolution state for efficient diffing
+		let finishedState = null;
+		outer: for (const pageWidth of allPageWidths) {
+			for (const state of this.state.resolutionStates[pageWidth] || []) {
+				if (state?.finished) {
+					finishedState = state;
+					break outer;
+				}
+			}
+		}
+
+		let removedIds;
+		let markAllUnfinished = false;
+
+		if (finishedState) {
+			const finishedAreaIds = new Set(Object.keys(finishedState.areas || {}));
+
+			// find new tags
+			for (const tagId of tagIds) {
+				if (!finishedAreaIds.has(tagId)) {
+					markAllUnfinished = true;
+					break;
+				}
+			}
+
+			// find removed tags
+			removedIds = new Set();
+			for (const areaId of finishedAreaIds) {
+				if (!tagIds.has(areaId)) {
+					removedIds.add(areaId);
+				}
+			}
+		} else {
+			removedIds = new Set();
+			for (const pageWidth of allPageWidths) {
+				for (const state of this.state.resolutionStates[pageWidth] || []) {
+					for (const areaId of Object.keys(state?.areas || {})) {
+						if (!tagIds.has(areaId)) {
+							removedIds.add(areaId);
+						}
+					}
+				}
+			}
+		}
+
+		// remove stale elements
+		if (removedIds.size > 0) {
+			for (const pageWidth of allPageWidths) {
+				for (const state of this.state.resolutionStates[pageWidth] || []) {
+					if (!state) continue;
+					let modified = false;
+					for (const id of removedIds) {
+						if (id in (state.areas || {})) {
+							delete state.areas[id];
+							modified = true;
+						}
+					}
+					if (modified && Array.isArray(state.gridMatrix)) {
+						for (let r = 0; r < state.gridMatrix.length; r++) {
+							const row = state.gridMatrix[r];
+							for (let c = 0; c < row.length; c++) {
+								if (removedIds.has(row[c])) {
+									row[c] = null;
+								}
+							}
+						}
+					}
+				}
+			}
+		}
+
+		if (markAllUnfinished && removedIds.size === 0) {
+			for (const pageWidth of allPageWidths) {
+				for (const state of this.state.resolutionStates[pageWidth] || []) {
+					if (state) state.finished = false;
+				}
+			}
+		} else {
+			this.refreshFinishedStates();
+		}
 	}
 
 	updateResolutionTabState() {
