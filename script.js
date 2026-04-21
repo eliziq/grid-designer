@@ -291,11 +291,12 @@
 		reader.onload = (e) => {
 			try {
 				const state = JSON.parse(e.target?.result || "{}");
-				const currentPageWidth = state.currentPageWidth;
 				this.loadEditorState(state);
+				this.populatePageWidthSelect();
 				this.createResolutionTabs();
+				const pageWidth = this.state.currentPageWidth;
 				const currentIndex = this.state.currentResolutionIndex || 0;
-				const resolution = this.resolutions[currentPageWidth]?.[currentIndex];
+				const resolution = this.resolutions[pageWidth]?.[currentIndex];
 				if (resolution) {
 					const activeState = this.getResolutionState(currentIndex);
 					if (activeState) {
