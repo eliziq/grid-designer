@@ -858,6 +858,7 @@
 			const element = this.state.elements.find((el) => el.id === area.id);
 			const block = document.createElement("div");
 			block.className = "area-block";
+			block.draggable = false;
 			block.dataset.areaId = area.id;
 			const x = area.colStart * (cellWidth + gap);
 			const y = area.rowStart * (cellHeight + gap);
@@ -883,12 +884,14 @@
 				if (edge.edge) {
 					block.style.cursor = edge.left || edge.right ? "ew-resize" : "ns-resize";
 				} else {
-					block.style.cursor = "move";
+					block.style.cursor = "default";
 				}
 			});
 			block.addEventListener("pointerleave", () => {
-				block.style.cursor = "move";
+				block.style.cursor = "default";
 			});
+			block.addEventListener("dragstart", (e) => e.preventDefault());
+			block.addEventListener("selectstart", (e) => e.preventDefault());
 			block.addEventListener("dragover", (e) => e.preventDefault());
 			block.addEventListener("drop", this.handleDrop.bind(this));
 			this.grid.appendChild(block);
@@ -939,6 +942,7 @@
 	}
 
 	handleAreaPointerDown(event) {
+		event.preventDefault();
 		event.stopPropagation();
 		if (event.button !== 0) return;
 		const block = event.currentTarget;

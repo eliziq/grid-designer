@@ -146,7 +146,9 @@ input[readonly] {
 	font-weight: 600;
 	color: #1a2b6f;
 	pointer-events: auto;
-	cursor: move;
+	cursor: default;
+	user-select: none;
+	-webkit-user-drag: none;
 }
 .area-block.edge-top,
 .area-block.edge-bottom {
