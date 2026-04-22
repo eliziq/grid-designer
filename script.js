@@ -233,6 +233,7 @@
 		this.initMatrix();
 		this.state.areas = {};
 		this.renderGrid();
+		this.renderElementList();
 		this.updateCssPreview();
 	}
 
@@ -389,6 +390,7 @@
 			return;
 		}
 		this.renderGrid();
+		this.renderElementList();
 		this.updateCssPreview();
 	}
 
@@ -1155,11 +1157,15 @@
 	renderElementList() {
 		if (!this.elementList) return;
 		this.elementList.innerHTML = "";
+		const placedIds = new Set(Object.keys(this.state.areas || {}));
 		this.state.elements.forEach((element) => {
 			const tag = document.createElement("div");
-			tag.className = "element-tag";
+			const isPlaced = placedIds.has(element.id);
+			tag.className = `element-tag ${isPlaced ? "placed" : "pending"}`;
 			tag.draggable = true;
 			tag.textContent = element.name;
+			tag.title = isPlaced ? "Placed on grid" : "Still needs placement";
+
 			if (!this.areaColors[element.id])
 				this.areaColors[element.id] = GridDesigner.generateAreaColor(element.id);
 			tag.style.borderColor = this.areaColors[element.id];

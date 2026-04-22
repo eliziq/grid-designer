@@ -174,6 +174,16 @@ input[readonly] {
 .element-tag:active {
 	cursor: grabbing;
 }
+.element-tag.pending {
+	background: #fff7d6;
+	border-width: 2px;
+	box-shadow: 0 0 0 2px rgba(255, 193, 7, 0.25);
+}
+.element-tag.placed {
+	background: #e8f7ee;
+	border-color: #5dbd77;
+	color: #1f5a31;
+}
 .deleteBtn {
 	background: #ff5c5c;
 	color: white;
