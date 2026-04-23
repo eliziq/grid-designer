@@ -933,7 +933,7 @@
 
 	isEdgePosition(event, block) {
 		const rect = block.getBoundingClientRect();
-		const threshold = 8;
+		const threshold = 12;
 		const x = event.clientX - rect.left;
 		const y = event.clientY - rect.top;
 		const right = x >= rect.width - threshold;
