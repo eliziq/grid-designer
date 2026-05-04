@@ -31,6 +31,11 @@ button {
 button:hover {
 	background: #535aff;
 }
+h2{
+	font-size: 1.25rem;
+	color: #333;
+	margin-bottom: 0.75rem;
+}
 #savePattern {
 	background: #28a745;
 }
@@ -166,7 +171,7 @@ input[readonly] {
 	padding: 0.35rem 0.5rem;
 	background: #f0f0ff;
 	border: 1px solid #bbb;
-	border-radius: 999px;
+	border-radius: 6px;
 	font-size: 0.9rem;
 	cursor: grab;
 	user-select: none;
@@ -336,7 +341,7 @@ input[readonly] {
 }
 #resolutionTabs label {
 	display: inline-block;
-	padding: 10px 15px;
+	padding: 8px 12px;
 	border: 2px solid #ccc;
 	background: #f9f9f9;
 	cursor: pointer;
