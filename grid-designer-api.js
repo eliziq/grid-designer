@@ -9,4 +9,7 @@ window.GridDesigner = {
 	GetState() {
 		return window.GridDesignerInstance?.getState?.() || null;
 	},
+	GetTags() {
+		return window.GridDesignerInstance?.getTags?.() || [];
+	},
 };

@@ -624,6 +624,10 @@ Object.assign(GridDesigner.prototype, {
 		};
 	},
 
+	getTags() {
+		return JSON.parse(JSON.stringify(this.allowedTags || []));
+	},
+
 	getCss() {
 		return this.generateCss();
 	},
