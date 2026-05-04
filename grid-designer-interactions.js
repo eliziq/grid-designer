@@ -17,9 +17,111 @@ Object.assign(GridDesigner.prototype, {
 			this.loadDesignButton.addEventListener("click", () => this.importStateInput?.click());
 		if (this.importStateInput)
 			this.importStateInput.addEventListener("change", this.handleImportJson.bind(this));
+		this.containerElement.addEventListener("click", this.handleTagSelectionClick.bind(this));
+		this.containerElement.addEventListener("change", this.handleTagSelectionChange.bind(this));
 		window.addEventListener("resize", this.handleResize.bind(this));
 		window.addEventListener("pointerup", this.handlePointerUp.bind(this));
 		this.editorReady = true;
+	},
+
+	handleTagSelectionClick(event) {
+		const target = event.target;
+		if (!(target instanceof Element)) return;
+		if (target.id === "tagSelectionSave") {
+			event.preventDefault();
+			this.handleSaveSelectedTags();
+			return;
+		}
+		if (target.id === "tagSelectionEdit") {
+			event.preventDefault();
+			this.tagSelectionLocked = false;
+			this.renderTagSelectionPanel();
+		}
+	},
+
+	handleTagSelectionChange(event) {
+		const target = event.target;
+		if (!(target instanceof Element)) return;
+		if (!target.closest("#tagSelectionPanel")) return;
+
+		if (target.classList.contains("tag-selector__tag-check")) {
+			const tagItem = target.closest(".tag-selector__item");
+			if (!tagItem) return;
+			const isChecked = target.checked;
+			tagItem.querySelectorAll(".tag-selector__ctrl input").forEach((ctrlInput) => {
+				ctrlInput.disabled = !isChecked;
+			});
+			return;
+		}
+
+		if (target.closest(".tag-selector__ctrl")) {
+			const tagItem = target.closest(".tag-selector__item");
+			if (!tagItem) return;
+			const tagId = tagItem.dataset.tagId;
+			const tag = this.allowedTags.find((item) => item.id === tagId);
+			if (!tag || tag.controlType !== "checkbox") return;
+
+			const controls = Array.from(tagItem.querySelectorAll(".tag-selector__ctrl input"));
+			const hasSelectedControl = controls.some((input) => input.checked);
+			const tagCheckbox = tagItem.querySelector(".tag-selector__tag-check");
+
+			if (!hasSelectedControl && tagCheckbox) {
+				tagCheckbox.checked = false;
+				controls.forEach((input) => {
+					input.disabled = true;
+				});
+			}
+		}
+	},
+
+	handleSaveSelectedTags() {
+		const panel = this.containerElement.querySelector("#tagSelectionPanel");
+		if (!panel) return;
+
+		this.allowedTags = this.allowedTags.map((tag) => {
+			const tagItem = panel.querySelector(`.tag-selector__item[data-tag-id="${tag.id}"]`);
+			if (!tagItem) return { ...tag };
+
+			let isSelected = Boolean(tagItem.querySelector(".tag-selector__tag-check")?.checked);
+			let ctrls = (tag.ctrls || []).map((ctrl) => {
+				const ctrlInput = tagItem.querySelector(`input[data-ctrl-id="${ctrl.id}"]`);
+				return {
+					...ctrl,
+					selected: isSelected ? Boolean(ctrlInput?.checked) : false,
+				};
+			});
+
+			if (tag.controlType === "checkbox" && isSelected && ctrls.length) {
+				isSelected = ctrls.some((ctrl) => ctrl.selected);
+				if (!isSelected) {
+					ctrls = ctrls.map((ctrl) => ({ ...ctrl, selected: false }));
+				}
+			}
+
+			if (
+				tag.controlType === "radio" &&
+				isSelected &&
+				ctrls.length &&
+				!ctrls.some((ctrl) => ctrl.selected)
+			) {
+				ctrls = ctrls.map((ctrl, index) => ({ ...ctrl, selected: index === 0 }));
+			}
+
+			return {
+				...tag,
+				selected: isSelected,
+				ctrls,
+			};
+		});
+
+		this.applySelectedTags();
+		this.syncStateWithTags();
+		this.tagSelectionLocked = true;
+		this.renderTagSelectionPanel();
+		this.renderElementList();
+		this.renderGrid();
+		this.renderRowControls();
+		this.updateCssPreview();
 	},
 
 	handleBuildGrid() {
@@ -99,6 +201,7 @@ Object.assign(GridDesigner.prototype, {
 		reader.onload = (e) => {
 			try {
 				const state = JSON.parse(e.target?.result || "{}");
+				this.tagSelectionLocked = true;
 				this.loadEditorState(state);
 				this.populatePageWidthSelect();
 				this.createResolutionTabs();
@@ -106,11 +209,7 @@ Object.assign(GridDesigner.prototype, {
 				const currentIndex = this.state.currentResolutionIndex || 0;
 				const resolution = this.resolutions[pageWidth]?.[currentIndex];
 				if (resolution) {
-					const activeState = this.getResolutionState(currentIndex);
-					if (activeState) {
-						this.applyResolutionState(activeState);
-					}
-					this.setCurrentResolution(resolution);
+					this.setCurrentResolution(resolution, true);
 				} else {
 					this.renderGrid();
 					this.renderElementList();
@@ -182,6 +281,7 @@ Object.assign(GridDesigner.prototype, {
 		event.preventDefault();
 		const elementId = event.dataTransfer.getData("text/plain");
 		if (!elementId) return;
+		this.ensureGridMatrixIntegrity();
 		let r;
 		let c;
 		if (event.currentTarget.classList.contains("cell")) {

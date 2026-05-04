@@ -27,6 +27,7 @@ class GridDesigner {
 		this.resizeState = null;
 		this.editorReady = false;
 		this.allowedTags = [];
+		this.tagSelectionLocked = false;
 
 		this.cacheDomElements();
 		this.init(editorCardId, resolutions, tags, state);
@@ -50,6 +51,10 @@ class GridDesigner {
 		this.resolutionTabs = this.q("resolutionTabs");
 		this.rowControls = this.q("controlsContainer");
 		this.mainMaxWidthSelect = this.q("mainMaxWidth");
+		this.tagSelectionPanel = this.q("tagSelectionPanel");
+		this.tagSelectorList = this.q("tagSelectorList");
+		this.tagSelectorMeta = this.q("tagSelectorMeta");
+		this.tagSelectorDetails = this.q("tagSelectorDetails");
 	}
 
 	q(id) {
@@ -103,12 +108,46 @@ class GridDesigner {
 	static normalizeTag(tag, index) {
 		if (tag && typeof tag === "object") {
 			const name = String(tag.name || tag.label || tag.id || `Tag ${index + 1}`);
+			const controlType = tag.controlType === "radio" ? "radio" : "checkbox";
+			const ctrls = Array.isArray(tag.ctrls)
+				? tag.ctrls
+						.map((ctrl, ctrlIndex) => GridDesigner.normalizeTagControl(ctrl, name, ctrlIndex))
+						.filter(Boolean)
+				: [];
+
+			if (controlType === "radio" && ctrls.length && !ctrls.some((ctrl) => ctrl.selected)) {
+				ctrls[0].selected = true;
+			}
+
 			return {
 				id: GridDesigner.sanitizeId(tag.id || name) || `tag_${index + 1}`,
 				name,
+				selected: GridDesigner.normalizeBoolean(tag.selected, true),
+				controlType,
+				ctrls,
 			};
 		}
 		return null;
+	}
+
+	static normalizeTagControl(ctrl, tagName, index) {
+		if (!ctrl || typeof ctrl !== "object") return null;
+		const name = String(ctrl.name || ctrl.label || `Option ${index + 1}`);
+		return {
+			id: GridDesigner.sanitizeId(ctrl.id || `${tagName}-${name}`) || `ctrl_${index + 1}`,
+			name,
+			selected: GridDesigner.normalizeBoolean(ctrl.selected, false),
+		};
+	}
+
+	static normalizeBoolean(value, fallback = false) {
+		if (typeof value === "boolean") return value;
+		if (typeof value === "string") {
+			const lowered = value.trim().toLowerCase();
+			if (lowered === "true") return true;
+			if (lowered === "false") return false;
+		}
+		return fallback;
 	}
 
 	static normalizeTags(tags) {
@@ -116,12 +155,70 @@ class GridDesigner {
 		return tags.map((tag, index) => GridDesigner.normalizeTag(tag, index)).filter(Boolean);
 	}
 
+	applySelectedTags() {
+		this.state.elements = this.allowedTags
+			.filter((tag) => tag.selected)
+			.map((tag) => ({
+				id: tag.id,
+				name: tag.name,
+				controlType: tag.controlType,
+				ctrls: (tag.ctrls || [])
+					.filter((ctrl) => ctrl.selected)
+					.map((ctrl) => ({ id: ctrl.id, name: ctrl.name, selected: true })),
+			}));
+	}
+
+	mergeAllowedTagsWithStateElements(elements = []) {
+		if (!this.allowedTags.length) return;
+		if (!Array.isArray(elements) || !elements.length) {
+			this.applySelectedTags();
+			return;
+		}
+
+		const selectedTagIds = new Set(
+			elements.map((el) => GridDesigner.sanitizeId(el?.id || el?.name || "")).filter(Boolean),
+		);
+
+		const selectedControlsByTag = new Map();
+		elements.forEach((el) => {
+			const tagId = GridDesigner.sanitizeId(el?.id || el?.name || "");
+			if (!tagId) return;
+			const ctrls = Array.isArray(el?.ctrls) ? el.ctrls : [];
+			const selectedControlIds = ctrls
+				.filter((ctrl) => GridDesigner.normalizeBoolean(ctrl?.selected, true))
+				.map((ctrl) => GridDesigner.sanitizeId(ctrl?.id || ctrl?.name || ""))
+				.filter(Boolean);
+			selectedControlsByTag.set(tagId, new Set(selectedControlIds));
+		});
+
+		this.allowedTags = this.allowedTags.map((tag) => {
+			const selected = selectedTagIds.has(tag.id);
+			const selectedCtrlIds = selectedControlsByTag.get(tag.id);
+			let ctrls = (tag.ctrls || []).map((ctrl) => ({
+				...ctrl,
+				selected: selectedCtrlIds ? selectedCtrlIds.has(ctrl.id) : ctrl.selected,
+			}));
+
+			if (tag.controlType === "radio" && ctrls.length && !ctrls.some((ctrl) => ctrl.selected)) {
+				ctrls = ctrls.map((ctrl, index) => ({ ...ctrl, selected: index === 0 }));
+			}
+
+			return {
+				...tag,
+				selected,
+				ctrls,
+			};
+		});
+
+		this.applySelectedTags();
+	}
+
 	init(editorCardId, resolutions = {}, tags = [], state = {}) {
 		this.editorCardId = String(editorCardId != null ? editorCardId : this.editorCardId);
 		this.resolutions = GridDesigner.normalizeResolutions(resolutions);
 		this.allowedTags = GridDesigner.normalizeTags(tags);
 		if (this.allowedTags.length) {
-			this.state.elements = [...this.allowedTags];
+			this.applySelectedTags();
 		}
 
 		this.loadEditorState(state);
@@ -129,6 +226,7 @@ class GridDesigner {
 		this.initializeMatrixFromState();
 		this.createResolutionTabs();
 		this.attachEditorListeners();
+		this.renderTagSelectionPanel();
 
 		const pageWidth = this.state.currentPageWidth || Object.keys(this.resolutions)[0];
 

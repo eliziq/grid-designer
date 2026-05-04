@@ -1,9 +1,10 @@
 Object.assign(GridDesigner.prototype, {
 	hasConflict(r0, c0, r1, c1, id = null) {
+		this.ensureGridMatrixIntegrity();
 		for (let r = r0; r <= r1; r++) {
 			for (let c = c0; c <= c1; c++) {
 				if (r < 0 || r >= this.state.rows || c < 0 || c >= this.state.cols) return true;
-				const current = this.state.gridMatrix[r][c];
+				const current = this.state.gridMatrix[r]?.[c];
 				if (current && current !== id) return true;
 			}
 		}
@@ -11,11 +12,12 @@ Object.assign(GridDesigner.prototype, {
 	},
 
 	removeArea(id) {
+		this.ensureGridMatrixIntegrity();
 		const area = this.state.areas[id];
 		if (!area) return;
 		for (let r = area.rowStart; r <= area.rowEnd; r++) {
 			for (let c = area.colStart; c <= area.colEnd; c++) {
-				if (this.state.gridMatrix[r][c] === id) {
+				if (this.state.gridMatrix[r]?.[c] === id) {
 					this.state.gridMatrix[r][c] = null;
 				}
 			}
@@ -24,6 +26,7 @@ Object.assign(GridDesigner.prototype, {
 	},
 
 	assignArea(id, r0, c0, r1, c1) {
+		this.ensureGridMatrixIntegrity();
 		const rowStart = Math.min(r0, r1);
 		const rowEnd = Math.max(r0, r1);
 		const colStart = Math.min(c0, c1);

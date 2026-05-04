@@ -1,0 +1,561 @@
+{
+  "id": "123",
+  "currentPageWidth": "1536",
+  "currentResolutionIndex": 0,
+  "elements": [
+    {
+      "id": "event_place",
+      "name": "Stadium name, Stadium description  ",
+      "controlType": "checkbox",
+      "ctrls": [
+        {
+          "id": "stadium_name_stadium_description_-stadium_name",
+          "name": "Stadium name",
+          "selected": true
+        },
+        {
+          "id": "stadium_name_stadium_description_-stadium_description",
+          "name": "Stadium description",
+          "selected": true
+        }
+      ]
+    }
+  ],
+  "resolutionStates": {
+    "672": [
+      {
+        "rows": 4,
+        "cols": 12,
+        "rowHeights": [
+          "1fr",
+          "1fr",
+          "1fr",
+          "1fr"
+        ],
+        "areas": {},
+        "finished": false,
+        "gridMatrix": [
+          [
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null
+          ],
+          [
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null
+          ],
+          [
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null
+          ],
+          [
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null
+          ]
+        ]
+      }
+    ],
+    "1536": [
+      {
+        "rows": 4,
+        "cols": 12,
+        "rowHeights": [
+          "1fr",
+          "1fr",
+          "1fr",
+          "1fr"
+        ],
+        "areas": {
+          "event_place": {
+            "id": "event_place",
+            "rowStart": 0,
+            "rowEnd": 0,
+            "colStart": 2,
+            "colEnd": 8
+          }
+        },
+        "gridMatrix": [
+          [
+            null,
+            null,
+            "event_place",
+            "event_place",
+            "event_place",
+            "event_place",
+            "event_place",
+            "event_place",
+            "event_place",
+            null,
+            null,
+            null
+          ],
+          [
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null
+          ],
+          [
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null
+          ],
+          [
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null
+          ]
+        ],
+        "finished": true
+      },
+      {
+        "rows": 4,
+        "cols": 10,
+        "rowHeights": [
+          "1fr",
+          "1fr",
+          "1fr",
+          "1fr"
+        ],
+        "areas": {},
+        "gridMatrix": [
+          [
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null
+          ],
+          [
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null
+          ],
+          [
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null
+          ],
+          [
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null
+          ]
+        ],
+        "finished": false
+      },
+      {
+        "rows": 4,
+        "cols": 16,
+        "rowHeights": [
+          "1fr",
+          "1fr",
+          "1fr",
+          "1fr"
+        ],
+        "areas": {
+          "event_place": {
+            "id": "event_place",
+            "rowStart": 0,
+            "rowEnd": 0,
+            "colStart": 3,
+            "colEnd": 6
+          }
+        },
+        "gridMatrix": [
+          [
+            null,
+            null,
+            null,
+            "event_place",
+            "event_place",
+            "event_place",
+            "event_place",
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null
+          ],
+          [
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null
+          ],
+          [
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null
+          ],
+          [
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null
+          ]
+        ],
+        "finished": true
+      },
+      {
+        "rows": 4,
+        "cols": 12,
+        "rowHeights": [
+          "1fr",
+          "1fr",
+          "1fr",
+          "1fr"
+        ],
+        "areas": {},
+        "gridMatrix": [
+          [
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null
+          ],
+          [
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null
+          ],
+          [
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null
+          ],
+          [
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null
+          ]
+        ],
+        "finished": false
+      },
+      {
+        "rows": 4,
+        "cols": 12,
+        "rowHeights": [
+          "1fr",
+          "1fr",
+          "1fr",
+          "1fr"
+        ],
+        "areas": {},
+        "gridMatrix": [
+          [
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null
+          ],
+          [
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null
+          ],
+          [
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null
+          ],
+          [
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null
+          ]
+        ],
+        "finished": false
+      },
+      {
+        "rows": 4,
+        "cols": 4,
+        "rowHeights": [
+          "1fr",
+          "1fr",
+          "1fr",
+          "1fr"
+        ],
+        "areas": {
+          "event_place": {
+            "id": "event_place",
+            "rowStart": 0,
+            "rowEnd": 0,
+            "colStart": 1,
+            "colEnd": 2
+          }
+        },
+        "gridMatrix": [
+          [
+            null,
+            "event_place",
+            "event_place",
+            null
+          ],
+          [
+            null,
+            null,
+            null,
+            null
+          ],
+          [
+            null,
+            null,
+            null,
+            null
+          ],
+          [
+            null,
+            null,
+            null,
+            null
+          ]
+        ],
+        "finished": true
+      }
+    ]
+  },
+  "resolutionStructure": {
+    "672": [
+      {
+        "width": 672,
+        "height": 336,
+        "label": "672x336"
+      }
+    ],
+    "1536": [
+      {
+        "width": 1536,
+        "height": 640,
+        "label": "1536x640"
+      },
+      {
+        "width": 1152,
+        "height": 640,
+        "label": "1152x640"
+      },
+      {
+        "width": 1024,
+        "height": 640,
+        "label": "1024x640"
+      },
+      {
+        "width": 768,
+        "height": 640,
+        "label": "768x640"
+      },
+      {
+        "width": 512,
+        "height": 640,
+        "label": "512x640"
+      },
+      {
+        "width": 384,
+        "height": 640,
+        "label": "384x640"
+      }
+    ]
+  }
+}

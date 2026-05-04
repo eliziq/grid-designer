@@ -1,19 +1,37 @@
 {
   "id": "123",
   "currentPageWidth": "1536",
-  "currentResolutionIndex": 1,
+  "currentResolutionIndex": 3,
   "elements": [
     {
-      "id": "title",
-      "name": "Title"
+      "id": "event_date",
+      "name": "Event date and time",
+      "controlType": "radio",
+      "ctrls": [
+        {
+          "id": "event_date_and_time-event_date_format_ddmmyyyy",
+          "name": "Event date (format: DD/MM/YYYY)",
+          "selected": true
+        }
+      ]
     },
     {
-      "id": "desc",
-      "name": "Desc"
+      "id": "event_place",
+      "name": "Stadium name, Stadium description  ",
+      "controlType": "checkbox",
+      "ctrls": [
+        {
+          "id": "stadium_name_stadium_description_-stadium_name",
+          "name": "Stadium name",
+          "selected": true
+        }
+      ]
     },
     {
-      "id": "button",
-      "name": "Button"
+      "id": "additional_info",
+      "name": "Additional info",
+      "controlType": "checkbox",
+      "ctrls": []
     }
   ],
   "resolutionStates": {
@@ -27,25 +45,17 @@
           "1fr",
           "1fr"
         ],
-        "areas": {
-          "title": {
-            "id": "title",
-            "rowStart": 0,
-            "rowEnd": 3,
-            "colStart": 2,
-            "colEnd": 7
-          }
-        },
+        "areas": {},
         "gridMatrix": [
           [
             null,
             null,
-            "title",
-            "title",
-            "title",
-            "title",
-            "title",
-            "title",
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
             null,
             null,
             null,
@@ -54,12 +64,12 @@
           [
             null,
             null,
-            "title",
-            "title",
-            "title",
-            "title",
-            "title",
-            "title",
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
             null,
             null,
             null,
@@ -68,12 +78,12 @@
           [
             null,
             null,
-            "title",
-            "title",
-            "title",
-            "title",
-            "title",
-            "title",
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
             null,
             null,
             null,
@@ -82,12 +92,12 @@
           [
             null,
             null,
-            "title",
-            "title",
-            "title",
-            "title",
-            "title",
-            "title",
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
             null,
             null,
             null,
@@ -108,152 +118,26 @@
           "1fr"
         ],
         "areas": {
-          "desc": {
-            "id": "desc",
+          "event_date": {
+            "id": "event_date",
             "rowStart": 0,
             "rowEnd": 0,
-            "colStart": 8,
-            "colEnd": 16
-          }
-        },
-        "gridMatrix": [
-          [
-            null,
-            null,
-            null,
-            null,
-            null,
-            null,
-            null,
-            null,
-            "desc",
-            "desc",
-            "desc",
-            "desc",
-            "desc",
-            "desc",
-            "desc",
-            "desc",
-            "desc",
-            null,
-            null,
-            null,
-            null,
-            null,
-            null,
-            null
-          ],
-          [
-            null,
-            null,
-            null,
-            null,
-            null,
-            null,
-            null,
-            null,
-            null,
-            null,
-            null,
-            null,
-            null,
-            null,
-            null,
-            null,
-            null,
-            null,
-            null,
-            null,
-            null,
-            null,
-            null,
-            null
-          ],
-          [
-            null,
-            null,
-            null,
-            null,
-            null,
-            null,
-            null,
-            null,
-            null,
-            null,
-            null,
-            null,
-            null,
-            null,
-            null,
-            null,
-            null,
-            null,
-            null,
-            null,
-            null,
-            null,
-            null,
-            null
-          ],
-          [
-            null,
-            null,
-            null,
-            null,
-            null,
-            null,
-            null,
-            null,
-            null,
-            null,
-            null,
-            null,
-            null,
-            null,
-            null,
-            null,
-            null,
-            null,
-            null,
-            null,
-            null,
-            null,
-            null,
-            null
-          ]
-        ],
-        "finished": false
-      },
-      {
-        "rows": 4,
-        "cols": 24,
-        "rowHeights": [
-          "1fr",
-          "1fr",
-          "1fr",
-          "1fr"
-        ],
-        "areas": {
-          "button": {
-            "id": "button",
+            "colStart": 3,
+            "colEnd": 14
+          },
+          "event_place": {
+            "id": "event_place",
             "rowStart": 1,
             "rowEnd": 1,
-            "colStart": 6,
-            "colEnd": 18
+            "colStart": 11,
+            "colEnd": 21
           },
-          "desc": {
-            "id": "desc",
-            "rowStart": 0,
-            "rowEnd": 0,
-            "colStart": 6,
-            "colEnd": 11
-          },
-          "title": {
-            "id": "title",
+          "additional_info": {
+            "id": "additional_info",
             "rowStart": 2,
             "rowEnd": 2,
-            "colStart": 6,
-            "colEnd": 14
+            "colStart": 7,
+            "colEnd": 12
           }
         },
         "gridMatrix": [
@@ -261,48 +145,22 @@
             null,
             null,
             null,
-            null,
-            null,
-            null,
-            "desc",
-            "desc",
-            "desc",
-            "desc",
-            "desc",
-            "desc",
-            null,
-            null,
-            null,
-            null,
-            null,
-            null,
-            null,
+            "event_date",
+            "event_date",
+            "event_date",
+            "event_date",
+            "event_date",
+            "event_date",
+            "event_date",
+            "event_date",
+            "event_date",
+            "event_date",
+            "event_date",
+            "event_date",
             null,
             null,
             null,
             null,
-            null
-          ],
-          [
-            null,
-            null,
-            null,
-            null,
-            null,
-            null,
-            "button",
-            "button",
-            "button",
-            "button",
-            "button",
-            "button",
-            "button",
-            "button",
-            "button",
-            "button",
-            "button",
-            "button",
-            "button",
             null,
             null,
             null,
@@ -316,15 +174,41 @@
             null,
             null,
             null,
-            "title",
-            "title",
-            "title",
-            "title",
-            "title",
-            "title",
-            "title",
-            "title",
-            "title",
+            null,
+            null,
+            null,
+            null,
+            null,
+            "event_place",
+            "event_place",
+            "event_place",
+            "event_place",
+            "event_place",
+            "event_place",
+            "event_place",
+            "event_place",
+            "event_place",
+            "event_place",
+            "event_place",
+            null,
+            null
+          ],
+          [
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            "additional_info",
+            "additional_info",
+            "additional_info",
+            "additional_info",
+            "additional_info",
+            "additional_info",
+            null,
+            null,
             null,
             null,
             null,
@@ -363,6 +247,120 @@
           ]
         ],
         "finished": true
+      },
+      {
+        "rows": 4,
+        "cols": 24,
+        "rowHeights": [
+          "1fr",
+          "1fr",
+          "1fr",
+          "1fr"
+        ],
+        "areas": {},
+        "gridMatrix": [],
+        "finished": false
+      },
+      {
+        "rows": 4,
+        "cols": 16,
+        "rowHeights": [
+          "1fr",
+          "1fr",
+          "1fr",
+          "1fr"
+        ],
+        "areas": {
+          "event_place": {
+            "id": "event_place",
+            "rowStart": 0,
+            "rowEnd": 0,
+            "colStart": 3,
+            "colEnd": 6
+          },
+          "additional_info": {
+            "id": "additional_info",
+            "rowStart": 1,
+            "rowEnd": 1,
+            "colStart": 8,
+            "colEnd": 14
+          }
+        },
+        "gridMatrix": [
+          [
+            null,
+            null,
+            null,
+            "event_place",
+            "event_place",
+            "event_place",
+            "event_place",
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null
+          ],
+          [
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            "additional_info",
+            "additional_info",
+            "additional_info",
+            "additional_info",
+            "additional_info",
+            "additional_info",
+            "additional_info",
+            null
+          ],
+          [
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null
+          ],
+          [
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null
+          ]
+        ],
+        "finished": false
       },
       {
         "rows": 4,
@@ -374,49 +372,49 @@
           "1fr"
         ],
         "areas": {
-          "desc": {
-            "id": "desc",
+          "event_date": {
+            "id": "event_date",
+            "rowStart": 0,
+            "rowEnd": 0,
+            "colStart": 0,
+            "colEnd": 1
+          },
+          "event_place": {
+            "id": "event_place",
             "rowStart": 1,
             "rowEnd": 1,
             "colStart": 1,
-            "colEnd": 2
+            "colEnd": 3
           },
-          "title": {
-            "id": "title",
-            "rowStart": 0,
-            "rowEnd": 3,
-            "colStart": 0,
-            "colEnd": 0
-          },
-          "button": {
-            "id": "button",
-            "rowStart": 0,
-            "rowEnd": 0,
+          "additional_info": {
+            "id": "additional_info",
+            "rowStart": 2,
+            "rowEnd": 2,
             "colStart": 1,
-            "colEnd": 1
+            "colEnd": 2
           }
         },
         "gridMatrix": [
           [
-            "title",
-            "button",
+            "event_date",
+            "event_date",
             null,
             null
           ],
           [
-            "title",
-            "desc",
-            "desc",
+            null,
+            "event_place",
+            "event_place",
+            "event_place"
+          ],
+          [
+            null,
+            "additional_info",
+            "additional_info",
             null
           ],
           [
-            "title",
             null,
-            null,
-            null
-          ],
-          [
-            "title",
             null,
             null,
             null
@@ -425,186 +423,150 @@
         "finished": true
       },
       {
-        "rows": 2,
-        "cols": 2,
+        "rows": 4,
+        "cols": 12,
         "rowHeights": [
+          "1fr",
+          "1fr",
+          "1fr",
+          "1fr"
+        ],
+        "areas": {},
+        "gridMatrix": [
+          [
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null
+          ],
+          [
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null
+          ],
+          [
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null
+          ],
+          [
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null
+          ]
+        ],
+        "finished": false
+      },
+      {
+        "rows": 4,
+        "cols": 8,
+        "rowHeights": [
+          "1fr",
+          "1fr",
           "1fr",
           "1fr"
         ],
         "areas": {
-          "title": {
-            "id": "title",
+          "event_date": {
+            "id": "event_date",
             "rowStart": 0,
             "rowEnd": 0,
-            "colStart": 0,
-            "colEnd": 0
+            "colStart": 2,
+            "colEnd": 6
           },
-          "button": {
-            "id": "button",
-            "rowStart": 0,
-            "rowEnd": 0,
-            "colStart": 1,
-            "colEnd": 1
-          },
-          "desc": {
-            "id": "desc",
+          "event_place": {
+            "id": "event_place",
             "rowStart": 1,
             "rowEnd": 1,
-            "colStart": 0,
-            "colEnd": 0
+            "colStart": 1,
+            "colEnd": 6
+          },
+          "additional_info": {
+            "id": "additional_info",
+            "rowStart": 2,
+            "rowEnd": 3,
+            "colStart": 1,
+            "colEnd": 7
           }
         },
         "gridMatrix": [
           [
-            "title",
-            "button"
+            null,
+            null,
+            "event_date",
+            "event_date",
+            "event_date",
+            "event_date",
+            "event_date",
+            null
           ],
           [
-            "desc",
+            null,
+            "event_place",
+            "event_place",
+            "event_place",
+            "event_place",
+            "event_place",
+            "event_place",
             null
+          ],
+          [
+            null,
+            "additional_info",
+            "additional_info",
+            "additional_info",
+            "additional_info",
+            "additional_info",
+            "additional_info",
+            "additional_info"
+          ],
+          [
+            null,
+            "additional_info",
+            "additional_info",
+            "additional_info",
+            "additional_info",
+            "additional_info",
+            "additional_info",
+            "additional_info"
           ]
         ],
         "finished": true
-      },
-      {
-        "rows": 4,
-        "cols": 12,
-        "rowHeights": [
-          "1fr",
-          "1fr",
-          "1fr",
-          "1fr"
-        ],
-        "areas": {},
-        "gridMatrix": [
-          [
-            null,
-            null,
-            null,
-            null,
-            null,
-            null,
-            null,
-            null,
-            null,
-            null,
-            null,
-            null
-          ],
-          [
-            null,
-            null,
-            null,
-            null,
-            null,
-            null,
-            null,
-            null,
-            null,
-            null,
-            null,
-            null
-          ],
-          [
-            null,
-            null,
-            null,
-            null,
-            null,
-            null,
-            null,
-            null,
-            null,
-            null,
-            null,
-            null
-          ],
-          [
-            null,
-            null,
-            null,
-            null,
-            null,
-            null,
-            null,
-            null,
-            null,
-            null,
-            null,
-            null
-          ]
-        ],
-        "finished": false
-      },
-      {
-        "rows": 4,
-        "cols": 12,
-        "rowHeights": [
-          "1fr",
-          "1fr",
-          "1fr",
-          "1fr"
-        ],
-        "areas": {},
-        "gridMatrix": [
-          [
-            null,
-            null,
-            null,
-            null,
-            null,
-            null,
-            null,
-            null,
-            null,
-            null,
-            null,
-            null
-          ],
-          [
-            null,
-            null,
-            null,
-            null,
-            null,
-            null,
-            null,
-            null,
-            null,
-            null,
-            null,
-            null
-          ],
-          [
-            null,
-            null,
-            null,
-            null,
-            null,
-            null,
-            null,
-            null,
-            null,
-            null,
-            null,
-            null
-          ],
-          [
-            null,
-            null,
-            null,
-            null,
-            null,
-            null,
-            null,
-            null,
-            null,
-            null,
-            null,
-            null
-          ]
-        ],
-        "finished": false
       }
     ]
   },

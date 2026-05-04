@@ -128,15 +128,48 @@ Object.assign(GridDesigner.prototype, {
 		this.updateCssPreview();
 		this.updateResolutionTabState();
 		this.updatePatternButtons();
+		this.renderTagSelectionPanel();
 	},
 
 	loadEditorState(state) {
 		if (!state || typeof state !== "object") return;
 
+		const hasIncomingDesign =
+			Array.isArray(state.elements) ||
+			Boolean(state.resolutionStates) ||
+			Boolean(state.resolutionStructure);
+		if (hasIncomingDesign) {
+			this.tagSelectionLocked = true;
+		}
+
+		const incomingElements = Array.isArray(state.elements)
+			? state.elements
+					.map((el, i) => {
+						const normalized = GridDesigner.normalizeTag(el, i);
+						if (!normalized) return null;
+						return {
+							...normalized,
+							selected: true,
+						};
+					})
+					.filter(Boolean)
+			: [];
+
 		if (Array.isArray(state.elements)) {
-			this.state.elements = state.elements
-				.map((el, i) => GridDesigner.normalizeTag(el, i))
-				.filter(Boolean);
+			if (this.allowedTags.length) {
+				this.mergeAllowedTagsWithStateElements(incomingElements);
+			} else {
+				this.state.elements = incomingElements.map((tag) => ({
+					id: tag.id,
+					name: tag.name,
+					controlType: tag.controlType,
+					ctrls: (tag.ctrls || [])
+						.filter((ctrl) => ctrl.selected)
+						.map((ctrl) => ({ id: ctrl.id, name: ctrl.name, selected: true })),
+				}));
+			}
+		} else if (this.allowedTags.length) {
+			this.applySelectedTags();
 		}
 
 		if (state.resolutionStructure) {
@@ -191,6 +224,11 @@ Object.assign(GridDesigner.prototype, {
 				};
 			});
 		});
+
+		const activeState = this.getResolutionState(this.state.currentResolutionIndex);
+		if (activeState) {
+			this.applyResolutionState(activeState);
+		}
 
 		this.syncStateWithTags();
 	},
@@ -295,6 +333,17 @@ Object.assign(GridDesigner.prototype, {
 		);
 	},
 
+	ensureGridMatrixIntegrity() {
+		const rows = Math.max(1, Number(this.state.rows) || 1);
+		const cols = Math.max(1, Number(this.state.cols) || 1);
+		const source = Array.isArray(this.state.gridMatrix) ? this.state.gridMatrix : [];
+
+		this.state.gridMatrix = Array.from({ length: rows }, (_, rowIndex) => {
+			const sourceRow = Array.isArray(source[rowIndex]) ? source[rowIndex] : [];
+			return Array.from({ length: cols }, (_, colIndex) => sourceRow[colIndex] || null);
+		});
+	},
+
 	updatePatternButtons() {
 		const patternKey = this.getCurrentPatternKey();
 		const hasSavedPattern = Boolean(this.savedPatterns[patternKey]);
@@ -328,7 +377,6 @@ Object.assign(GridDesigner.prototype, {
 
 	syncStateWithTags() {
 		const tagIds = new Set((this.state.elements || []).map((el) => el.id));
-		if (!tagIds.size) return;
 
 		const allPageWidths = Object.keys(this.state.resolutionStates || {});
 
@@ -345,7 +393,18 @@ Object.assign(GridDesigner.prototype, {
 		let removedIds;
 		let markAllUnfinished = false;
 
-		if (finishedState) {
+		if (!tagIds.size) {
+			removedIds = new Set();
+			for (const pageWidth of allPageWidths) {
+				for (const state of this.state.resolutionStates[pageWidth] || []) {
+					for (const areaId of Object.keys(state?.areas || {})) {
+						removedIds.add(areaId);
+					}
+				}
+			}
+		}
+
+		if (!removedIds && finishedState) {
 			const finishedAreaIds = new Set(Object.keys(finishedState.areas || {}));
 
 			for (const tagId of tagIds) {
@@ -361,7 +420,7 @@ Object.assign(GridDesigner.prototype, {
 					removedIds.add(areaId);
 				}
 			}
-		} else {
+		} else if (!removedIds) {
 			removedIds = new Set();
 			for (const pageWidth of allPageWidths) {
 				for (const state of this.state.resolutionStates[pageWidth] || []) {
@@ -375,6 +434,28 @@ Object.assign(GridDesigner.prototype, {
 		}
 
 		if (removedIds.size > 0) {
+			let liveStateModified = false;
+			this.ensureGridMatrixIntegrity();
+			for (const id of removedIds) {
+				if (id in (this.state.areas || {})) {
+					delete this.state.areas[id];
+					liveStateModified = true;
+				}
+			}
+
+			if (liveStateModified && Array.isArray(this.state.gridMatrix)) {
+				for (let r = 0; r < this.state.gridMatrix.length; r++) {
+					const row = Array.isArray(this.state.gridMatrix[r])
+						? this.state.gridMatrix[r]
+						: [];
+					for (let c = 0; c < row.length; c++) {
+						if (removedIds.has(row[c])) {
+							row[c] = null;
+						}
+					}
+				}
+			}
+
 			for (const pageWidth of allPageWidths) {
 				for (const state of this.state.resolutionStates[pageWidth] || []) {
 					if (!state) continue;
@@ -387,7 +468,9 @@ Object.assign(GridDesigner.prototype, {
 					}
 					if (modified && Array.isArray(state.gridMatrix)) {
 						for (let r = 0; r < state.gridMatrix.length; r++) {
-							const row = state.gridMatrix[r];
+							const row = Array.isArray(state.gridMatrix[r])
+								? state.gridMatrix[r]
+								: [];
 							for (let c = 0; c < row.length; c++) {
 								if (removedIds.has(row[c])) {
 									row[c] = null;
@@ -408,6 +491,8 @@ Object.assign(GridDesigner.prototype, {
 		} else {
 			this.refreshFinishedStates();
 		}
+
+		this.saveResolutionState(this.state.currentResolutionIndex);
 	},
 
 	updateResolutionTabState() {

@@ -213,6 +213,80 @@ input[readonly] {
 	align-items: center;
 	margin-bottom: 0.5rem;
 }
+.tag-selector {
+	margin-bottom: 0.85rem;
+	padding: 0.75rem;
+	background: #ffffff;
+	border: 1px solid #d7dbe5;
+	border-radius: 8px;
+}
+.tag-selector__details {
+	width: 100%;
+}
+.tag-selector__summary {
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+	cursor: pointer;
+	font-weight: 600;
+	color: #3d4b78;
+	list-style: none;
+}
+.tag-selector__summary::-webkit-details-marker {
+	display: none;
+}
+.tag-selector__meta {
+	font-size: 0.85rem;
+	font-weight: 500;
+	color: #56618f;
+}
+.tag-selector__body {
+	margin-top: 0.75rem;
+}
+.tag-selector__list {
+	display: grid;
+	gap: 0.5rem;
+}
+.tag-selector__item {
+	padding: 0.6rem;
+	border: 1px solid #dce1ef;
+	border-radius: 7px;
+	background: #f7f9ff;
+}
+.tag-selector__tag {
+	display: flex;
+	align-items: center;
+	gap: 0.45rem;
+	font-weight: 600;
+	color: #3e4767;
+	margin: 0;
+}
+.tag-selector__ctrls {
+	margin-top: 0.45rem;
+	padding-left: 1.45rem;
+	display: grid;
+	gap: 0.35rem;
+}
+.tag-selector__ctrl {
+	display: flex;
+	align-items: center;
+	gap: 0.45rem;
+	font-weight: 400;
+	color: #4c5578;
+	margin: 0;
+}
+.tag-selector__actions {
+	margin-top: 0.65rem;
+	display: flex;
+	justify-content: flex-end;
+	gap: 0.5rem;
+}
+#tagSelectionEdit {
+	background: #3f7dff;
+}
+#tagSelectionEdit:hover {
+	background: #3367d1;
+}
 #rowControls {
 	margin-top: 1rem;
 	padding: 1rem;

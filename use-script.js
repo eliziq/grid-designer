@@ -18,67 +18,62 @@ const resolutions = {
 };
 
 const cardId = 123;
-const tags = [
-	{ id: "title", name: "Title" },
-	{ id: "desc", name: "Desc" },
-	{ id: "button", name: "Button" },
-];
 
-// const tags = [
-// 	{
-// 		id: "event_name_logo",
-// 		name: "Event name and logo",
-// 		ctrls: [
-// 			{
-// 				name: "Event name",
-// 				selected: "true",
-// 			},
-// 			{
-// 				name: "Team logos",
-// 				selected: "true",
-// 			},
-// 		],
-// 		controlType: "checkbox",
-// 	},
-// 	{
-// 		id: "event_date",
-// 		name: "Event date and time",
-// 		ctrls: [
-// 			{
-// 				name: "Event date (format: DD/MM/YYYY)",
-// 				selected: "true",
-// 			},
-// 			{
-// 				name: "Event start time (format: HH:MM)",
-// 				selected: "false",
-// 			},
-// 			{
-// 				name: "Displayed event date (text format)",
-// 				selected: "false",
-// 			},
-// 		],
-// 		controlType: "radio",
-// 	},
-// 	{
-// 		id: "event_place",
-// 		name: "Stadium name and description",
-// 		ctrls: [
-// 			{
-// 				name: "Stadium name",
-// 				selected: "true",
-// 			},
-// 			{
-// 				name: "Stadium description",
-// 				selected: "false",
-// 			},
-// 		],
-// 		controlType: "checkbox",
-// 	},
-// 	{
-// 		id: "additional_info",
-// 		name: "Additional info",
-// 	},
-// ];
+const tags = [
+	{
+		id: "event_name_logo",
+		name: "Event name, Team Logos",
+		ctrls: [
+			{
+				name: "Event name",
+				selected: "true",
+			},
+			{
+				name: "Team logos",
+				selected: "true",
+			},
+		],
+		controlType: "checkbox",
+	},
+	{
+		id: "event_date",
+		name: "Event date and time",
+		ctrls: [
+			{
+				name: "Event date (format: DD/MM/YYYY)",
+				selected: "true",
+			},
+			{
+				name: "Event start time (format: HH:MM)",
+				selected: "false",
+			},
+			{
+				name: "Displayed event date (text format)",
+				selected: "false",
+			},
+		],
+		controlType: "radio",
+	},
+	{
+		id: "event_place",
+		name: "Stadium name, Stadium description  ",
+		ctrls: [
+			{
+				name: "Stadium name",
+				selected: "true",
+			},
+			{
+				name: "Stadium description",
+				selected: "false",
+			},
+		],
+		controlType: "checkbox",
+	},
+	{
+		id: "additional_info",
+		name: "Additional info",
+	},
+];
 const state = {}; //not neccessary, can be used to load existing design state
 
 if (document.readyState === "loading") {
