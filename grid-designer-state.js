@@ -122,13 +122,7 @@ Object.assign(GridDesigner.prototype, {
 			this.state.areas = {};
 			this.initMatrix();
 		}
-		this.renderGrid();
-		this.renderElementList();
-		this.renderRowControls();
-		this.updateCssPreview();
-		this.updateResolutionTabState();
-		this.updatePatternButtons();
-		this.renderTagSelectionPanel();
+		this.refreshResolutionUi();
 	},
 
 	loadEditorState(state) {
@@ -159,14 +153,7 @@ Object.assign(GridDesigner.prototype, {
 			if (this.allowedTags.length) {
 				this.mergeAllowedTagsWithStateElements(incomingElements);
 			} else {
-				this.state.elements = incomingElements.map((tag) => ({
-					id: tag.id,
-					name: tag.name,
-					controlType: tag.controlType,
-					ctrls: (tag.ctrls || [])
-						.filter((ctrl) => ctrl.selected)
-						.map((ctrl) => ({ id: ctrl.id, name: ctrl.name, selected: true })),
-				}));
+				this.state.elements = this.buildSelectedElements(incomingElements);
 			}
 		} else if (this.allowedTags.length) {
 			this.applySelectedTags();
@@ -208,20 +195,7 @@ Object.assign(GridDesigner.prototype, {
 					return this.createDefaultResolutionState(res);
 				}
 
-				const rows = Math.max(1, incoming.rows || 1);
-				const cols = Math.max(1, incoming.cols || 1);
-
-				return {
-					rows,
-					cols,
-					rowHeights: Array.isArray(incoming.rowHeights)
-						? [...incoming.rowHeights]
-						: Array(rows).fill("1fr"),
-					areas: incoming.areas ? JSON.parse(JSON.stringify(incoming.areas)) : {},
-					gridMatrix: Array.isArray(incoming.gridMatrix)
-						? incoming.gridMatrix.map((row) => [...row])
-						: Array.from({ length: rows }, () => Array(cols).fill(null)),
-				};
+				return this.createNormalizedResolutionStateSnapshot(incoming);
 			});
 		});
 
@@ -245,6 +219,33 @@ Object.assign(GridDesigner.prototype, {
 		};
 	},
 
+	createNormalizedResolutionStateSnapshot(source, fallback = {}) {
+		const rows = Math.max(1, source?.rows || fallback.rows || 1);
+		const cols = Math.max(1, source?.cols || fallback.cols || 1);
+
+		return {
+			rows,
+			cols,
+			rowHeights: Array.isArray(source?.rowHeights)
+				? source.rowHeights.map((row) => row || "1fr")
+				: Array(rows).fill("1fr"),
+			areas: GridDesigner.cloneData(source?.areas, {}) || {},
+			gridMatrix: Array.isArray(source?.gridMatrix)
+				? source.gridMatrix.map((row) => [...row])
+				: Array.from({ length: rows }, () => Array(cols).fill(null)),
+		};
+	},
+
+	applyGridStateSnapshot(snapshot) {
+		this.state.rows = snapshot.rows;
+		this.state.cols = snapshot.cols;
+		this.state.rowHeights = [...snapshot.rowHeights];
+		this.state.areas = GridDesigner.cloneData(snapshot.areas, {}) || {};
+		this.state.gridMatrix = snapshot.gridMatrix.map((row) => [...row]);
+		if (this.colCountInput) this.colCountInput.value = this.state.cols;
+		if (this.rowCountInput) this.rowCountInput.value = this.state.rows;
+	},
+
 	getCurrentPatternKey() {
 		return `${this.editorCardId}-${this.state.currentPageWidth}-${this.state.currentResolutionIndex}`;
 	},
@@ -256,19 +257,7 @@ Object.assign(GridDesigner.prototype, {
 			this.state.resolutionStates[pageWidth] = [];
 		}
 
-		const normalizedState = {
-			rows: Math.max(1, state.rows || 1),
-			cols: Math.max(1, state.cols || 1),
-			rowHeights: Array.isArray(state.rowHeights)
-				? state.rowHeights.map((row) => row || "1fr")
-				: Array(Math.max(1, state.rows || 1)).fill("1fr"),
-			areas: state.areas ? JSON.parse(JSON.stringify(state.areas)) : {},
-			gridMatrix: Array.isArray(state.gridMatrix)
-				? state.gridMatrix.map((row) => [...row])
-				: Array.from({ length: Math.max(1, state.rows || 1) }, () =>
-						Array(Math.max(1, state.cols || 1)).fill(null),
-					),
-		};
+		const normalizedState = this.createNormalizedResolutionStateSnapshot(state);
 
 		normalizedState.finished = this.isResolutionStateFinished(normalizedState);
 		this.state.resolutionStates[pageWidth][index] = normalizedState;
@@ -277,17 +266,12 @@ Object.assign(GridDesigner.prototype, {
 	loadPattern(patternKey) {
 		const pattern = this.savedPatterns[patternKey];
 		if (!pattern) return;
-		this.state.rows = Math.max(1, pattern.rows || this.state.rows);
-		this.state.cols = Math.max(1, pattern.cols || this.state.cols);
-		this.state.rowHeights = Array.isArray(pattern.rowHeights)
-			? [...pattern.rowHeights]
-			: Array(this.state.rows).fill("1fr");
-		this.state.areas = pattern.areas ? JSON.parse(JSON.stringify(pattern.areas)) : {};
-		this.state.gridMatrix = Array.isArray(pattern.gridMatrix)
-			? pattern.gridMatrix.map((row) => [...row])
-			: Array.from({ length: this.state.rows }, () => Array(this.state.cols).fill(null));
-		if (this.colCountInput) this.colCountInput.value = this.state.cols;
-		if (this.rowCountInput) this.rowCountInput.value = this.state.rows;
+		this.applyGridStateSnapshot(
+			this.createNormalizedResolutionStateSnapshot(pattern, {
+				rows: this.state.rows,
+				cols: this.state.cols,
+			}),
+		);
 	},
 
 	getResolutionState(index) {
@@ -296,17 +280,7 @@ Object.assign(GridDesigner.prototype, {
 	},
 
 	applyResolutionState(state) {
-		this.state.rows = Math.max(1, state.rows || 1);
-		this.state.cols = Math.max(1, state.cols || 1);
-		this.state.rowHeights = Array.isArray(state.rowHeights)
-			? state.rowHeights.map((row) => row || "1fr")
-			: Array(this.state.rows).fill("1fr");
-		this.state.areas = state.areas ? JSON.parse(JSON.stringify(state.areas)) : {};
-		this.state.gridMatrix = Array.isArray(state.gridMatrix)
-			? state.gridMatrix.map((row) => [...row])
-			: Array.from({ length: this.state.rows }, () => Array(this.state.cols).fill(null));
-		if (this.colCountInput) this.colCountInput.value = this.state.cols;
-		if (this.rowCountInput) this.rowCountInput.value = this.state.rows;
+		this.applyGridStateSnapshot(this.createNormalizedResolutionStateSnapshot(state));
 	},
 
 	saveResolutionState(index) {
@@ -375,109 +349,97 @@ Object.assign(GridDesigner.prototype, {
 		});
 	},
 
+	findFirstFinishedState(pageWidths = []) {
+		for (const pageWidth of pageWidths) {
+			for (const state of this.state.resolutionStates[pageWidth] || []) {
+				if (state?.finished) return state;
+			}
+		}
+		return null;
+	},
+
+	collectRemovedAreaIds(tagIds, pageWidths, finishedState) {
+		const removedIds = new Set();
+
+		if (!tagIds.size) {
+			pageWidths.forEach((pageWidth) => {
+				(this.state.resolutionStates[pageWidth] || []).forEach((state) => {
+					Object.keys(state?.areas || {}).forEach((areaId) => removedIds.add(areaId));
+				});
+			});
+			return { removedIds, markAllUnfinished: false };
+		}
+
+		if (finishedState) {
+			const finishedAreaIds = new Set(Object.keys(finishedState.areas || {}));
+			const markAllUnfinished = [...tagIds].some((tagId) => !finishedAreaIds.has(tagId));
+
+			finishedAreaIds.forEach((areaId) => {
+				if (!tagIds.has(areaId)) removedIds.add(areaId);
+			});
+
+			return { removedIds, markAllUnfinished };
+		}
+
+		pageWidths.forEach((pageWidth) => {
+			(this.state.resolutionStates[pageWidth] || []).forEach((state) => {
+				Object.keys(state?.areas || {}).forEach((areaId) => {
+					if (!tagIds.has(areaId)) removedIds.add(areaId);
+				});
+			});
+		});
+
+		return { removedIds, markAllUnfinished: false };
+	},
+
+	pruneAreaIdsFromStateSnapshot(state, removedIds, ensureIntegrity = false) {
+		if (!state || !removedIds.size) return false;
+
+		if (ensureIntegrity) {
+			this.ensureGridMatrixIntegrity();
+		}
+
+		let modified = false;
+		for (const id of removedIds) {
+			if (id in (state.areas || {})) {
+				delete state.areas[id];
+				modified = true;
+			}
+		}
+
+		if (!modified || !Array.isArray(state.gridMatrix)) {
+			return modified;
+		}
+
+		for (let r = 0; r < state.gridMatrix.length; r++) {
+			const row = Array.isArray(state.gridMatrix[r]) ? state.gridMatrix[r] : [];
+			for (let c = 0; c < row.length; c++) {
+				if (removedIds.has(row[c])) {
+					row[c] = null;
+				}
+			}
+		}
+
+		return true;
+	},
+
 	syncStateWithTags() {
 		const tagIds = new Set((this.state.elements || []).map((el) => el.id));
 
 		const allPageWidths = Object.keys(this.state.resolutionStates || {});
-
-		let finishedState = null;
-		outer: for (const pageWidth of allPageWidths) {
-			for (const state of this.state.resolutionStates[pageWidth] || []) {
-				if (state?.finished) {
-					finishedState = state;
-					break outer;
-				}
-			}
-		}
-
-		let removedIds;
-		let markAllUnfinished = false;
-
-		if (!tagIds.size) {
-			removedIds = new Set();
-			for (const pageWidth of allPageWidths) {
-				for (const state of this.state.resolutionStates[pageWidth] || []) {
-					for (const areaId of Object.keys(state?.areas || {})) {
-						removedIds.add(areaId);
-					}
-				}
-			}
-		}
-
-		if (!removedIds && finishedState) {
-			const finishedAreaIds = new Set(Object.keys(finishedState.areas || {}));
-
-			for (const tagId of tagIds) {
-				if (!finishedAreaIds.has(tagId)) {
-					markAllUnfinished = true;
-					break;
-				}
-			}
-
-			removedIds = new Set();
-			for (const areaId of finishedAreaIds) {
-				if (!tagIds.has(areaId)) {
-					removedIds.add(areaId);
-				}
-			}
-		} else if (!removedIds) {
-			removedIds = new Set();
-			for (const pageWidth of allPageWidths) {
-				for (const state of this.state.resolutionStates[pageWidth] || []) {
-					for (const areaId of Object.keys(state?.areas || {})) {
-						if (!tagIds.has(areaId)) {
-							removedIds.add(areaId);
-						}
-					}
-				}
-			}
-		}
+		const finishedState = this.findFirstFinishedState(allPageWidths);
+		const { removedIds, markAllUnfinished } = this.collectRemovedAreaIds(
+			tagIds,
+			allPageWidths,
+			finishedState,
+		);
 
 		if (removedIds.size > 0) {
-			let liveStateModified = false;
-			this.ensureGridMatrixIntegrity();
-			for (const id of removedIds) {
-				if (id in (this.state.areas || {})) {
-					delete this.state.areas[id];
-					liveStateModified = true;
-				}
-			}
-
-			if (liveStateModified && Array.isArray(this.state.gridMatrix)) {
-				for (let r = 0; r < this.state.gridMatrix.length; r++) {
-					const row = Array.isArray(this.state.gridMatrix[r])
-						? this.state.gridMatrix[r]
-						: [];
-					for (let c = 0; c < row.length; c++) {
-						if (removedIds.has(row[c])) {
-							row[c] = null;
-						}
-					}
-				}
-			}
+			this.pruneAreaIdsFromStateSnapshot(this.state, removedIds, true);
 
 			for (const pageWidth of allPageWidths) {
 				for (const state of this.state.resolutionStates[pageWidth] || []) {
-					if (!state) continue;
-					let modified = false;
-					for (const id of removedIds) {
-						if (id in (state.areas || {})) {
-							delete state.areas[id];
-							modified = true;
-						}
-					}
-					if (modified && Array.isArray(state.gridMatrix)) {
-						for (let r = 0; r < state.gridMatrix.length; r++) {
-							const row = Array.isArray(state.gridMatrix[r])
-								? state.gridMatrix[r]
-								: [];
-							for (let c = 0; c < row.length; c++) {
-								if (removedIds.has(row[c])) {
-									row[c] = null;
-								}
-							}
-						}
-					}
+					this.pruneAreaIdsFromStateSnapshot(state, removedIds);
 				}
 			}
 		}
@@ -618,14 +580,14 @@ Object.assign(GridDesigner.prototype, {
 			id: this.editorCardId,
 			currentPageWidth: this.state.currentPageWidth,
 			currentResolutionIndex: this.state.currentResolutionIndex,
-			elements: JSON.parse(JSON.stringify(this.state.elements)),
+			elements: GridDesigner.cloneData(this.state.elements, []),
 			resolutionStates: this.state.resolutionStates,
 			resolutionStructure: this.resolutions,
 		};
 	},
 
 	getTags() {
-		return JSON.parse(JSON.stringify(this.allowedTags || []));
+		return GridDesigner.cloneData(this.allowedTags, []) || [];
 	},
 
 	getCss() {

@@ -4,6 +4,26 @@ GridDesigner.generateAreaColor = function (id) {
 };
 
 Object.assign(GridDesigner.prototype, {
+	refreshGridView() {
+		this.renderGrid();
+		this.renderElementList();
+		this.updateCssPreview();
+	},
+
+	refreshWorkspaceView() {
+		this.renderGrid();
+		this.renderElementList();
+		this.renderRowControls();
+		this.updateCssPreview();
+	},
+
+	refreshResolutionUi() {
+		this.refreshWorkspaceView();
+		this.updateResolutionTabState();
+		this.updatePatternButtons();
+		this.renderTagSelectionPanel();
+	},
+
 	renderGrid() {
 		if (!this.grid) return;
 		this.grid.innerHTML = "";

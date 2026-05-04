@@ -118,10 +118,7 @@ Object.assign(GridDesigner.prototype, {
 		this.syncStateWithTags();
 		this.tagSelectionLocked = true;
 		this.renderTagSelectionPanel();
-		this.renderElementList();
-		this.renderGrid();
-		this.renderRowControls();
-		this.updateCssPreview();
+		this.refreshWorkspaceView();
 	},
 
 	handleBuildGrid() {
@@ -132,18 +129,13 @@ Object.assign(GridDesigner.prototype, {
 		}
 		this.initMatrix();
 		this.state.areas = {};
-		this.renderGrid();
-		this.renderElementList();
-		this.renderRowControls();
-		this.updateCssPreview();
+		this.refreshWorkspaceView();
 	},
 
 	handleClearGrid() {
 		this.initMatrix();
 		this.state.areas = {};
-		this.renderGrid();
-		this.renderElementList();
-		this.updateCssPreview();
+		this.refreshGridView();
 	},
 
 	handleExportCss() {
@@ -177,7 +169,7 @@ Object.assign(GridDesigner.prototype, {
 			cols: this.state.cols,
 			gridMatrix: this.state.gridMatrix.map((row) => [...row]),
 			elements: [...this.state.elements],
-			areas: JSON.parse(JSON.stringify(this.state.areas)),
+			areas: GridDesigner.cloneData(this.state.areas, {}) || {},
 			rowHeights: [...this.state.rowHeights],
 		};
 		this.savedPatterns[key] = pattern;
@@ -211,10 +203,7 @@ Object.assign(GridDesigner.prototype, {
 				if (resolution) {
 					this.setCurrentResolution(resolution, true);
 				} else {
-					this.renderGrid();
-					this.renderElementList();
-					this.renderRowControls();
-					this.updateCssPreview();
+					this.refreshWorkspaceView();
 				}
 			} catch (error) {
 				alert("Error loading design file: " + error.message);
@@ -297,9 +286,7 @@ Object.assign(GridDesigner.prototype, {
 			alert("Cannot place here; overlap existing area.");
 			return;
 		}
-		this.renderGrid();
-		this.renderElementList();
-		this.updateCssPreview();
+		this.refreshGridView();
 	},
 
 	handleAreaPointerDown(event) {
@@ -325,7 +312,6 @@ Object.assign(GridDesigner.prototype, {
 
 		this.handlePointerMoveBound = this.handlePointerMove.bind(this);
 		window.addEventListener("pointermove", this.handlePointerMoveBound);
-		window.addEventListener("pointerup", this.handlePointerUp.bind(this));
 		document.body.style.cursor =
 			edge.top || edge.bottom ? "ns-resize" : edge.left || edge.right ? "ew-resize" : "move";
 	},

@@ -19,7 +19,7 @@ class GridDesigner {
 		this.resolutions = resolutions;
 		this.state.currentPageWidth = Object.keys(resolutions)[0];
 		this.currentResolution = null;
-		this.sortedscreenWidths = [];
+		this.sortedScreenWidths = [];
 		this.gridWidth = 1536;
 		this.gridHeight = 864;
 		this.savedPatterns = {};
@@ -69,6 +69,11 @@ class GridDesigner {
 			.replace(/[^a-z0-9_\-]/g, "");
 	}
 
+	static cloneData(value, fallback = null) {
+		if (value == null) return fallback;
+		return JSON.parse(JSON.stringify(value));
+	}
+
 	static normalizeResolution(res) {
 		const width = Number(res?.width) || 0;
 		const height = Number(res?.height) || 0;
@@ -111,7 +116,9 @@ class GridDesigner {
 			const controlType = tag.controlType === "radio" ? "radio" : "checkbox";
 			const ctrls = Array.isArray(tag.ctrls)
 				? tag.ctrls
-						.map((ctrl, ctrlIndex) => GridDesigner.normalizeTagControl(ctrl, name, ctrlIndex))
+						.map((ctrl, ctrlIndex) =>
+							GridDesigner.normalizeTagControl(ctrl, name, ctrlIndex),
+						)
 						.filter(Boolean)
 				: [];
 
@@ -155,8 +162,8 @@ class GridDesigner {
 		return tags.map((tag, index) => GridDesigner.normalizeTag(tag, index)).filter(Boolean);
 	}
 
-	applySelectedTags() {
-		this.state.elements = this.allowedTags
+	buildSelectedElements(tags = []) {
+		return tags
 			.filter((tag) => tag.selected)
 			.map((tag) => ({
 				id: tag.id,
@@ -166,6 +173,10 @@ class GridDesigner {
 					.filter((ctrl) => ctrl.selected)
 					.map((ctrl) => ({ id: ctrl.id, name: ctrl.name, selected: true })),
 			}));
+	}
+
+	applySelectedTags() {
+		this.state.elements = this.buildSelectedElements(this.allowedTags);
 	}
 
 	mergeAllowedTagsWithStateElements(elements = []) {
@@ -199,7 +210,11 @@ class GridDesigner {
 				selected: selectedCtrlIds ? selectedCtrlIds.has(ctrl.id) : ctrl.selected,
 			}));
 
-			if (tag.controlType === "radio" && ctrls.length && !ctrls.some((ctrl) => ctrl.selected)) {
+			if (
+				tag.controlType === "radio" &&
+				ctrls.length &&
+				!ctrls.some((ctrl) => ctrl.selected)
+			) {
 				ctrls = ctrls.map((ctrl, index) => ({ ...ctrl, selected: index === 0 }));
 			}
 
