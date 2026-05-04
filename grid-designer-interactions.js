@@ -288,7 +288,11 @@ Object.assign(GridDesigner.prototype, {
 		}
 		this.refreshGridView();
 	},
-
+	handleRemoveTagFromGrid(elementId) {
+		if (!elementId || !this.state.areas?.[elementId]) return;
+		this.removeArea(elementId);
+		this.refreshGridView();
+	},
 	handleAreaPointerDown(event) {
 		event.preventDefault();
 		event.stopPropagation();

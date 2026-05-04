@@ -218,8 +218,25 @@ Object.assign(GridDesigner.prototype, {
 			const isPlaced = placedIds.has(element.id);
 			tag.className = `element-tag ${isPlaced ? "placed" : "pending"}`;
 			tag.draggable = true;
-			tag.textContent = element.name;
 			tag.title = isPlaced ? "Placed on grid" : "Still needs placement";
+
+			const label = document.createElement("span");
+			label.textContent = element.name;
+			tag.appendChild(label);
+
+			if (isPlaced) {
+				const removeButton = document.createElement("button");
+				removeButton.type = "button";
+				removeButton.className = "deleteBtn";
+				removeButton.textContent = "\u00D7";
+				removeButton.title = "Remove from grid";
+				removeButton.addEventListener("click", (e) => {
+					e.preventDefault();
+					e.stopPropagation();
+					this.handleRemoveTagFromGrid(element.id);
+				});
+				tag.appendChild(removeButton);
+			}
 
 			if (!this.areaColors[element.id]) {
 				this.areaColors[element.id] = GridDesigner.generateAreaColor(element.id);

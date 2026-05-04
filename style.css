@@ -31,7 +31,7 @@ button {
 button:hover {
 	background: #535aff;
 }
-h2{
+h2 {
 	font-size: 1.25rem;
 	color: #333;
 	margin-bottom: 0.75rem;
@@ -190,17 +190,18 @@ input[readonly] {
 	color: #1f5a31;
 }
 .deleteBtn {
-	background: #ff5c5c;
-	color: white;
+	background: unset;
+	color: #121111;
 	border: none;
-	border-radius: 50%;
-	width: 1rem;
-	font-size: 0.8rem;
-	line-height: 1;
-	cursor: pointer;
+	width: 18px;
+	padding: 8px 0px;
 	display: flex;
+	height: 17px;
 	align-items: center;
 	justify-content: center;
+	&:hover {
+		background: white;
+	}
 }
 #elementList {
 	margin-top: 0.5rem;
