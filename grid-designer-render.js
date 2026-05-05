@@ -170,40 +170,58 @@ Object.assign(GridDesigner.prototype, {
 			item.className = "tag-selector__item";
 			item.dataset.tagId = tag.id;
 
-			const controlsMarkup = (tag.ctrls || [])
-				.map((ctrl) => {
-					const inputType = tag.controlType === "radio" ? "radio" : "checkbox";
-					const checked = ctrl.selected ? "checked" : "";
-					const disabled = !tag.selected || isLocked ? "disabled" : "";
-					const radioName = `tagctrl-${tag.id}`;
-					return `
-						<label class="tag-selector__ctrl">
-							<input
-								type="${inputType}"
-								name="${radioName}"
-								data-ctrl-id="${ctrl.id}"
-								${checked}
-								${disabled}
-							/>
-							<span>${ctrl.name}</span>
-						</label>
-					`;
-				})
-				.join("");
+			const ctrls = tag.ctrls || [];
+			const isSubgroup = ctrls.length >= 2;
 
-			item.innerHTML = `
-				<label class="tag-selector__tag">
-					<input
-						type="checkbox"
-						class="tag-selector__tag-check"
-						data-tag-id="${tag.id}"
-						${tag.selected ? "checked" : ""}
-						${isLocked ? "disabled" : ""}
-					/>
-					<span>${tag.name}</span>
-				</label>
-				${controlsMarkup ? `<div class="tag-selector__ctrls">${controlsMarkup}</div>` : ""}
-			`;
+			if (isSubgroup) {
+				const controlsMarkup = ctrls
+					.map((ctrl) => {
+						const inputType = tag.controlType === "radio" ? "radio" : "checkbox";
+						const checked = ctrl.selected ? "checked" : "";
+						const disabled = !tag.selected || isLocked ? "disabled" : "";
+						const radioName = `tagctrl-${tag.id}`;
+						return `
+							<label class="tag-selector__ctrl">
+								<input
+									type="${inputType}"
+									name="${radioName}"
+									data-ctrl-id="${ctrl.id}"
+									${checked}
+									${disabled}
+								/>
+								<span>${ctrl.name}</span>
+							</label>
+						`;
+					})
+					.join("");
+
+				item.innerHTML = `
+					<label class="tag-selector__tag">
+						<input
+							type="checkbox"
+							class="tag-selector__tag-check"
+							data-tag-id="${tag.id}"
+							${tag.selected ? "checked" : ""}
+							${isLocked ? "disabled" : ""}
+						/>
+						<span>${tag.name}</span>
+					</label>
+					<div class="tag-selector__ctrls">${controlsMarkup}</div>
+				`;
+			} else {
+				item.innerHTML = `
+					<label class="tag-selector__tag">
+						<input
+							type="checkbox"
+							class="tag-selector__tag-check"
+							data-tag-id="${tag.id}"
+							${tag.selected ? "checked" : ""}
+							${isLocked ? "disabled" : ""}
+						/>
+						<span>${tag.name}</span>
+					</label>
+				`;
+			}
 
 			list.appendChild(item);
 		});

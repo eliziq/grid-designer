@@ -83,7 +83,12 @@ Object.assign(GridDesigner.prototype, {
 			if (!tagItem) return { ...tag };
 
 			let isSelected = Boolean(tagItem.querySelector(".tag-selector__tag-check")?.checked);
+			const isSingleCtrl = (tag.ctrls || []).length <= 1;
+
 			let ctrls = (tag.ctrls || []).map((ctrl) => {
+				if (isSingleCtrl) {
+					return { ...ctrl, selected: isSelected };
+				}
 				const ctrlInput = tagItem.querySelector(`input[data-ctrl-id="${ctrl.id}"]`);
 				return {
 					...ctrl,
@@ -91,7 +96,7 @@ Object.assign(GridDesigner.prototype, {
 				};
 			});
 
-			if (tag.controlType === "checkbox" && isSelected && ctrls.length) {
+			if (!isSingleCtrl && tag.controlType === "checkbox" && isSelected && ctrls.length) {
 				isSelected = ctrls.some((ctrl) => ctrl.selected);
 				if (!isSelected) {
 					ctrls = ctrls.map((ctrl) => ({ ...ctrl, selected: false }));
@@ -99,6 +104,7 @@ Object.assign(GridDesigner.prototype, {
 			}
 
 			if (
+				!isSingleCtrl &&
 				tag.controlType === "radio" &&
 				isSelected &&
 				ctrls.length &&

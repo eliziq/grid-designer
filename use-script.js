@@ -72,6 +72,8 @@ const tags = [
 	{
 		id: "additional_info",
 		name: "Additional info",
+		controlType: "checkbox",
+		ctrls: [{ name: "Additional info", selected: "false" }],
 	},
 ];
 const state = {}; //not neccessary, can be used to load existing design state

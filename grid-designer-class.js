@@ -126,10 +126,14 @@ class GridDesigner {
 				ctrls[0].selected = true;
 			}
 
+			const selected = ctrls.length > 0
+				? ctrls.some((ctrl) => ctrl.selected)
+				: GridDesigner.normalizeBoolean(tag.selected, true);
+
 			return {
 				id: GridDesigner.sanitizeId(tag.id || name) || `tag_${index + 1}`,
 				name,
-				selected: GridDesigner.normalizeBoolean(tag.selected, true),
+				selected,
 				controlType,
 				ctrls,
 			};
