@@ -82,7 +82,21 @@ Object.assign(GridDesigner.prototype, {
 			block.style.boxShadow = `0 0 0 1px ${color}`;
 
 			const label = document.createElement("span");
-			label.textContent = element ? element.name : area.id;
+			label.className = "area-block__label";
+			label.setAttribute("contenteditable", "true");
+			label.setAttribute("spellcheck", "false");
+			label.textContent = area.label ?? (element ? element.name : area.id);
+			label.addEventListener("pointerdown", (e) => {
+				e.stopPropagation();
+			});
+			label.addEventListener("paste", (e) => {
+				e.preventDefault();
+				const text = e.clipboardData?.getData("text/plain") || "";
+				document.execCommand("insertText", false, text);
+			});
+			label.addEventListener("input", () => {
+				this.handleAreaLabelInput(area.id, label.innerText || "");
+			});
 			block.appendChild(label);
 
 			const removeButton = document.createElement("button");
@@ -114,7 +128,10 @@ Object.assign(GridDesigner.prototype, {
 				block.style.cursor = "default";
 			});
 			block.addEventListener("dragstart", (e) => e.preventDefault());
-			block.addEventListener("selectstart", (e) => e.preventDefault());
+			block.addEventListener("selectstart", (e) => {
+				if (e.target.closest(".area-block__label")) return;
+				e.preventDefault();
+			});
 			block.addEventListener("dragover", (e) => e.preventDefault());
 			block.addEventListener("drop", this.handleDrop.bind(this));
 			this.grid.appendChild(block);

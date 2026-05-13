@@ -112,6 +112,26 @@
 	user-select: none;
 	-webkit-user-drag: none;
 }
+.area-block__label {
+	max-width: 100%;
+	min-width: 0;
+	padding: 0 26px 0 6px;
+	white-space: pre-wrap;
+	overflow-wrap: normal;
+	word-break: normal;
+	display: -webkit-box;
+	-webkit-box-orient: vertical;
+	-webkit-line-clamp: 4;
+	overflow: hidden;
+	line-height: 1.2;
+	cursor: text;
+	outline: none;
+	user-select: text;
+}
+.area-block__label:focus {
+	background: rgba(255, 255, 255, 0.45);
+	border-radius: 3px;
+}
 .area-block__remove {
 	position: absolute;
 	top: 2px;

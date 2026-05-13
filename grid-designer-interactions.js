@@ -298,7 +298,14 @@ Object.assign(GridDesigner.prototype, {
 			return;
 		}
 
-		this.state.areas[id] = { id, rowStart, rowEnd, colStart, colEnd };
+		this.state.areas[id] = {
+			id,
+			rowStart,
+			rowEnd,
+			colStart,
+			colEnd,
+			label: startArea.label,
+		};
 		this.initMatrix();
 		Object.values(this.state.areas).forEach((area) => {
 			for (let rr = area.rowStart; rr <= area.rowEnd; rr++) {
@@ -339,8 +346,16 @@ Object.assign(GridDesigner.prototype, {
 		this.removeArea(elementId);
 		this.refreshGridView();
 	},
-	
+
+	handleAreaLabelInput(elementId, textValue) {
+		const nextValue = String(textValue || "").replace(/\r\n?/g, "\n");
+		const area = this.state.areas?.[elementId];
+		if (!area || area.label === nextValue) return;
+		area.label = nextValue;
+	},
+
 	handleAreaPointerDown(event) {
+		if (event.target.closest(".area-block__label")) return;
 		event.preventDefault();
 		event.stopPropagation();
 		if (event.button !== 0) return;
