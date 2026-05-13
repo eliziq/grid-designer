@@ -20,50 +20,50 @@ const resolutions = {
 const cardId = 123;
 
 const tags = [
-	{
-		id: "Event_Counter",
-		name: "Sold counter",
-		ctrls: [
-			{
-				name: "Sold counter",
-				selected: "true",
-			},
-		],
-		controlType: "checkbox",
-	},
-	{
-		id: "Event_DefaultPrice",
-		name: "Default price",
-		ctrls: [
-			{
-				name: "Default price",
-				selected: "true",
-			},
-		],
-		controlType: "checkbox",
-	},
-	{
-		id: "Event_Tournament",
-		name: "Competition name",
-		ctrls: [
-			{
-				name: "Competition name",
-				selected: "true",
-			},
-		],
-		controlType: "checkbox",
-	},
-	{
-		id: "Event_DescriptionHeader",
-		name: "Sales status",
-		ctrls: [
-			{
-				name: "Sales status",
-				selected: "true",
-			},
-		],
-		controlType: "checkbox",
-	},
+	// {
+	// 	id: "Event_Counter",
+	// 	name: "Sold counter",
+	// 	ctrls: [
+	// 		{
+	// 			name: "Sold counter",
+	// 			selected: "true",
+	// 		},
+	// 	],
+	// 	controlType: "checkbox",
+	// },
+	// {
+	// 	id: "Event_DefaultPrice",
+	// 	name: "Default price",
+	// 	ctrls: [
+	// 		{
+	// 			name: "Default price",
+	// 			selected: "true",
+	// 		},
+	// 	],
+	// 	controlType: "checkbox",
+	// },
+	// {
+	// 	id: "Event_Tournament",
+	// 	name: "Competition name",
+	// 	ctrls: [
+	// 		{
+	// 			name: "Competition name",
+	// 			selected: "true",
+	// 		},
+	// 	],
+	// 	controlType: "checkbox",
+	// },
+	// {
+	// 	id: "Event_DescriptionHeader",
+	// 	name: "Sales status",
+	// 	ctrls: [
+	// 		{
+	// 			name: "Sales status",
+	// 			selected: "true",
+	// 		},
+	// 	],
+	// 	controlType: "checkbox",
+	// },
 	{
 		id: "Event_ShortDescription",
 		name: "Short event description (max. 300 characters)",
@@ -124,21 +124,21 @@ const tags = [
 		],
 		controlType: "checkbox",
 	},
-	{
-		id: "Event_Btns",
-		name: "Buy parking ticket, Link to more information about the event",
-		ctrls: [
-			{
-				name: "Buy parking ticket",
-				selected: "true",
-			},
-			{
-				name: "Link to more information about the event",
-				selected: "true",
-			},
-		],
-		controlType: "checkbox",
-	},
+	// {
+	// 	id: "Event_Btns",
+	// 	name: "Buy parking ticket, Link to more information about the event",
+	// 	ctrls: [
+	// 		{
+	// 			name: "Buy parking ticket",
+	// 			selected: "true",
+	// 		},
+	// 		{
+	// 			name: "Link to more information about the event",
+	// 			selected: "true",
+	// 		},
+	// 	],
+	// 	controlType: "checkbox",
+	// },
 ];
 const state = {}; //not neccessary, can be used to load existing design state
 
