@@ -244,16 +244,55 @@ Object.assign(GridDesigner.prototype, {
 
 	handlePointerMove(event) {
 		if (!this.resizeState || !this.resizeState.dragging) return;
-
-		const { row, col } = this.cellToGridPos(event.clientX, event.clientY);
 		const { id, edge, startArea } = this.resizeState;
+		const gridRect = this.grid.getBoundingClientRect();
+		const scale = parseFloat(
+			getComputedStyle(this.gridWrapper).getPropertyValue("--grid-scale") || "1",
+		);
+		const { colWidth, rowHeight, gap } = this.getGridMetrics();
+		const stepX = colWidth + gap;
+		const stepY = rowHeight + gap;
+		const pointerX = (event.clientX - gridRect.left) / scale;
+		const pointerY = (event.clientY - gridRect.top) / scale;
+		const snapDelta = (pixelDelta, step) => {
+			const halfStep = step * 0.5;
+			if (pixelDelta > halfStep) {
+				return Math.floor((pixelDelta - halfStep) / step) + 1;
+			}
+			if (pixelDelta < -halfStep) {
+				return Math.ceil((pixelDelta + halfStep) / step) - 1;
+			}
+			return 0;
+		};
 
 		let { rowStart, rowEnd, colStart, colEnd } = startArea;
 
-		if (edge.top) rowStart = Math.min(row, rowEnd);
-		if (edge.bottom) rowEnd = Math.max(row, rowStart);
-		if (edge.left) colStart = Math.min(col, colEnd);
-		if (edge.right) colEnd = Math.max(col, colStart);
+		if (edge.top) {
+			const startEdgeY = startArea.rowStart * stepY;
+			const deltaRows = snapDelta(pointerY - startEdgeY, stepY);
+			rowStart = Math.max(0, Math.min(rowEnd, startArea.rowStart + deltaRows));
+		}
+		if (edge.bottom) {
+			const startEdgeY = (startArea.rowEnd + 1) * stepY;
+			const deltaRows = snapDelta(pointerY - startEdgeY, stepY);
+			rowEnd = Math.min(
+				this.state.rows - 1,
+				Math.max(rowStart, startArea.rowEnd + deltaRows),
+			);
+		}
+		if (edge.left) {
+			const startEdgeX = startArea.colStart * stepX;
+			const deltaCols = snapDelta(pointerX - startEdgeX, stepX);
+			colStart = Math.max(0, Math.min(colEnd, startArea.colStart + deltaCols));
+		}
+		if (edge.right) {
+			const startEdgeX = (startArea.colEnd + 1) * stepX;
+			const deltaCols = snapDelta(pointerX - startEdgeX, stepX);
+			colEnd = Math.min(
+				this.state.cols - 1,
+				Math.max(colStart, startArea.colEnd + deltaCols),
+			);
+		}
 
 		if (this.hasConflict(rowStart, colStart, rowEnd, colEnd, id)) {
 			return;
@@ -294,11 +333,13 @@ Object.assign(GridDesigner.prototype, {
 		}
 		this.refreshGridView();
 	},
+
 	handleRemoveTagFromGrid(elementId) {
 		if (!elementId || !this.state.areas?.[elementId]) return;
 		this.removeArea(elementId);
 		this.refreshGridView();
 	},
+	
 	handleAreaPointerDown(event) {
 		event.preventDefault();
 		event.stopPropagation();
