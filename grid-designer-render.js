@@ -80,7 +80,27 @@ Object.assign(GridDesigner.prototype, {
 			block.style.borderColor = color;
 			block.style.background = "rgba(100, 160, 255, 0.2)";
 			block.style.boxShadow = `0 0 0 1px ${color}`;
-			block.textContent = element ? element.name : area.id;
+
+			const label = document.createElement("span");
+			label.textContent = element ? element.name : area.id;
+			block.appendChild(label);
+
+			const removeButton = document.createElement("button");
+			removeButton.type = "button";
+			removeButton.className = "area-block__remove";
+			removeButton.textContent = "\u00D7";
+			removeButton.title = "Remove from grid";
+			removeButton.addEventListener("pointerdown", (e) => {
+				e.preventDefault();
+				e.stopPropagation();
+			});
+			removeButton.addEventListener("click", (e) => {
+				e.preventDefault();
+				e.stopPropagation();
+				this.handleRemoveTagFromGrid(area.id);
+			});
+			block.appendChild(removeButton);
+
 			block.addEventListener("pointerdown", this.handleAreaPointerDown.bind(this));
 			block.addEventListener("pointermove", (e) => {
 				const edge = this.isEdgePosition(e, block);
@@ -241,20 +261,6 @@ Object.assign(GridDesigner.prototype, {
 			const label = document.createElement("span");
 			label.textContent = element.name;
 			tag.appendChild(label);
-
-			if (isPlaced) {
-				const removeButton = document.createElement("button");
-				removeButton.type = "button";
-				removeButton.className = "deleteBtn";
-				removeButton.textContent = "\u00D7";
-				removeButton.title = "Remove from grid";
-				removeButton.addEventListener("click", (e) => {
-					e.preventDefault();
-					e.stopPropagation();
-					this.handleRemoveTagFromGrid(element.id);
-				});
-				tag.appendChild(removeButton);
-			}
 
 			if (!this.areaColors[element.id]) {
 				this.areaColors[element.id] = GridDesigner.generateAreaColor(element.id);

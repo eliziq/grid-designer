@@ -18,6 +18,11 @@ select {
 	font-size: 1rem;
 	min-width: 120px;
 }
+input[readonly] {
+	background-color: #e8e8e8;
+	cursor: not-allowed;
+	color: #666;
+}
 button {
 	background: #656dff;
 	color: white;
