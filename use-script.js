@@ -21,8 +21,63 @@ const cardId = 123;
 
 const tags = [
 	{
-		id: "event_name_logo",
-		name: "Event name, Team Logos",
+		id: "Event_Counter",
+		name: "Sold counter",
+		ctrls: [
+			{
+				name: "Sold counter",
+				selected: "true",
+			},
+		],
+		controlType: "checkbox",
+	},
+	{
+		id: "Event_DefaultPrice",
+		name: "Default price",
+		ctrls: [
+			{
+				name: "Default price",
+				selected: "true",
+			},
+		],
+		controlType: "checkbox",
+	},
+	{
+		id: "Event_Tournament",
+		name: "Competition name",
+		ctrls: [
+			{
+				name: "Competition name",
+				selected: "true",
+			},
+		],
+		controlType: "checkbox",
+	},
+	{
+		id: "Event_DescriptionHeader",
+		name: "Sales status",
+		ctrls: [
+			{
+				name: "Sales status",
+				selected: "true",
+			},
+		],
+		controlType: "checkbox",
+	},
+	{
+		id: "Event_ShortDescription",
+		name: "Short event description (max. 300 characters)",
+		ctrls: [
+			{
+				name: "Short event description (max. 300 characters)",
+				selected: "true",
+			},
+		],
+		controlType: "checkbox",
+	},
+	{
+		id: "Event_NameAndLogo",
+		name: "Event name, Team logos",
 		ctrls: [
 			{
 				name: "Event name",
@@ -36,8 +91,8 @@ const tags = [
 		controlType: "checkbox",
 	},
 	{
-		id: "event_date",
-		name: "Event date and time",
+		id: "Event_Date",
+		name: "Event date (format: DD/MM/YYYY), Event start time (format: HH:MM), Displayed event date (text format)",
 		ctrls: [
 			{
 				name: "Event date (format: DD/MM/YYYY)",
@@ -55,25 +110,34 @@ const tags = [
 		controlType: "radio",
 	},
 	{
-		id: "event_place",
-		name: "Stadium name, Stadium description  ",
+		id: "Event_Place",
+		name: "Stadium name, Venue/Stadium description",
 		ctrls: [
 			{
 				name: "Stadium name",
 				selected: "true",
 			},
 			{
-				name: "Stadium description",
-				selected: "false",
+				name: "Venue/Stadium description",
+				selected: "true",
 			},
 		],
 		controlType: "checkbox",
 	},
 	{
-		id: "additional_info",
-		name: "Additional info",
+		id: "Event_Btns",
+		name: "Buy parking ticket, Link to more information about the event",
+		ctrls: [
+			{
+				name: "Buy parking ticket",
+				selected: "true",
+			},
+			{
+				name: "Link to more information about the event",
+				selected: "true",
+			},
+		],
 		controlType: "checkbox",
-		ctrls: [{ name: "Additional info", selected: "false" }],
 	},
 ];
 const state = {}; //not neccessary, can be used to load existing design state

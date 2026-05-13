@@ -126,9 +126,10 @@ class GridDesigner {
 				ctrls[0].selected = true;
 			}
 
-			const selected = ctrls.length > 0
-				? ctrls.some((ctrl) => ctrl.selected)
-				: GridDesigner.normalizeBoolean(tag.selected, true);
+			const selected =
+				ctrls.length > 0
+					? ctrls.some((ctrl) => ctrl.selected)
+					: GridDesigner.normalizeBoolean(tag.selected, true);
 
 			return {
 				id: GridDesigner.sanitizeId(tag.id || name) || `tag_${index + 1}`,
@@ -166,12 +167,26 @@ class GridDesigner {
 		return tags.map((tag, index) => GridDesigner.normalizeTag(tag, index)).filter(Boolean);
 	}
 
+	getElementDisplayName(tag) {
+		const ctrls = Array.isArray(tag?.ctrls) ? tag.ctrls : [];
+		if (!ctrls.length) return tag?.name || "";
+
+		const selectedCtrls = ctrls.filter((ctrl) => ctrl?.selected);
+		if (!selectedCtrls.length) return tag?.name || "";
+
+		if (tag?.controlType === "radio") {
+			return selectedCtrls[0].name || tag?.name || "";
+		}
+
+		return selectedCtrls.map((ctrl) => ctrl.name).join(", ") || tag?.name || "";
+	}
+
 	buildSelectedElements(tags = []) {
 		return tags
 			.filter((tag) => tag.selected)
 			.map((tag) => ({
 				id: tag.id,
-				name: tag.name,
+				name: this.getElementDisplayName(tag),
 				controlType: tag.controlType,
 				ctrls: (tag.ctrls || [])
 					.filter((ctrl) => ctrl.selected)
