@@ -587,7 +587,12 @@ Object.assign(GridDesigner.prototype, {
 	},
 
 	getTags() {
-		return GridDesigner.cloneData(this.allowedTags, []) || [];
+		return (this.allowedTags || []).flatMap((tag) =>
+			(tag?.ctrls || []).map((ctrl) => ({
+				tag: String(ctrl?.tag || ""),
+				selected: GridDesigner.normalizeBoolean(ctrl?.selected, false),
+			})),
+		);
 	},
 
 	getCss() {

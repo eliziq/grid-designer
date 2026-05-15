@@ -148,6 +148,7 @@ class GridDesigner {
 		return {
 			id: GridDesigner.sanitizeId(ctrl.id || `${tagName}-${name}`) || `ctrl_${index + 1}`,
 			name,
+			tag: String(ctrl.tag || ""),
 			selected: GridDesigner.normalizeBoolean(ctrl.selected, false),
 		};
 	}
@@ -188,9 +189,11 @@ class GridDesigner {
 				id: tag.id,
 				name: this.getElementDisplayName(tag),
 				controlType: tag.controlType,
-				ctrls: (tag.ctrls || [])
-					.filter((ctrl) => ctrl.selected)
-					.map((ctrl) => ({ id: ctrl.id, name: ctrl.name, selected: true })),
+				ctrls: (tag.ctrls || []).map((ctrl) => ({
+					id: ctrl.id,
+					name: ctrl.name,
+					selected: ctrl.selected,
+				})),
 			}));
 	}
 

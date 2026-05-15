@@ -20,50 +20,54 @@ const resolutions = {
 const cardId = 123;
 
 const tags = [
-	// {
-	// 	id: "Event_Counter",
-	// 	name: "Sold counter",
-	// 	ctrls: [
-	// 		{
-	// 			name: "Sold counter",
-	// 			selected: "true",
-	// 		},
-	// 	],
-	// 	controlType: "checkbox",
-	// },
-	// {
-	// 	id: "Event_DefaultPrice",
-	// 	name: "Default price",
-	// 	ctrls: [
-	// 		{
-	// 			name: "Default price",
-	// 			selected: "true",
-	// 		},
-	// 	],
-	// 	controlType: "checkbox",
-	// },
-	// {
-	// 	id: "Event_Tournament",
-	// 	name: "Competition name",
-	// 	ctrls: [
-	// 		{
-	// 			name: "Competition name",
-	// 			selected: "true",
-	// 		},
-	// 	],
-	// 	controlType: "checkbox",
-	// },
-	// {
-	// 	id: "Event_DescriptionHeader",
-	// 	name: "Sales status",
-	// 	ctrls: [
-	// 		{
-	// 			name: "Sales status",
-	// 			selected: "true",
-	// 		},
-	// 	],
-	// 	controlType: "checkbox",
-	// },
+	{
+		id: "Event_Counter",
+		name: "Sold counter",
+		ctrls: [
+			{
+				name: "Sold counter",
+				selected: "true",
+				tag: "Counter",
+			},
+		],
+		controlType: "checkbox",
+	},
+	{
+		id: "Event_DefaultPrice",
+		name: "Default price",
+		ctrls: [
+			{
+				name: "Default price",
+				selected: "true",
+				tag: "DefaultPrice",
+			},
+		],
+		controlType: "checkbox",
+	},
+	{
+		id: "Event_Tournament",
+		name: "Competition name",
+		ctrls: [
+			{
+				name: "Competition name",
+				selected: "true",
+				tag: "Tournament",
+			},
+		],
+		controlType: "checkbox",
+	},
+	{
+		id: "Event_DescriptionHeader",
+		name: "Sales status",
+		ctrls: [
+			{
+				name: "Sales status",
+				selected: "true",
+				tag: "DescriptionHeader",
+			},
+		],
+		controlType: "checkbox",
+	},
 	{
 		id: "Event_ShortDescription",
 		name: "Short event description (max. 300 characters)",
@@ -71,6 +75,7 @@ const tags = [
 			{
 				name: "Short event description (max. 300 characters)",
 				selected: "true",
+				tag: "ShortDescription",
 			},
 		],
 		controlType: "checkbox",
@@ -82,10 +87,12 @@ const tags = [
 			{
 				name: "Event name",
 				selected: "true",
+				tag: "Name",
 			},
 			{
 				name: "Team logos",
 				selected: "true",
+				tag: "TeamsLogo",
 			},
 		],
 		controlType: "checkbox",
@@ -97,14 +104,17 @@ const tags = [
 			{
 				name: "Event date (format: DD/MM/YYYY)",
 				selected: "true",
+				tag: "Day",
 			},
 			{
 				name: "Event start time (format: HH:MM)",
 				selected: "false",
+				tag: "Hour",
 			},
 			{
 				name: "Displayed event date (text format)",
 				selected: "false",
+				tag: "DisplayDate",
 			},
 		],
 		controlType: "radio",
@@ -116,29 +126,33 @@ const tags = [
 			{
 				name: "Stadium name",
 				selected: "true",
+				tag: "StadiumName",
 			},
 			{
 				name: "Venue/Stadium description",
 				selected: "true",
+				tag: "Place",
 			},
 		],
 		controlType: "checkbox",
 	},
-	// {
-	// 	id: "Event_Btns",
-	// 	name: "Buy parking ticket, Link to more information about the event",
-	// 	ctrls: [
-	// 		{
-	// 			name: "Buy parking ticket",
-	// 			selected: "true",
-	// 		},
-	// 		{
-	// 			name: "Link to more information about the event",
-	// 			selected: "true",
-	// 		},
-	// 	],
-	// 	controlType: "checkbox",
-	// },
+	{
+		id: "Event_Btns",
+		name: "Buy parking ticket, Link to more information about the event",
+		ctrls: [
+			{
+				name: "Buy parking ticket",
+				selected: "true",
+				tag: "BuyUrlParking",
+			},
+			{
+				name: "Link to more information about the event",
+				selected: "true",
+				tag: "InfoUrl",
+			},
+		],
+		controlType: "checkbox",
+	},
 ];
 const state = {}; //not neccessary, can be used to load existing design state
 
