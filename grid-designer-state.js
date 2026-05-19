@@ -192,7 +192,7 @@ Object.assign(GridDesigner.prototype, {
 					resolutionStates?.[pageWidth]?.[index] || (isCurrentlyActive ? state : null);
 
 				if (!incoming || (!incoming.rows && !incoming.areas)) {
-					return this.createDefaultResolutionState(res);
+					return this.createDefaultResolutionState(res, pageWidth);
 				}
 
 				return this.createNormalizedResolutionStateSnapshot(incoming);
@@ -207,8 +207,21 @@ Object.assign(GridDesigner.prototype, {
 		this.syncStateWithTags();
 	},
 
-	createDefaultResolutionState(res) {
-		const cols = res.width <= 768 ? 12 : res.width <= 1024 ? 16 : 24;
+	calculateDefaultCols(res, pageWidth = this.state.currentPageWidth) {
+		pageWidth = Number(pageWidth) || 0;
+		const isMobile = pageWidth > 0 && pageWidth <= 768;
+
+		if (isMobile) return 12;
+
+		const resolutionWidth = Number(res?.width) || pageWidth;
+		if (!pageWidth) return 24;
+
+		const ratioBasedCols = Math.round((resolutionWidth / pageWidth) * 24);
+		return Math.max(1, Math.min(24, ratioBasedCols));
+	},
+
+	createDefaultResolutionState(res, pageWidth = this.state.currentPageWidth) {
+		const cols = this.calculateDefaultCols(res, pageWidth);
 		return {
 			rows: 4,
 			cols,
