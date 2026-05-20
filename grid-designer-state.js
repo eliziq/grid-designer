@@ -496,28 +496,6 @@ Object.assign(GridDesigner.prototype, {
 		return `@container box (min-width: ${min}px) and (max-width: ${max}px)`;
 	},
 
-	getCssContainerQueryForFinished(finishedWidths, index) {
-		if (!Array.isArray(finishedWidths) || finishedWidths.length === 0) {
-			return "@container box";
-		}
-
-		if (finishedWidths.length === 1) {
-			return "@container box";
-		}
-
-		if (index === 0) {
-			return `@container box (min-width: ${finishedWidths[0] + 1}px)`;
-		}
-
-		if (index === finishedWidths.length - 1) {
-			return `@container box (max-width: ${finishedWidths[index - 1]}px)`;
-		}
-
-		const min = finishedWidths[index] + 1;
-		const max = finishedWidths[index - 1];
-		return `@container box (min-width: ${min}px) and (max-width: ${max}px)`;
-	},
-
 	generateGridTemplate(state, indent = "") {
 		const cols = Math.max(1, Number(state?.cols) || 1);
 		const rowHeights = Array.isArray(state?.rowHeights) ? state.rowHeights : ["1fr"];
@@ -548,34 +526,72 @@ Object.assign(GridDesigner.prototype, {
 		const rootSelector = `.box[cardid="${GridDesigner.sanitizeId(this.editorCardId)}"] .stripe`;
 		this.refreshFinishedStates();
 
-		return this.sortedScreenWidths
+		const buildRangeQuery = (atRule, items, idx) => {
+			if (!Array.isArray(items) || items.length <= 1) return null;
+			if (idx === 0) return `@${atRule} (min-width: ${items[1].width + 1}px)`;
+			if (idx === items.length - 1) return `@${atRule} (max-width: ${items[idx].width}px)`;
+			return `@${atRule} (min-width: ${items[idx + 1].width + 1}px) and (max-width: ${items[idx].width}px)`;
+		};
+
+		const finishedGroups = this.sortedScreenWidths
 			.map((pageWidth) => {
-				const banners = this.resolutions[pageWidth];
+				const banners = this.resolutions[pageWidth] || [];
 				const states = this.state.resolutionStates[pageWidth] || [];
-				const finishedEntries = banners
-					.map((res, idx) => ({ res, state: states[idx] }))
-					.filter(({ state }) => Boolean(state?.finished));
+				const resolutions = banners
+					.map((res, idx) => ({ width: res.width, state: states[idx] }))
+					.filter((entry) => entry.state?.finished)
+				if (!resolutions.length) return null;
+				return { width: Number(pageWidth), resolutions };
+			})
+			.filter(Boolean)
 
-				if (!finishedEntries.length) return "";
+		const totalFinished = finishedGroups.reduce(
+			(sum, group) => sum + group.resolutions.length,
+			0,
+		);
 
-				const finishedWidths = finishedEntries.map(({ res }) => res.width);
+		if (totalFinished === 1) {
+			const state = finishedGroups[0]?.resolutions[0]?.state;
+			if (!state) return "";
+			return [
+				`${rootSelector} {`,
+				this.generateGridTemplate(state, "  "),
+				"}",
+			].join("\n");
+		}
 
-				const innerContent = finishedEntries
-					.map(({ state }, idx) => {
-						const query = this.getCssContainerQueryForFinished(finishedWidths, idx);
+		return finishedGroups
+			.map((group, mediaIndex, mediaItems) => {
+				const mediaQuery = buildRangeQuery("media", mediaItems, mediaIndex);
+				const mediaContent = group.resolutions
+					.map((resolution, containerIndex, containerItems) => {
+						const containerQuery = buildRangeQuery(
+							"container box",
+							containerItems,
+							containerIndex,
+						);
+
+						if (!containerQuery) {
+							return [
+								`  ${rootSelector} {`,
+								this.generateGridTemplate(resolution.state, "    "),
+								"  }",
+							].join("\n");
+						}
+
 						return [
-							`  ${query} {`,
+							`  ${containerQuery} {`,
 							`    ${rootSelector} {`,
-							this.generateGridTemplate(state, "      "),
+							this.generateGridTemplate(resolution.state, "      "),
 							"    }",
 							"  }",
 						].join("\n");
 					})
 					.join("\n\n");
 
-				return [`@media (max-width: ${pageWidth}px) {`, innerContent, "}"].join("\n");
+				if (!mediaQuery) return mediaContent.replace(/^  /gm, "");
+				return [`${mediaQuery} {`, mediaContent, "}"].join("\n");
 			})
-			.filter(Boolean)
 			.join("\n\n");
 	},
 
