@@ -539,11 +539,11 @@ Object.assign(GridDesigner.prototype, {
 				const states = this.state.resolutionStates[pageWidth] || [];
 				const resolutions = banners
 					.map((res, idx) => ({ width: res.width, state: states[idx] }))
-					.filter((entry) => entry.state?.finished)
+					.filter((entry) => entry.state?.finished);
 				if (!resolutions.length) return null;
 				return { width: Number(pageWidth), resolutions };
 			})
-			.filter(Boolean)
+			.filter(Boolean);
 
 		const totalFinished = finishedGroups.reduce(
 			(sum, group) => sum + group.resolutions.length,
@@ -553,11 +553,7 @@ Object.assign(GridDesigner.prototype, {
 		if (totalFinished === 1) {
 			const state = finishedGroups[0]?.resolutions[0]?.state;
 			if (!state) return "";
-			return [
-				`${rootSelector} {`,
-				this.generateGridTemplate(state, "  "),
-				"}",
-			].join("\n");
+			return [`${rootSelector} {`, this.generateGridTemplate(state, "  "), "}"].join("\n");
 		}
 
 		return finishedGroups
