@@ -130,6 +130,11 @@ Object.assign(GridDesigner.prototype, {
 	handleBuildGrid() {
 		this.state.cols = Math.max(1, parseInt(this.colCountInput?.value, 10) || 1);
 		this.state.rows = Math.max(1, parseInt(this.rowCountInput?.value, 10) || 1);
+		const maxRows = this.getMaxRowsForHeight?.(this.currentResolution?.height);
+		if (Number.isFinite(maxRows) && this.state.rows > maxRows) {
+			this.state.rows = maxRows;
+			if (this.rowCountInput) this.rowCountInput.value = String(maxRows);
+		}
 		if (this.state.rowHeights.length !== this.state.rows) {
 			this.state.rowHeights = Array(this.state.rows).fill("1fr");
 		}
@@ -203,7 +208,7 @@ Object.assign(GridDesigner.prototype, {
 				this.loadEditorState(state);
 				this.populatePageWidthSelect();
 				this.createResolutionTabs();
-				const pageWidth = this.state.currentPageWidth;
+				const pageWidth = this.state.currentLayoutName;
 				const currentIndex = this.state.currentResolutionIndex || 0;
 				const resolution = this.resolutions[pageWidth]?.[currentIndex];
 				if (resolution) {

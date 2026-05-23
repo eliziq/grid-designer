@@ -1,6 +1,6 @@
 window.GridDesigner = {
-	Init(id, resolutions, tags, state) {
-		window.GridDesignerInstance = new GridDesigner(id, resolutions, tags, state);
+	Init(id, layoutDefinitions, tags, state) {
+		window.GridDesignerInstance = new GridDesigner(id, layoutDefinitions, tags, state);
 		return window.GridDesignerInstance;
 	},
 	GetCss() {

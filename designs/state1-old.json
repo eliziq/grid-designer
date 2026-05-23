@@ -1,0 +1,629 @@
+{
+	"id": "123",
+	"currentLayoutName": "Main Page",
+	"currentPageWidth": "Main Page",
+	"currentResolutionIndex": 2,
+	"elements": [
+		{
+			"id": "event_counter",
+			"name": "Sold counter",
+			"gridArea": "prodcnt",
+			"controlType": "checkbox",
+			"ctrls": [
+				{
+					"id": "sold_counter-sold_counter",
+					"name": "Sold counter",
+					"selected": true
+				}
+			]
+		},
+		{
+			"id": "event_date",
+			"name": "Event date (format: DD/MM/YYYY)",
+			"gridArea": "boxdates",
+			"controlType": "radio",
+			"ctrls": [
+				{
+					"id": "event_date_format_ddmmyyyy_event_start_time_format_hhmm_displayed_event_date_text_format-event_date_format_ddmmyyyy",
+					"name": "Event date (format: DD/MM/YYYY)",
+					"selected": true
+				},
+				{
+					"id": "event_date_format_ddmmyyyy_event_start_time_format_hhmm_displayed_event_date_text_format-event_start_time_format_hhmm",
+					"name": "Event start time (format: HH:MM)",
+					"selected": false
+				},
+				{
+					"id": "event_date_format_ddmmyyyy_event_start_time_format_hhmm_displayed_event_date_text_format-displayed_event_date_text_format",
+					"name": "Displayed event date (text format)",
+					"selected": false
+				}
+			]
+		}
+	],
+	"resolutionStates": {
+		"Single event for GOLD": [
+			{
+				"rows": 4,
+				"cols": 24,
+				"rowHeights": ["1fr", "max-content", "1fr", "1fr"],
+				"areas": {
+					"event_counter": {
+						"id": "event_counter",
+						"rowStart": 0,
+						"rowEnd": 0,
+						"colStart": 2,
+						"colEnd": 17
+					},
+					"event_date": {
+						"id": "event_date",
+						"rowStart": 2,
+						"rowEnd": 2,
+						"colStart": 7,
+						"colEnd": 22
+					}
+				},
+				"gridMatrix": [
+					[
+						null,
+						null,
+						"event_counter",
+						"event_counter",
+						"event_counter",
+						"event_counter",
+						"event_counter",
+						"event_counter",
+						"event_counter",
+						"event_counter",
+						"event_counter",
+						"event_counter",
+						"event_counter",
+						"event_counter",
+						"event_counter",
+						"event_counter",
+						"event_counter",
+						"event_counter",
+						null,
+						null,
+						null,
+						null,
+						null,
+						null
+					],
+					[
+						null,
+						null,
+						null,
+						null,
+						null,
+						null,
+						null,
+						null,
+						null,
+						null,
+						null,
+						null,
+						null,
+						null,
+						null,
+						null,
+						null,
+						null,
+						null,
+						null,
+						null,
+						null,
+						null,
+						null
+					],
+					[
+						null,
+						null,
+						null,
+						null,
+						null,
+						null,
+						null,
+						"event_date",
+						"event_date",
+						"event_date",
+						"event_date",
+						"event_date",
+						"event_date",
+						"event_date",
+						"event_date",
+						"event_date",
+						"event_date",
+						"event_date",
+						"event_date",
+						"event_date",
+						"event_date",
+						"event_date",
+						"event_date",
+						null
+					],
+					[
+						null,
+						null,
+						null,
+						null,
+						null,
+						null,
+						null,
+						null,
+						null,
+						null,
+						null,
+						null,
+						null,
+						null,
+						null,
+						null,
+						null,
+						null,
+						null,
+						null,
+						null,
+						null,
+						null,
+						null
+					]
+				],
+				"finished": true
+			},
+			{
+				"rows": 4,
+				"cols": 11,
+				"rowHeights": ["1fr", "1fr", "1fr", "1fr"],
+				"areas": {
+					"event_date": {
+						"id": "event_date",
+						"rowStart": 0,
+						"rowEnd": 0,
+						"colStart": 2,
+						"colEnd": 2
+					}
+				},
+				"gridMatrix": [
+					[null, null, "event_date", null, null, null, null, null, null, null, null],
+					[null, null, null, null, null, null, null, null, null, null, null],
+					[null, null, null, null, null, null, null, null, null, null, null],
+					[null, null, null, null, null, null, null, null, null, null, null]
+				],
+				"finished": false
+			}
+		],
+		"Vertical events for VIP + GOLD + SILVER": [
+			{
+				"rows": 2,
+				"cols": 24,
+				"rowHeights": ["1fr", "max-content"],
+				"areas": {
+					"event_counter": {
+						"id": "event_counter",
+						"rowStart": 0,
+						"rowEnd": 1,
+						"colStart": 1,
+						"colEnd": 8
+					},
+					"event_date": {
+						"id": "event_date",
+						"rowStart": 0,
+						"rowEnd": 1,
+						"colStart": 10,
+						"colEnd": 18
+					}
+				},
+				"gridMatrix": [
+					[
+						null,
+						"event_counter",
+						"event_counter",
+						"event_counter",
+						"event_counter",
+						"event_counter",
+						"event_counter",
+						"event_counter",
+						"event_counter",
+						null,
+						"event_date",
+						"event_date",
+						"event_date",
+						"event_date",
+						"event_date",
+						"event_date",
+						"event_date",
+						"event_date",
+						"event_date",
+						null,
+						null,
+						null,
+						null,
+						null
+					],
+					[
+						null,
+						"event_counter",
+						"event_counter",
+						"event_counter",
+						"event_counter",
+						"event_counter",
+						"event_counter",
+						"event_counter",
+						"event_counter",
+						null,
+						"event_date",
+						"event_date",
+						"event_date",
+						"event_date",
+						"event_date",
+						"event_date",
+						"event_date",
+						"event_date",
+						"event_date",
+						null,
+						null,
+						null,
+						null,
+						null
+					]
+				],
+				"finished": true
+			},
+			{
+				"rows": 4,
+				"cols": 11,
+				"rowHeights": ["1fr", "1fr", "1fr", "1fr"],
+				"areas": {
+					"event_date": {
+						"id": "event_date",
+						"rowStart": 0,
+						"rowEnd": 0,
+						"colStart": 3,
+						"colEnd": 8
+					},
+					"event_counter": {
+						"id": "event_counter",
+						"rowStart": 2,
+						"rowEnd": 2,
+						"colStart": 3,
+						"colEnd": 7
+					}
+				},
+				"gridMatrix": [
+					[
+						null,
+						null,
+						null,
+						"event_date",
+						"event_date",
+						"event_date",
+						"event_date",
+						"event_date",
+						"event_date",
+						null,
+						null
+					],
+					[null, null, null, null, null, null, null, null, null, null, null],
+					[
+						null,
+						null,
+						null,
+						"event_counter",
+						"event_counter",
+						"event_counter",
+						"event_counter",
+						"event_counter",
+						null,
+						null,
+						null
+					],
+					[null, null, null, null, null, null, null, null, null, null, null]
+				],
+				"finished": true
+			}
+		],
+		"Main Page": [
+			{
+				"rows": 4,
+				"cols": 16,
+				"rowHeights": ["1fr", "1fr", "1fr", "1fr"],
+				"areas": {
+					"event_date": {
+						"id": "event_date",
+						"rowStart": 0,
+						"rowEnd": 0,
+						"colStart": 4,
+						"colEnd": 11
+					},
+					"event_counter": {
+						"id": "event_counter",
+						"rowStart": 2,
+						"rowEnd": 2,
+						"colStart": 5,
+						"colEnd": 13
+					}
+				},
+				"gridMatrix": [
+					[
+						null,
+						null,
+						null,
+						null,
+						"event_date",
+						"event_date",
+						"event_date",
+						"event_date",
+						"event_date",
+						"event_date",
+						"event_date",
+						"event_date",
+						null,
+						null,
+						null,
+						null
+					],
+					[
+						null,
+						null,
+						null,
+						null,
+						null,
+						null,
+						null,
+						null,
+						null,
+						null,
+						null,
+						null,
+						null,
+						null,
+						null,
+						null
+					],
+					[
+						null,
+						null,
+						null,
+						null,
+						null,
+						"event_counter",
+						"event_counter",
+						"event_counter",
+						"event_counter",
+						"event_counter",
+						"event_counter",
+						"event_counter",
+						"event_counter",
+						"event_counter",
+						null,
+						null
+					],
+					[
+						null,
+						null,
+						null,
+						null,
+						null,
+						null,
+						null,
+						null,
+						null,
+						null,
+						null,
+						null,
+						null,
+						null,
+						null,
+						null
+					]
+				],
+				"finished": true
+			},
+			{
+				"rows": 4,
+				"cols": 11,
+				"rowHeights": ["1fr", "1fr", "1fr", "1fr"],
+				"areas": {
+					"event_date": {
+						"id": "event_date",
+						"rowStart": 0,
+						"rowEnd": 2,
+						"colStart": 0,
+						"colEnd": 4
+					}
+				},
+				"gridMatrix": [
+					[
+						"event_date",
+						"event_date",
+						"event_date",
+						"event_date",
+						"event_date",
+						null,
+						null,
+						null,
+						null,
+						null,
+						null
+					],
+					[
+						"event_date",
+						"event_date",
+						"event_date",
+						"event_date",
+						"event_date",
+						null,
+						null,
+						null,
+						null,
+						null,
+						null
+					],
+					[
+						"event_date",
+						"event_date",
+						"event_date",
+						"event_date",
+						"event_date",
+						null,
+						null,
+						null,
+						null,
+						null,
+						null
+					],
+					[null, null, null, null, null, null, null, null, null, null, null]
+				],
+				"finished": false
+			},
+			{
+				"rows": 4,
+				"cols": 8,
+				"rowHeights": ["1fr", "1fr", "1fr", "1fr"],
+				"areas": {
+					"event_date": {
+						"id": "event_date",
+						"rowStart": 0,
+						"rowEnd": 0,
+						"colStart": 1,
+						"colEnd": 6
+					},
+					"event_counter": {
+						"id": "event_counter",
+						"rowStart": 2,
+						"rowEnd": 2,
+						"colStart": 1,
+						"colEnd": 7
+					}
+				},
+				"gridMatrix": [
+					[
+						null,
+						"event_date",
+						"event_date",
+						"event_date",
+						"event_date",
+						"event_date",
+						"event_date",
+						null
+					],
+					[null, null, null, null, null, null, null, null],
+					[
+						null,
+						"event_counter",
+						"event_counter",
+						"event_counter",
+						"event_counter",
+						"event_counter",
+						"event_counter",
+						"event_counter"
+					],
+					[null, null, null, null, null, null, null, null]
+				],
+				"finished": true
+			}
+		]
+	},
+	"layoutDefinitions": {
+		"Single event for GOLD": {
+			"name": "Single event for GOLD",
+			"id": "547",
+			"width": 1536,
+			"sizes": [
+				{
+					"width": 1536,
+					"height": 704,
+					"label": "1536x704"
+				},
+				{
+					"width": 672,
+					"height": 756,
+					"label": "672x756"
+				}
+			]
+		},
+		"Vertical events for VIP + GOLD + SILVER": {
+			"name": "Vertical events for VIP + GOLD + SILVER",
+			"id": "509",
+			"width": 1536,
+			"sizes": [
+				{
+					"width": 1536,
+					"height": 128,
+					"label": "1536x128"
+				},
+				{
+					"width": 672,
+					"height": 336,
+					"label": "672x336"
+				}
+			]
+		},
+		"Main Page": {
+			"name": "Main Page",
+			"id": "101",
+			"width": 1536,
+			"sizes": [
+				{
+					"width": 1024,
+					"height": 576,
+					"label": "1024x576"
+				},
+				{
+					"width": 672,
+					"height": 840,
+					"label": "672x840"
+				},
+				{
+					"width": 512,
+					"height": 576,
+					"label": "512x576"
+				}
+			]
+		}
+	},
+	"resolutionStructure": {
+		"Single event for GOLD": [
+			{
+				"width": 1536,
+				"height": 704,
+				"label": "1536x704"
+			},
+			{
+				"width": 672,
+				"height": 756,
+				"label": "672x756"
+			}
+		],
+		"Vertical events for VIP + GOLD + SILVER": [
+			{
+				"width": 1536,
+				"height": 128,
+				"label": "1536x128"
+			},
+			{
+				"width": 672,
+				"height": 336,
+				"label": "672x336"
+			}
+		],
+		"Main Page": [
+			{
+				"width": 1024,
+				"height": 576,
+				"label": "1024x576"
+			},
+			{
+				"width": 672,
+				"height": 840,
+				"label": "672x840"
+			},
+			{
+				"width": 512,
+				"height": 576,
+				"label": "512x576"
+			}
+		]
+	}
+}

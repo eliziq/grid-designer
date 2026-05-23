@@ -1,0 +1,636 @@
+{
+	"id": "123",
+	"currentLayoutName": "Single event for GOLD",
+	"currentPageWidth": "Single event for GOLD",
+	"currentResolutionIndex": 0,
+	"elements": [
+		{
+			"id": "Event_NameAndLogo",
+			"name": "Event name",
+			"gridArea": "namewrap",
+			"controlType": "checkbox",
+			"ctrls": [
+				{
+					"id": "event_name_team_logos-event_name",
+					"name": "Event name",
+					"selected": true
+				},
+				{
+					"id": "event_name_team_logos-team_logos",
+					"name": "Team logos",
+					"selected": false
+				}
+			]
+		},
+		{
+			"id": "Event_Counter",
+			"name": "Sold counter",
+			"gridArea": "prodcnt",
+			"controlType": "checkbox",
+			"ctrls": [
+				{
+					"id": "sold_counter-sold_counter",
+					"name": "Sold counter",
+					"selected": true
+				}
+			]
+		},
+		{
+			"id": "Event_Date",
+			"name": "Displayed event date (text format)",
+			"gridArea": "boxdates",
+			"controlType": "radio",
+			"ctrls": [
+				{
+					"id": "event_date_format_ddmmyyyy_event_start_time_format_hhmm_displayed_event_date_text_format-event_date_format_ddmmyyyy",
+					"name": "Event date (format: DD/MM/YYYY)",
+					"selected": false
+				},
+				{
+					"id": "event_date_format_ddmmyyyy_event_start_time_format_hhmm_displayed_event_date_text_format-event_start_time_format_hhmm",
+					"name": "Event start time (format: HH:MM)",
+					"selected": false
+				},
+				{
+					"id": "event_date_format_ddmmyyyy_event_start_time_format_hhmm_displayed_event_date_text_format-displayed_event_date_text_format",
+					"name": "Displayed event date (text format)",
+					"selected": true
+				}
+			]
+		}
+	],
+	"resolutionStates": {
+		"Single event for GOLD": [
+			{
+				"rows": 4,
+				"cols": 24,
+				"rowHeights": ["1fr", "max-content", "1fr", "max-content"],
+				"areas": {
+					"Event_NameAndLogo": {
+						"id": "Event_NameAndLogo",
+						"rowStart": 0,
+						"rowEnd": 0,
+						"colStart": 1,
+						"colEnd": 22
+					},
+					"Event_Counter": {
+						"id": "Event_Counter",
+						"rowStart": 2,
+						"rowEnd": 2,
+						"colStart": 4,
+						"colEnd": 19
+					},
+					"Event_Date": {
+						"id": "Event_Date",
+						"rowStart": 3,
+						"rowEnd": 3,
+						"colStart": 5,
+						"colEnd": 15
+					}
+				},
+				"gridMatrix": [
+					[
+						null,
+						"Event_NameAndLogo",
+						"Event_NameAndLogo",
+						"Event_NameAndLogo",
+						"Event_NameAndLogo",
+						"Event_NameAndLogo",
+						"Event_NameAndLogo",
+						"Event_NameAndLogo",
+						"Event_NameAndLogo",
+						"Event_NameAndLogo",
+						"Event_NameAndLogo",
+						"Event_NameAndLogo",
+						"Event_NameAndLogo",
+						"Event_NameAndLogo",
+						"Event_NameAndLogo",
+						"Event_NameAndLogo",
+						"Event_NameAndLogo",
+						"Event_NameAndLogo",
+						"Event_NameAndLogo",
+						"Event_NameAndLogo",
+						"Event_NameAndLogo",
+						"Event_NameAndLogo",
+						"Event_NameAndLogo",
+						null
+					],
+					[
+						null,
+						null,
+						null,
+						null,
+						null,
+						null,
+						null,
+						null,
+						null,
+						null,
+						null,
+						null,
+						null,
+						null,
+						null,
+						null,
+						null,
+						null,
+						null,
+						null,
+						null,
+						null,
+						null,
+						null
+					],
+					[
+						null,
+						null,
+						null,
+						null,
+						"Event_Counter",
+						"Event_Counter",
+						"Event_Counter",
+						"Event_Counter",
+						"Event_Counter",
+						"Event_Counter",
+						"Event_Counter",
+						"Event_Counter",
+						"Event_Counter",
+						"Event_Counter",
+						"Event_Counter",
+						"Event_Counter",
+						"Event_Counter",
+						"Event_Counter",
+						"Event_Counter",
+						"Event_Counter",
+						null,
+						null,
+						null,
+						null
+					],
+					[
+						null,
+						null,
+						null,
+						null,
+						null,
+						"Event_Date",
+						"Event_Date",
+						"Event_Date",
+						"Event_Date",
+						"Event_Date",
+						"Event_Date",
+						"Event_Date",
+						"Event_Date",
+						"Event_Date",
+						"Event_Date",
+						"Event_Date",
+						null,
+						null,
+						null,
+						null,
+						null,
+						null,
+						null,
+						null
+					]
+				],
+				"finished": true
+			},
+			{
+				"rows": 4,
+				"cols": 11,
+				"rowHeights": ["1fr", "1fr", "1fr", "1fr"],
+				"areas": {},
+				"gridMatrix": [
+					[null, null, null, null, null, null, null, null, null, null, null],
+					[null, null, null, null, null, null, null, null, null, null, null],
+					[null, null, null, null, null, null, null, null, null, null, null],
+					[null, null, null, null, null, null, null, null, null, null, null]
+				],
+				"finished": false
+			}
+		],
+		"Vertical events for VIP + GOLD + SILVER": [
+			{
+				"rows": 2,
+				"cols": 24,
+				"rowHeights": ["1fr", "max-content"],
+				"areas": {
+					"Event_Counter": {
+						"id": "Event_Counter",
+						"rowStart": 0,
+						"rowEnd": 1,
+						"colStart": 6,
+						"colEnd": 17
+					},
+					"Event_NameAndLogo": {
+						"id": "Event_NameAndLogo",
+						"rowStart": 0,
+						"rowEnd": 0,
+						"colStart": 2,
+						"colEnd": 5
+					},
+					"Event_Date": {
+						"id": "Event_Date",
+						"rowStart": 1,
+						"rowEnd": 1,
+						"colStart": 18,
+						"colEnd": 23
+					}
+				},
+				"gridMatrix": [
+					[
+						null,
+						null,
+						"Event_NameAndLogo",
+						"Event_NameAndLogo",
+						"Event_NameAndLogo",
+						"Event_NameAndLogo",
+						"Event_Counter",
+						"Event_Counter",
+						"Event_Counter",
+						"Event_Counter",
+						"Event_Counter",
+						"Event_Counter",
+						"Event_Counter",
+						"Event_Counter",
+						"Event_Counter",
+						"Event_Counter",
+						"Event_Counter",
+						"Event_Counter",
+						null,
+						null,
+						null,
+						null,
+						null,
+						null
+					],
+					[
+						null,
+						null,
+						null,
+						null,
+						null,
+						null,
+						"Event_Counter",
+						"Event_Counter",
+						"Event_Counter",
+						"Event_Counter",
+						"Event_Counter",
+						"Event_Counter",
+						"Event_Counter",
+						"Event_Counter",
+						"Event_Counter",
+						"Event_Counter",
+						"Event_Counter",
+						"Event_Counter",
+						"Event_Date",
+						"Event_Date",
+						"Event_Date",
+						"Event_Date",
+						"Event_Date",
+						"Event_Date"
+					]
+				],
+				"finished": true
+			},
+			{
+				"rows": 4,
+				"cols": 4,
+				"rowHeights": ["1fr", "1fr", "1fr", "1fr"],
+				"areas": {
+					"Event_Counter": {
+						"id": "Event_Counter",
+						"rowStart": 0,
+						"rowEnd": 0,
+						"colStart": 1,
+						"colEnd": 1
+					},
+					"Event_NameAndLogo": {
+						"id": "Event_NameAndLogo",
+						"rowStart": 2,
+						"rowEnd": 2,
+						"colStart": 1,
+						"colEnd": 1
+					},
+					"Event_Date": {
+						"id": "Event_Date",
+						"rowStart": 0,
+						"rowEnd": 3,
+						"colStart": 3,
+						"colEnd": 3
+					}
+				},
+				"gridMatrix": [
+					[null, "Event_Counter", null, "Event_Date"],
+					[null, null, null, "Event_Date"],
+					[null, "Event_NameAndLogo", null, "Event_Date"],
+					[null, null, null, "Event_Date"]
+				],
+				"finished": true
+			}
+		],
+		"Main Page": [
+			{
+				"rows": 4,
+				"cols": 16,
+				"rowHeights": ["1fr", "1fr", "1fr", "1fr"],
+				"areas": {
+					"Event_Date": {
+						"id": "Event_Date",
+						"rowStart": 0,
+						"rowEnd": 0,
+						"colStart": 6,
+						"colEnd": 12
+					},
+					"Event_Counter": {
+						"id": "Event_Counter",
+						"rowStart": 2,
+						"rowEnd": 2,
+						"colStart": 4,
+						"colEnd": 10
+					},
+					"Event_NameAndLogo": {
+						"id": "Event_NameAndLogo",
+						"rowStart": 3,
+						"rowEnd": 3,
+						"colStart": 2,
+						"colEnd": 11,
+						"label": "COOL GAME"
+					}
+				},
+				"gridMatrix": [
+					[
+						null,
+						null,
+						null,
+						null,
+						null,
+						null,
+						"Event_Date",
+						"Event_Date",
+						"Event_Date",
+						"Event_Date",
+						"Event_Date",
+						"Event_Date",
+						"Event_Date",
+						null,
+						null,
+						null
+					],
+					[
+						null,
+						null,
+						null,
+						null,
+						null,
+						null,
+						null,
+						null,
+						null,
+						null,
+						null,
+						null,
+						null,
+						null,
+						null,
+						null
+					],
+					[
+						null,
+						null,
+						null,
+						null,
+						"Event_Counter",
+						"Event_Counter",
+						"Event_Counter",
+						"Event_Counter",
+						"Event_Counter",
+						"Event_Counter",
+						"Event_Counter",
+						null,
+						null,
+						null,
+						null,
+						null
+					],
+					[
+						null,
+						null,
+						"Event_NameAndLogo",
+						"Event_NameAndLogo",
+						"Event_NameAndLogo",
+						"Event_NameAndLogo",
+						"Event_NameAndLogo",
+						"Event_NameAndLogo",
+						"Event_NameAndLogo",
+						"Event_NameAndLogo",
+						"Event_NameAndLogo",
+						"Event_NameAndLogo",
+						null,
+						null,
+						null,
+						null
+					]
+				],
+				"finished": true
+			},
+			{
+				"rows": 4,
+				"cols": 11,
+				"rowHeights": ["1fr", "1fr", "1fr", "1fr"],
+				"areas": {
+					"Event_Counter": {
+						"id": "Event_Counter",
+						"rowStart": 1,
+						"rowEnd": 1,
+						"colStart": 4,
+						"colEnd": 8
+					}
+				},
+				"gridMatrix": [
+					[null, null, null, null, null, null, null, null, null, null, null],
+					[
+						null,
+						null,
+						null,
+						null,
+						"Event_Counter",
+						"Event_Counter",
+						"Event_Counter",
+						"Event_Counter",
+						"Event_Counter",
+						null,
+						null
+					],
+					[null, null, null, null, null, null, null, null, null, null, null],
+					[null, null, null, null, null, null, null, null, null, null, null]
+				],
+				"finished": false
+			},
+			{
+				"rows": 4,
+				"cols": 8,
+				"rowHeights": ["1fr", "1fr", "1fr", "1fr"],
+				"areas": {
+					"Event_Date": {
+						"id": "Event_Date",
+						"rowStart": 0,
+						"rowEnd": 0,
+						"colStart": 2,
+						"colEnd": 6
+					},
+					"Event_Counter": {
+						"id": "Event_Counter",
+						"rowStart": 1,
+						"rowEnd": 1,
+						"colStart": 1,
+						"colEnd": 6
+					},
+					"Event_NameAndLogo": {
+						"id": "Event_NameAndLogo",
+						"rowStart": 2,
+						"rowEnd": 2,
+						"colStart": 3,
+						"colEnd": 6
+					}
+				},
+				"gridMatrix": [
+					[
+						null,
+						null,
+						"Event_Date",
+						"Event_Date",
+						"Event_Date",
+						"Event_Date",
+						"Event_Date",
+						null
+					],
+					[
+						null,
+						"Event_Counter",
+						"Event_Counter",
+						"Event_Counter",
+						"Event_Counter",
+						"Event_Counter",
+						"Event_Counter",
+						null
+					],
+					[
+						null,
+						null,
+						null,
+						"Event_NameAndLogo",
+						"Event_NameAndLogo",
+						"Event_NameAndLogo",
+						"Event_NameAndLogo",
+						null
+					],
+					[null, null, null, null, null, null, null, null]
+				],
+				"finished": true
+			}
+		]
+	},
+	"layoutDefinitions": {
+		"Single event for GOLD": {
+			"name": "Single event for GOLD",
+			"id": "547",
+			"width": 1536,
+			"sizes": [
+				{
+					"width": 1536,
+					"height": 704,
+					"label": "1536x704"
+				},
+				{
+					"width": 672,
+					"height": 756,
+					"label": "672x756"
+				}
+			]
+		},
+		"Vertical events for VIP + GOLD + SILVER": {
+			"name": "Vertical events for VIP + GOLD + SILVER",
+			"id": "509",
+			"width": 1536,
+			"sizes": [
+				{
+					"width": 1536,
+					"height": 128,
+					"label": "1536x128"
+				},
+				{
+					"width": 672,
+					"height": 336,
+					"label": "672x336"
+				}
+			]
+		},
+		"Main Page": {
+			"name": "Main Page",
+			"id": "101",
+			"width": 1536,
+			"sizes": [
+				{
+					"width": 1024,
+					"height": 576,
+					"label": "1024x576"
+				},
+				{
+					"width": 672,
+					"height": 840,
+					"label": "672x840"
+				},
+				{
+					"width": 512,
+					"height": 576,
+					"label": "512x576"
+				}
+			]
+		}
+	},
+	"resolutionStructure": {
+		"Single event for GOLD": [
+			{
+				"width": 1536,
+				"height": 704,
+				"label": "1536x704"
+			},
+			{
+				"width": 672,
+				"height": 756,
+				"label": "672x756"
+			}
+		],
+		"Vertical events for VIP + GOLD + SILVER": [
+			{
+				"width": 1536,
+				"height": 128,
+				"label": "1536x128"
+			},
+			{
+				"width": 672,
+				"height": 336,
+				"label": "672x336"
+			}
+		],
+		"Main Page": [
+			{
+				"width": 1024,
+				"height": 576,
+				"label": "1024x576"
+			},
+			{
+				"width": 672,
+				"height": 840,
+				"label": "672x840"
+			},
+			{
+				"width": 512,
+				"height": 576,
+				"label": "512x576"
+			}
+		]
+	}
+}

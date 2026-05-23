@@ -1,10 +1,10 @@
 class GridDesigner {
-	constructor(editorCardId, resolutions = {}, tags = [], state = {}) {
+	constructor(editorCardId, layoutDefinitions = {}, tags = [], state = {}) {
 		if (!editorCardId) return;
 
 		this.containerElement = document;
 		this.editorCardId = editorCardId;
-		this.rootSelector = `#${GridDesigner.sanitizeId(this.editorCardId)}`;
+		this.rootSelector = `#${String(this.editorCardId)}`;
 
 		this.state = {
 			rows: 4,
@@ -15,9 +15,11 @@ class GridDesigner {
 			resolutionStates: [],
 			elements: [],
 			currentResolutionIndex: 0,
+			currentLayoutName: "",
 		};
-		this.resolutions = resolutions;
-		this.state.currentPageWidth = Object.keys(resolutions)[0];
+		this.layoutDefinitions = {};
+		this.layoutOrder = [];
+		this.resolutions = {};
 		this.currentResolution = null;
 		this.sortedScreenWidths = [];
 		this.gridWidth = 1536;
@@ -30,7 +32,7 @@ class GridDesigner {
 		this.tagSelectionLocked = false;
 
 		this.cacheDomElements();
-		this.init(editorCardId, resolutions, tags, state);
+		this.init(editorCardId, layoutDefinitions, tags, state);
 	}
 
 	cacheDomElements() {
@@ -61,26 +63,58 @@ class GridDesigner {
 		return this.containerElement.querySelector(`#${id}`);
 	}
 
-	static sanitizeId(raw) {
-		return String(raw || "")
-			.trim()
-			.toLowerCase()
-			.replace(/\s+/g, "_")
-			.replace(/[^a-z0-9_\-]/g, "");
-	}
-
 	static cloneData(value, fallback = null) {
 		if (value == null) return fallback;
 		return JSON.parse(JSON.stringify(value));
 	}
 
 	static normalizeResolution(res) {
-		const width = Number(res?.width) || 0;
-		const height = Number(res?.height) || 0;
+		if (!res || typeof res !== "object") return null;
+		const width = Number(res.width);
+		const height = Number(res.height);
+		if (!Number.isFinite(width) || !Number.isFinite(height)) return null;
 		return {
+			...res,
 			width,
 			height,
-			label: res?.label || res?.name || `${width}x${height}`,
+		};
+	}
+
+	static normalizeLayoutDefinitions(layoutDefinitions) {
+		if (!layoutDefinitions || typeof layoutDefinitions !== "object") {
+			console.warn("Invalid layoutDefinitions format. Expected an object.");
+			return { layoutDefinitions: {}, resolutions: {}, layoutOrder: [] };
+		}
+
+		const normalizedDefinitions = {};
+		const normalizedResolutions = {};
+
+		for (const [layoutName, definition] of Object.entries(layoutDefinitions)) {
+			if (!definition || typeof definition !== "object") continue;
+
+			const sizes = Array.isArray(definition.sizes)
+				? definition.sizes
+						.map((res) => GridDesigner.normalizeResolution(res))
+						.filter(Boolean)
+				: [];
+
+			if (!sizes.length) continue;
+
+			const layoutWidth = Number(definition.width);
+			normalizedDefinitions[layoutName] = {
+				...definition,
+				width: Number.isFinite(layoutWidth) ? layoutWidth : sizes[0].width,
+				sizes,
+			};
+			normalizedResolutions[layoutName] = sizes;
+		}
+
+		const layoutOrder = Object.keys(normalizedDefinitions);
+
+		return {
+			layoutDefinitions: normalizedDefinitions,
+			resolutions: normalizedResolutions,
+			layoutOrder,
 		};
 	}
 
@@ -98,8 +132,7 @@ class GridDesigner {
 			if (Array.isArray(bannerSizes)) {
 				const validBanners = bannerSizes
 					.map((res) => this.normalizeResolution(res))
-					.filter((res) => res.width > 0 && res.height > 0)
-					.sort((a, b) => b.width - a.width || b.height - a.height);
+					.filter(Boolean);
 
 				if (validBanners.length > 0) {
 					normalized[pageWidth] = validBanners;
@@ -112,8 +145,16 @@ class GridDesigner {
 
 	static normalizeTag(tag, index) {
 		if (tag && typeof tag === "object") {
-			const name = String(tag.name || tag.label || tag.id || `Tag ${index + 1}`);
+			const name =
+				tag.name != null
+					? String(tag.name)
+					: tag.label != null
+						? String(tag.label)
+						: tag.id != null
+							? String(tag.id)
+							: `Tag ${index + 1}`;
 			const controlType = tag.controlType === "radio" ? "radio" : "checkbox";
+			const gridArea = tag.gridArea != null ? String(tag.gridArea) : "";
 			const ctrls = Array.isArray(tag.ctrls)
 				? tag.ctrls
 						.map((ctrl, ctrlIndex) =>
@@ -122,18 +163,15 @@ class GridDesigner {
 						.filter(Boolean)
 				: [];
 
-			if (controlType === "radio" && ctrls.length && !ctrls.some((ctrl) => ctrl.selected)) {
-				ctrls[0].selected = true;
-			}
-
 			const selected =
-				ctrls.length > 0
-					? ctrls.some((ctrl) => ctrl.selected)
-					: GridDesigner.normalizeBoolean(tag.selected, true);
+				tag.selected != null
+					? GridDesigner.normalizeBoolean(tag.selected, false)
+					: ctrls.some((ctrl) => ctrl.selected);
 
 			return {
-				id: GridDesigner.sanitizeId(tag.id || name) || `tag_${index + 1}`,
+				id: String(tag.id ?? name ?? `tag_${index + 1}`),
 				name,
+				gridArea,
 				selected,
 				controlType,
 				ctrls,
@@ -146,7 +184,7 @@ class GridDesigner {
 		if (!ctrl || typeof ctrl !== "object") return null;
 		const name = String(ctrl.name || ctrl.label || `Option ${index + 1}`);
 		return {
-			id: GridDesigner.sanitizeId(ctrl.id || `${tagName}-${name}`) || `ctrl_${index + 1}`,
+			id: String(ctrl.id ?? `${tagName}-${name}` ?? `ctrl_${index + 1}`),
 			name,
 			tag: String(ctrl.tag || ""),
 			selected: GridDesigner.normalizeBoolean(ctrl.selected, false),
@@ -165,7 +203,10 @@ class GridDesigner {
 
 	static normalizeTags(tags) {
 		if (!Array.isArray(tags)) return [];
-		return tags.map((tag, index) => GridDesigner.normalizeTag(tag, index)).filter(Boolean);
+		const flattenedTags = tags.flatMap((item) => (Array.isArray(item) ? item : [item]));
+		return flattenedTags
+			.map((tag, index) => GridDesigner.normalizeTag(tag, index))
+			.filter(Boolean);
 	}
 
 	getElementDisplayName(tag) {
@@ -188,6 +229,7 @@ class GridDesigner {
 			.map((tag) => ({
 				id: tag.id,
 				name: this.getElementDisplayName(tag),
+				gridArea: tag.gridArea,
 				controlType: tag.controlType,
 				ctrls: (tag.ctrls || []).map((ctrl) => ({
 					id: ctrl.id,
@@ -209,17 +251,17 @@ class GridDesigner {
 		}
 
 		const selectedTagIds = new Set(
-			elements.map((el) => GridDesigner.sanitizeId(el?.id || el?.name || "")).filter(Boolean),
+			elements.map((el) => String(el?.id || el?.name || "")).filter(Boolean),
 		);
 
 		const selectedControlsByTag = new Map();
 		elements.forEach((el) => {
-			const tagId = GridDesigner.sanitizeId(el?.id || el?.name || "");
+			const tagId = String(el?.id || el?.name || "");
 			if (!tagId) return;
 			const ctrls = Array.isArray(el?.ctrls) ? el.ctrls : [];
 			const selectedControlIds = ctrls
 				.filter((ctrl) => GridDesigner.normalizeBoolean(ctrl?.selected, true))
-				.map((ctrl) => GridDesigner.sanitizeId(ctrl?.id || ctrl?.name || ""))
+				.map((ctrl) => String(ctrl?.id || ctrl?.name || ""))
 				.filter(Boolean);
 			selectedControlsByTag.set(tagId, new Set(selectedControlIds));
 		});
@@ -250,9 +292,13 @@ class GridDesigner {
 		this.applySelectedTags();
 	}
 
-	init(editorCardId, resolutions = {}, tags = [], state = {}) {
+	init(editorCardId, layoutDefinitions = {}, tags = [], state = {}) {
 		this.editorCardId = String(editorCardId != null ? editorCardId : this.editorCardId);
-		this.resolutions = GridDesigner.normalizeResolutions(resolutions);
+		const normalizedLayouts = GridDesigner.normalizeLayoutDefinitions(layoutDefinitions);
+		this.layoutDefinitions = normalizedLayouts.layoutDefinitions;
+		this.layoutOrder = normalizedLayouts.layoutOrder;
+		this.resolutions = normalizedLayouts.resolutions;
+		this.state.currentLayoutName = this.layoutOrder[0] || "";
 		this.allowedTags = GridDesigner.normalizeTags(tags);
 		if (this.allowedTags.length) {
 			this.applySelectedTags();
@@ -265,11 +311,11 @@ class GridDesigner {
 		this.attachEditorListeners();
 		this.renderTagSelectionPanel();
 
-		const pageWidth = this.state.currentPageWidth || Object.keys(this.resolutions)[0];
+		const layoutName = this.state.currentLayoutName || Object.keys(this.resolutions)[0];
 
 		const defaultResolution =
-			this.resolutions[pageWidth]?.[this.state.currentResolutionIndex] ||
-			this.resolutions[pageWidth]?.[0];
+			this.resolutions[layoutName]?.[this.state.currentResolutionIndex] ||
+			this.resolutions[layoutName]?.[0];
 
 		if (defaultResolution) {
 			this.setCurrentResolution(defaultResolution);
