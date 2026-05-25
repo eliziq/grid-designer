@@ -162,13 +162,19 @@ Object.assign(GridDesigner.prototype, {
 		}
 	},
 
+	getResolutionSignature(resolution) {
+		const width = Number(resolution?.width);
+		const height = Number(resolution?.height);
+
+		if (!Number.isFinite(width) || !Number.isFinite(height)) return "";
+
+		return `${width}x${height}`;
+	},
+
 	loadEditorState(state) {
 		if (!state || typeof state !== "object") return;
 
-		const hasIncomingDesign =
-			Array.isArray(state.elements) ||
-			Boolean(state.resolutionStates) ||
-			Boolean(state.resolutionStructure);
+		const hasIncomingDesign = Array.isArray(state.elements) || Boolean(state.resolutionStates);
 		if (hasIncomingDesign) {
 			this.tagSelectionLocked = true;
 		}
@@ -196,21 +202,32 @@ Object.assign(GridDesigner.prototype, {
 			this.applySelectedTags();
 		}
 
-		if (state.resolutionStructure) {
-			const normalizedResolutions = GridDesigner.normalizeResolutions(
-				state.resolutionStructure,
-			);
-			this.resolutions = normalizedResolutions;
-			this.layoutOrder = Object.keys(normalizedResolutions);
-		}
+		const incomingLayouts = state.layoutDefinitions
+			? GridDesigner.normalizeLayoutDefinitions(state.layoutDefinitions)
+			: null;
+		const incomingResolutions = incomingLayouts?.resolutions || {};
+		const incomingResolutionLookup = Object.fromEntries(
+			Object.entries(incomingResolutions).map(([layoutName, resolutions]) => {
+				const map = new Map();
+				(resolutions || []).forEach((resolution, idx) => {
+					const signature = this.getResolutionSignature(resolution);
+					if (signature && !map.has(signature)) map.set(signature, idx);
+				});
+				return [layoutName, map];
+			}),
+		);
+		const incomingActiveLayoutName = String(state.currentLayoutName || "");
+		const incomingActiveResolution =
+			incomingResolutions[incomingActiveLayoutName]?.[
+				Number(state.currentResolutionIndex) || 0
+			];
+		const incomingActiveSignature = this.getResolutionSignature(incomingActiveResolution);
+		const hasConfiguredLayouts = Object.keys(this.resolutions || {}).length > 0;
 
-		if (state.layoutDefinitions) {
-			const normalizedLayouts = GridDesigner.normalizeLayoutDefinitions(
-				state.layoutDefinitions,
-			);
-			this.layoutDefinitions = normalizedLayouts.layoutDefinitions;
-			this.layoutOrder = normalizedLayouts.layoutOrder;
-			this.resolutions = normalizedLayouts.resolutions;
+		if (!hasConfiguredLayouts && incomingLayouts) {
+			this.layoutDefinitions = incomingLayouts.layoutDefinitions;
+			this.layoutOrder = incomingLayouts.layoutOrder;
+			this.resolutions = incomingLayouts.resolutions;
 		}
 
 		const availableWidths = Object.keys(this.resolutions);
@@ -220,10 +237,8 @@ Object.assign(GridDesigner.prototype, {
 		this.sortedScreenWidths = [...this.layoutOrder];
 
 		this.state.currentLayoutName =
-			(state.currentLayoutName &&
-				availableWidths.includes(String(state.currentLayoutName))) ||
-			(state.currentPageWidth && availableWidths.includes(String(state.currentPageWidth)))
-				? String(state.currentLayoutName || state.currentPageWidth)
+			state.currentLayoutName && availableWidths.includes(String(state.currentLayoutName))
+				? String(state.currentLayoutName)
 				: availableWidths[0];
 
 		const currentGroup = this.resolutions[this.state.currentLayoutName] || [];
@@ -238,13 +253,14 @@ Object.assign(GridDesigner.prototype, {
 			const banners = this.resolutions[pageWidth];
 
 			this.state.resolutionStates[pageWidth] = banners.map((res, index) => {
-				const { resolutionStates, currentResolutionIndex } = state;
-
-				const isCurrentlyActive =
-					pageWidth === this.state.currentLayoutName && index === currentResolutionIndex;
-
+				const signature = this.getResolutionSignature(res);
+				const incomingStates = state?.resolutionStates?.[pageWidth];
+				const matchedIndex = incomingResolutionLookup[pageWidth]?.get(signature);
 				const incoming =
-					resolutionStates?.[pageWidth]?.[index] || (isCurrentlyActive ? state : null);
+					(Number.isInteger(matchedIndex) ? incomingStates?.[matchedIndex] : null) ||
+					(incomingActiveLayoutName === pageWidth && signature === incomingActiveSignature
+						? state
+						: null);
 
 				if (!incoming || (!incoming.rows && !incoming.areas)) {
 					return this.createDefaultResolutionState(res, pageWidth);
@@ -621,7 +637,9 @@ Object.assign(GridDesigner.prototype, {
 		if (totalFinished === 1) {
 			const state = finishedGroups[0]?.resolutions[0]?.state;
 			const layoutId = finishedGroups[0]?.layoutId;
-			const rootSelector = layoutId ? `[layoutid="${layoutId}"] ${cardSelector}` : cardSelector;
+			const rootSelector = layoutId
+				? `[layoutid="${layoutId}"] ${cardSelector}`
+				: cardSelector;
 			if (!state) return "";
 			return [`${rootSelector} {`, this.generateGridTemplate(state, "  "), "}"].join("\n");
 		}
@@ -679,7 +697,6 @@ Object.assign(GridDesigner.prototype, {
 			elements: GridDesigner.cloneData(this.state.elements, []),
 			resolutionStates: this.state.resolutionStates,
 			layoutDefinitions: this.layoutDefinitions,
-			resolutionStructure: this.resolutions,
 		};
 	},
 
