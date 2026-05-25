@@ -251,27 +251,29 @@ class GridDesigner {
 		}
 
 		const selectedTagIds = new Set(
-			elements.map((el) => String(el?.id || el?.name || "")).filter(Boolean),
+			elements.map((el) => String(el?.id || el?.name || "").toLowerCase()).filter(Boolean),
 		);
 
 		const selectedControlsByTag = new Map();
 		elements.forEach((el) => {
-			const tagId = String(el?.id || el?.name || "");
+			const tagId = String(el?.id || el?.name || "").toLowerCase();
 			if (!tagId) return;
 			const ctrls = Array.isArray(el?.ctrls) ? el.ctrls : [];
 			const selectedControlIds = ctrls
 				.filter((ctrl) => GridDesigner.normalizeBoolean(ctrl?.selected, true))
-				.map((ctrl) => String(ctrl?.id || ctrl?.name || ""))
+				.map((ctrl) => String(ctrl?.id || ctrl?.name || "").toLowerCase())
 				.filter(Boolean);
 			selectedControlsByTag.set(tagId, new Set(selectedControlIds));
 		});
 
 		this.allowedTags = this.allowedTags.map((tag) => {
-			const selected = selectedTagIds.has(tag.id);
-			const selectedCtrlIds = selectedControlsByTag.get(tag.id);
+			const selected = selectedTagIds.has(tag.id.toLowerCase());
+			const selectedCtrlIds = selectedControlsByTag.get(tag.id.toLowerCase());
 			let ctrls = (tag.ctrls || []).map((ctrl) => ({
 				...ctrl,
-				selected: selectedCtrlIds ? selectedCtrlIds.has(ctrl.id) : ctrl.selected,
+				selected: selectedCtrlIds
+					? selectedCtrlIds.has(ctrl.id.toLowerCase())
+					: ctrl.selected,
 			}));
 
 			if (

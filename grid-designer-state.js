@@ -119,7 +119,7 @@ Object.assign(GridDesigner.prototype, {
 			this.calculateGridDimensions();
 			this.clampRowsToCurrentResolutionHeight();
 			this.saveResolutionState(index);
-			this.updatePatternButtons();
+			this.refreshResolutionUi();
 			return;
 		} else {
 			this.applyResolutionState(this.createDefaultResolutionState(this.currentResolution));
@@ -201,20 +201,6 @@ Object.assign(GridDesigner.prototype, {
 				state.resolutionStructure,
 			);
 			this.resolutions = normalizedResolutions;
-			this.layoutDefinitions = Object.fromEntries(
-				Object.keys(normalizedResolutions).map((layoutName) => [
-					layoutName,
-					{
-						name: layoutName,
-						id: "",
-						width:
-							Number(layoutName) ||
-							normalizedResolutions[layoutName]?.[0]?.width ||
-							0,
-						sizes: normalizedResolutions[layoutName],
-					},
-				]),
-			);
 			this.layoutOrder = Object.keys(normalizedResolutions);
 		}
 
@@ -635,7 +621,7 @@ Object.assign(GridDesigner.prototype, {
 		if (totalFinished === 1) {
 			const state = finishedGroups[0]?.resolutions[0]?.state;
 			const layoutId = finishedGroups[0]?.layoutId;
-			const rootSelector = layoutId ? `[layout="${layoutId}"] ${cardSelector}` : cardSelector;
+			const rootSelector = layoutId ? `[layoutid="${layoutId}"] ${cardSelector}` : cardSelector;
 			if (!state) return "";
 			return [`${rootSelector} {`, this.generateGridTemplate(state, "  "), "}"].join("\n");
 		}
@@ -643,7 +629,7 @@ Object.assign(GridDesigner.prototype, {
 		return finishedGroups
 			.map((group) => {
 				const rootSelector = group.layoutId
-					? `[layout="${group.layoutId}"] ${cardSelector}`
+					? `[layoutid="${group.layoutId}"] ${cardSelector}`
 					: cardSelector;
 				const mediaContent = group.resolutions
 					.map((resolution, containerIndex, containerItems) => {
