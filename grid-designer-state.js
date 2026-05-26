@@ -604,11 +604,24 @@ Object.assign(GridDesigner.prototype, {
 		const cardSelector = `.box[cardid="${String(this.editorCardId)}"] .stripe`;
 		this.refreshFinishedStates();
 
-		const buildRangeQuery = (atRule, items, idx) => {
+		const buildRangeQuery = (atRule, items, idx, dimension = "width") => {
 			if (!Array.isArray(items) || items.length <= 1) return null;
-			if (idx === 0) return `@${atRule} (min-width: ${items[1].width + 1}px)`;
-			if (idx === items.length - 1) return `@${atRule} (max-width: ${items[idx].width}px)`;
-			return `@${atRule} (min-width: ${items[idx + 1].width + 1}px) and (max-width: ${items[idx].width}px)`;
+			const currentValue = Number(items[idx]?.[dimension]);
+			if (!Number.isFinite(currentValue)) return null;
+
+			if (idx === 0) {
+				const nextValue = Number(items[1]?.[dimension]);
+				if (!Number.isFinite(nextValue)) return null;
+				return `@${atRule} (min-${dimension}: ${nextValue + 1}px)`;
+			}
+
+			if (idx === items.length - 1) {
+				return `@${atRule} (max-${dimension}: ${currentValue}px)`;
+			}
+
+			const nextValue = Number(items[idx + 1]?.[dimension]);
+			if (!Number.isFinite(nextValue)) return null;
+			return `@${atRule} (min-${dimension}: ${nextValue + 1}px) and (max-${dimension}: ${currentValue}px)`;
 		};
 
 		const finishedGroups = this.layoutOrder
@@ -616,9 +629,18 @@ Object.assign(GridDesigner.prototype, {
 				const layoutDefinition = this.layoutDefinitions[layoutName] || {};
 				const banners = this.resolutions[layoutName] || [];
 				const states = this.state.resolutionStates[layoutName] || [];
-				const resolutions = banners
-					.map((res, idx) => ({ width: res.width, state: states[idx] }))
-					.filter((entry) => entry.state?.finished);
+				const resolutionsByPair = new Map();
+				banners.forEach((res, idx) => {
+					const state = states[idx];
+					if (!state?.finished) return;
+					const width = Number(res?.width);
+					const height = Number(res?.height);
+					if (!Number.isFinite(width) || !Number.isFinite(height)) return;
+					resolutionsByPair.set(`${width}x${height}`, { width, height, state });
+				});
+				const resolutions = [...resolutionsByPair.values()].sort(
+					(a, b) => b.width - a.width || b.height - a.height,
+				);
 				if (!resolutions.length) return null;
 				return {
 					layoutName,
@@ -644,38 +666,87 @@ Object.assign(GridDesigner.prototype, {
 			return [`${rootSelector} {`, this.generateGridTemplate(state, "  "), "}"].join("\n");
 		}
 
+		const renderResolutionBlock = (rootSelector, resolution, indent = "") =>
+			[
+				`${indent}${rootSelector} {`,
+				this.generateGridTemplate(resolution.state, `${indent}  `),
+				`${indent}}`,
+			].join("\n");
+
+		const renderHeightBlocks = (rootSelector, resolutions, indent = "") =>
+			resolutions
+				.map((resolution, heightIndex, heightItems) => {
+					const heightQuery = buildRangeQuery(
+						"container box",
+						heightItems,
+						heightIndex,
+						"height",
+					);
+					if (!heightQuery) {
+						return renderResolutionBlock(rootSelector, resolution, indent);
+					}
+
+					return [
+						`${indent}${heightQuery} {`,
+						renderResolutionBlock(rootSelector, resolution, `${indent}  `),
+						`${indent}}`,
+					].join("\n");
+				})
+				.join("\n\n");
+
+		const renderWidthGroup = (
+			rootSelector,
+			widthGroup,
+			widthIndex,
+			widthItems,
+			indent = "",
+		) => {
+			const widthQuery = buildRangeQuery("container box", widthItems, widthIndex, "width");
+
+			if (widthGroup.resolutions.length > 1) {
+				const heightBlocks = renderHeightBlocks(
+					rootSelector,
+					widthGroup.resolutions,
+					`${indent}  `,
+				);
+				if (!widthQuery) return heightBlocks;
+				return [`${indent}${widthQuery} {`, heightBlocks, `${indent}}`].join("\n");
+			}
+
+			const rule = renderResolutionBlock(
+				rootSelector,
+				widthGroup.resolutions[0],
+				`${indent}  `,
+			);
+			if (!widthQuery) return rule;
+			return [`${indent}${widthQuery} {`, rule, `${indent}}`].join("\n");
+		};
+
 		return finishedGroups
 			.map((group) => {
 				const rootSelector = group.layoutId
 					? `[layoutid="${group.layoutId}"] ${cardSelector}`
 					: cardSelector;
-				const mediaContent = group.resolutions
-					.map((resolution, containerIndex, containerItems) => {
-						const containerQuery = buildRangeQuery(
-							"container box",
-							containerItems,
-							containerIndex,
-						);
+				const widthGroupsByWidth = new Map();
+				group.resolutions.forEach((resolution) => {
+					const widthGroup = widthGroupsByWidth.get(resolution.width) || {
+						width: resolution.width,
+						resolutions: [],
+					};
+					widthGroup.resolutions.push(resolution);
+					widthGroupsByWidth.set(resolution.width, widthGroup);
+				});
+				const widthGroups = [...widthGroupsByWidth.values()].sort(
+					(a, b) => b.width - a.width,
+				);
 
-						if (!containerQuery) {
-							return [
-								`  ${rootSelector} {`,
-								this.generateGridTemplate(resolution.state, "    "),
-								"  }",
-							].join("\n");
-						}
-
-						return [
-							`  ${containerQuery} {`,
-							`    ${rootSelector} {`,
-							this.generateGridTemplate(resolution.state, "      "),
-							"    }",
-							"  }",
-						].join("\n");
-					})
+				const mediaContent = widthGroups
+					.map((widthGroup, widthIndex, widthItems) =>
+						renderWidthGroup(rootSelector, widthGroup, widthIndex, widthItems),
+					)
 					.join("\n\n");
 
-				return mediaContent.replace(/^  /gm, "");
+				return mediaContent;
 			})
 			.join("\n\n");
 	},
