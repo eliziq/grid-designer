@@ -216,25 +216,12 @@ Object.assign(GridDesigner.prototype, {
 				return [layoutName, map];
 			}),
 		);
-		const incomingActiveLayoutName = String(state.currentLayoutName || "");
-		const incomingActiveResolution =
-			incomingResolutions[incomingActiveLayoutName]?.[
-				Number(state.currentResolutionIndex) || 0
-			];
-		const incomingActiveSignature = this.getResolutionSignature(incomingActiveResolution);
-		const hasConfiguredLayouts = Object.keys(this.resolutions || {}).length > 0;
-
-		if (!hasConfiguredLayouts && incomingLayouts) {
-			this.layoutDefinitions = incomingLayouts.layoutDefinitions;
-			this.layoutOrder = incomingLayouts.layoutOrder;
-			this.resolutions = incomingLayouts.resolutions;
-		}
 
 		const availableWidths = Object.keys(this.resolutions);
+		if (!availableWidths.length) return;
 		this.layoutOrder = this.layoutOrder.length
 			? this.layoutOrder.filter((name) => availableWidths.includes(name))
 			: [...availableWidths];
-		this.sortedScreenWidths = [...this.layoutOrder];
 
 		this.state.currentLayoutName =
 			state.currentLayoutName && availableWidths.includes(String(state.currentLayoutName))
@@ -253,20 +240,19 @@ Object.assign(GridDesigner.prototype, {
 			const banners = this.resolutions[pageWidth];
 
 			this.state.resolutionStates[pageWidth] = banners.map((res, index) => {
+				const defaultState = this.createDefaultResolutionState(res, pageWidth);
 				const signature = this.getResolutionSignature(res);
 				const incomingStates = state?.resolutionStates?.[pageWidth];
 				const matchedIndex = incomingResolutionLookup[pageWidth]?.get(signature);
-				const incoming =
-					(Number.isInteger(matchedIndex) ? incomingStates?.[matchedIndex] : null) ||
-					(incomingActiveLayoutName === pageWidth && signature === incomingActiveSignature
-						? state
-						: null);
+				const incomingState = Number.isInteger(matchedIndex)
+					? incomingStates?.[matchedIndex]
+					: null;
 
-				if (!incoming || (!incoming.rows && !incoming.areas)) {
-					return this.createDefaultResolutionState(res, pageWidth);
+				if (!incomingState || typeof incomingState !== "object") {
+					return defaultState;
 				}
 
-				return this.createNormalizedResolutionStateSnapshot(incoming);
+				return this.createNormalizedResolutionStateSnapshot(incomingState, defaultState);
 			});
 		});
 
@@ -550,23 +536,6 @@ Object.assign(GridDesigner.prototype, {
 		});
 	},
 
-	getCssContainerQuery(screenWidth, bannerWidth) {
-		const resolutions = this.resolutions[screenWidth];
-		const index = resolutions.findIndex((r) => r.width === bannerWidth);
-
-		if (index === resolutions.length - 1) {
-			return `@container box (max-width: ${bannerWidth}px)`;
-		}
-
-		if (index === 0) {
-			return `@container box (min-width: ${resolutions[index + 1].width + 1}px)`;
-		}
-
-		const min = resolutions[index + 1].width + 1;
-		const max = bannerWidth;
-		return `@container box (min-width: ${min}px) and (max-width: ${max}px)`;
-	},
-
 	generateGridTemplate(state, indent = "") {
 		const areaNameById = new Map(
 			(this.state.elements || []).map((element) => [
@@ -643,9 +612,7 @@ Object.assign(GridDesigner.prototype, {
 				);
 				if (!resolutions.length) return null;
 				return {
-					layoutName,
 					layoutId: String(layoutDefinition.id || ""),
-					width: Number(layoutDefinition.width) || 0,
 					resolutions,
 				};
 			})

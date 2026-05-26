@@ -21,7 +21,6 @@ class GridDesigner {
 		this.layoutOrder = [];
 		this.resolutions = {};
 		this.currentResolution = null;
-		this.sortedScreenWidths = [];
 		this.gridWidth = 1536;
 		this.gridHeight = 864;
 		this.savedPatterns = {};
@@ -116,31 +115,6 @@ class GridDesigner {
 			resolutions: normalizedResolutions,
 			layoutOrder,
 		};
-	}
-
-	static normalizeResolutions(resolutions) {
-		if (!resolutions || typeof resolutions !== "object") {
-			console.warn("Invalid resolutions format. Expected an object.");
-			return {};
-		}
-
-		const normalized = {};
-
-		Object.keys(resolutions).forEach((pageWidth) => {
-			const bannerSizes = resolutions[pageWidth];
-
-			if (Array.isArray(bannerSizes)) {
-				const validBanners = bannerSizes
-					.map((res) => this.normalizeResolution(res))
-					.filter(Boolean);
-
-				if (validBanners.length > 0) {
-					normalized[pageWidth] = validBanners;
-				}
-			}
-		});
-
-		return normalized;
 	}
 
 	static normalizeTag(tag, index) {
