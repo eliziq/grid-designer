@@ -55,21 +55,21 @@
 	border: 2px solid #656dff;
 	border-radius: 8px;
 	padding: 0.5rem;
-	overflow: auto;
-	max-width: 100vw;
-	display: inline-block;
-	min-width: fit-content;
-	transition: transform 0.3s ease;
-	transform-origin: top left;
-	transform: scale(var(--grid-scale, 1));
-	margin-left: var(--grid-margin, 0);
-	margin-top: var(--grid-margin-top, 0);
+	overflow: hidden;
+	max-width: 100%;
+	display: block;
+	width: min(100%, calc(60vh * var(--grid-aspect-ratio, 1.6) + 20px));
+	margin-left: 0;
+	margin-top: 0;
 }
 #grid {
 	display: grid;
 	position: relative;
 	gap: 8px;
 	background: #f9f9ff;
+	width: 100%;
+	height: auto;
+	aspect-ratio: var(--grid-aspect-ratio, 16 / 10);
 }
 .cell {
 	border: 1px dashed #bbb;
@@ -323,8 +323,30 @@
 
 #resolutionTabs {
 	display: flex;
-	gap: 10px;
+	flex-wrap: wrap;
+	align-items: flex-start;
+	gap: 20px;
 	margin-bottom: 20px;
+}
+#resolutionTabs .resolution-group {
+	display: flex;
+	flex-direction: column;
+	gap: 8px;
+}
+#resolutionTabs .resolution-group-caption {
+	margin-top: 0;
+	margin-right: 0;
+	font-size: 0.78rem;
+	line-height: 1;
+	text-transform: uppercase;
+	letter-spacing: 0.08em;
+	color: #5f6c96;
+	font-weight: 700;
+}
+#resolutionTabs .resolution-group-options {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 10px;
 }
 #resolutionTabs label {
 	display: inline-block;
