@@ -45,10 +45,12 @@ Object.assign(GridDesigner.prototype, {
 	getGridMetrics() {
 		const gap = 8;
 		const { cols, rows } = this.state;
+		const renderedWidth = this.grid?.clientWidth || this.gridWidth;
+		const renderedHeight = this.grid?.clientHeight || this.gridHeight;
 		return {
 			gap,
-			colWidth: (this.gridWidth - gap * (cols - 1)) / cols,
-			rowHeight: (this.gridHeight - gap * (rows - 1)) / rows,
+			colWidth: (renderedWidth - gap * (cols - 1)) / cols,
+			rowHeight: (renderedHeight - gap * (rows - 1)) / rows,
 		};
 	},
 
