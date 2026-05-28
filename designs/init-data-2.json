@@ -1,0 +1,85 @@
+{
+	"id": "demo-2",
+	"layoutDefinitions": {
+		"Layout Alpha": {
+			"id": 21,
+			"width": 1280,
+			"type": "Editorial Grid",
+			"sizes": [
+				{ "width": 1280, "height": 640, "type": "grid" },
+				{ "width": 600, "height": 900, "type": "mobile" }
+			]
+		},
+		"Layout Beta": {
+			"id": 22,
+			"width": 1536,
+			"type": "Footer Promo",
+			"sizes": [
+				{ "width": 1536, "height": 512, "type": "grid" },
+				{ "width": 672, "height": 336, "type": "mobile" }
+			]
+		}
+	},
+	"tags": [
+		{ "id": "banner", "name": "Banner", "gridArea": "banner", "selected": false },
+		{ "id": "footer", "name": "Footer", "gridArea": "footer", "selected": true }
+	],
+	"state": {
+		"currentLayoutName": "Layout Alpha",
+		"currentResolutionIndex": 0,
+		"elements": [
+			{ "id": "banner", "name": "Banner", "gridArea": "banner", "controlType": "checkbox", "ctrls": [] },
+			{ "id": "footer", "name": "Footer", "gridArea": "footer", "controlType": "checkbox", "ctrls": [] }
+		],
+		"resolutionStates": {
+			"Layout Alpha": [
+				{
+					"rows": 2,
+					"cols": 2,
+					"rowHeights": ["1fr", "1fr"],
+					"areas": {
+						"banner": { "id": "banner", "rowStart": 0, "rowEnd": 0, "colStart": 0, "colEnd": 1, "label": "Banner" },
+						"footer": { "id": "footer", "rowStart": 1, "rowEnd": 1, "colStart": 0, "colEnd": 0, "label": "Footer" }
+					},
+					"gridMatrix": [["banner", "banner"], ["footer", null]],
+					"finished": true
+				},
+				{
+					"rows": 2,
+					"cols": 2,
+					"rowHeights": ["1fr", "1fr"],
+					"areas": {
+						"banner": { "id": "banner", "rowStart": 0, "rowEnd": 1, "colStart": 0, "colEnd": 0, "label": "Banner" },
+						"footer": { "id": "footer", "rowStart": 1, "rowEnd": 1, "colStart": 1, "colEnd": 1, "label": "Footer" }
+					},
+					"gridMatrix": [["banner", null], ["banner", "footer"]],
+					"finished": true
+				}
+			],
+			"Layout Beta": [
+				{
+					"rows": 2,
+					"cols": 2,
+					"rowHeights": ["1fr", "1fr"],
+					"areas": {
+						"banner": { "id": "banner", "rowStart": 0, "rowEnd": 0, "colStart": 0, "colEnd": 0, "label": "Banner" },
+						"footer": { "id": "footer", "rowStart": 0, "rowEnd": 1, "colStart": 1, "colEnd": 1, "label": "Footer" }
+					},
+					"gridMatrix": [["banner", "footer"], [null, "footer"]],
+					"finished": true
+				},
+				{
+					"rows": 2,
+					"cols": 2,
+					"rowHeights": ["1fr", "1fr"],
+					"areas": {
+						"banner": { "id": "banner", "rowStart": 0, "rowEnd": 1, "colStart": 0, "colEnd": 1, "label": "Banner" },
+						"footer": { "id": "footer", "rowStart": 1, "rowEnd": 1, "colStart": 0, "colEnd": 0, "label": "Footer" }
+					},
+					"gridMatrix": [["banner", "banner"], ["footer", null]],
+					"finished": true
+				}
+			]
+		}
+	}
+}

@@ -1,0 +1,85 @@
+{
+	"id": "demo-1",
+	"layoutDefinitions": {
+		"Layout One": {
+			"id": 11,
+			"width": 1200,
+			"type": "Hero Banner",
+			"sizes": [
+				{ "width": 1200, "height": 600, "type": "grid" },
+				{ "width": 768, "height": 900, "type": "mobile" }
+			]
+		},
+		"Layout Two": {
+			"id": 12,
+			"width": 1440,
+			"type": "Sidebar Promo",
+			"sizes": [
+				{ "width": 1440, "height": 720, "type": "grid" },
+				{ "width": 672, "height": 840, "type": "mobile" }
+			]
+		}
+	},
+	"tags": [
+		{ "id": "hero", "name": "Hero", "gridArea": "hero", "selected": true },
+		{ "id": "cta", "name": "CTA", "gridArea": "cta", "selected": false }
+	],
+	"state": {
+		"currentLayoutName": "Layout One",
+		"currentResolutionIndex": 0,
+		"elements": [
+			{ "id": "hero", "name": "Hero", "gridArea": "hero", "controlType": "checkbox", "ctrls": [] },
+			{ "id": "cta", "name": "CTA", "gridArea": "cta", "controlType": "checkbox", "ctrls": [] }
+		],
+		"resolutionStates": {
+			"Layout One": [
+				{
+					"rows": 2,
+					"cols": 2,
+					"rowHeights": ["1fr", "1fr"],
+					"areas": {
+						"hero": { "id": "hero", "rowStart": 0, "rowEnd": 0, "colStart": 0, "colEnd": 0, "label": "Hero" },
+						"cta": { "id": "cta", "rowStart": 0, "rowEnd": 1, "colStart": 1, "colEnd": 1, "label": "CTA" }
+					},
+					"gridMatrix": [["hero", "cta"], [null, "cta"]],
+					"finished": true
+				},
+				{
+					"rows": 2,
+					"cols": 2,
+					"rowHeights": ["1fr", "1fr"],
+					"areas": {
+						"hero": { "id": "hero", "rowStart": 0, "rowEnd": 1, "colStart": 0, "colEnd": 0, "label": "Hero" },
+						"cta": { "id": "cta", "rowStart": 1, "rowEnd": 1, "colStart": 1, "colEnd": 1, "label": "CTA" }
+					},
+					"gridMatrix": [["hero", null], ["hero", "cta"]],
+					"finished": true
+				}
+			],
+			"Layout Two": [
+				{
+					"rows": 2,
+					"cols": 2,
+					"rowHeights": ["1fr", "1fr"],
+					"areas": {
+						"hero": { "id": "hero", "rowStart": 0, "rowEnd": 0, "colStart": 0, "colEnd": 1, "label": "Hero" },
+						"cta": { "id": "cta", "rowStart": 1, "rowEnd": 1, "colStart": 1, "colEnd": 1, "label": "CTA" }
+					},
+					"gridMatrix": [["hero", "hero"], [null, "cta"]],
+					"finished": true
+				},
+				{
+					"rows": 2,
+					"cols": 2,
+					"rowHeights": ["1fr", "1fr"],
+					"areas": {
+						"hero": { "id": "hero", "rowStart": 0, "rowEnd": 0, "colStart": 0, "colEnd": 0, "label": "Hero" },
+						"cta": { "id": "cta", "rowStart": 1, "rowEnd": 1, "colStart": 0, "colEnd": 1, "label": "CTA" }
+					},
+					"gridMatrix": [["hero", null], ["cta", "cta"]],
+					"finished": true
+				}
+			]
+		}
+	}
+}
