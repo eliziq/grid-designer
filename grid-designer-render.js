@@ -4,6 +4,15 @@ GridDesigner.generateAreaColor = function (id) {
 };
 
 Object.assign(GridDesigner.prototype, {
+	applyGridBaseStyles() {
+		if (!this.grid) return;
+		this.grid.style.gridTemplateColumns = `repeat(${this.state.cols}, 1fr)`;
+		this.grid.style.gridTemplateRows = `repeat(${this.state.rows}, minmax(60px, 1fr))`;
+		this.grid.style.aspectRatio = `${this.gridWidth} / ${this.gridHeight}`;
+		this.grid.style.minHeight = "auto";
+		this.updateGridScaling();
+	},
+
 	refreshGridView() {
 		this.renderGrid();
 		this.renderElementList();
@@ -25,18 +34,11 @@ Object.assign(GridDesigner.prototype, {
 	},
 
 	renderGrid() {
+		if (!this.grid?.isConnected || !this.gridWrapper?.isConnected) this.cacheDomElements();
 		if (!this.grid) return;
+
 		this.grid.innerHTML = "";
-		this.grid.style.gridTemplateColumns = `repeat(${this.state.cols}, 1fr)`;
-		this.grid.style.gridTemplateRows = `repeat(${this.state.rows}, minmax(60px, 1fr))`;
-		this.grid.style.width = `${this.gridWidth}px`;
-		this.grid.style.height = `${this.gridHeight}px`;
-		this.grid.style.minHeight = "auto";
-		if (this.gridWrapper) {
-			this.gridWrapper.style.width = `${this.gridWidth + 20}px`;
-			this.gridWrapper.style.height = `${this.gridHeight + 20}px`;
-		}
-		this.updateGridScaling();
+		this.applyGridBaseStyles();
 		for (let r = 0; r < this.state.rows; r++) {
 			for (let c = 0; c < this.state.cols; c++) {
 				const cell = document.createElement("div");
@@ -50,6 +52,11 @@ Object.assign(GridDesigner.prototype, {
 			}
 		}
 		this.renderAreas();
+		const lateReapply = () => {
+			if (!this.grid?.isConnected || !this.gridWrapper?.isConnected) this.cacheDomElements();
+			this.applyGridBaseStyles();
+		};
+		window.setTimeout(lateReapply, 120);
 	},
 
 	renderAreas() {
@@ -292,28 +299,10 @@ Object.assign(GridDesigner.prototype, {
 
 	updateGridScaling() {
 		if (!this.gridWrapper) return;
-		const viewportWidth = window.innerWidth - 40;
-		const viewportHeight = window.innerHeight * 0.8;
-		const totalGridWidth = this.gridWidth + 20;
-		const totalGridHeight = this.gridHeight + 20;
-		const widthScale = totalGridWidth > viewportWidth ? viewportWidth / totalGridWidth : 1;
-		const heightScale = totalGridHeight > viewportHeight ? viewportHeight / totalGridHeight : 1;
-		const scale = Math.min(widthScale, heightScale);
-		if (scale < 1) {
-			this.gridWrapper.style.setProperty("--grid-scale", scale);
-			this.gridWrapper.style.setProperty(
-				"--grid-margin",
-				`${(viewportWidth - totalGridWidth * scale) / 2}px`,
-			);
-			this.gridWrapper.style.setProperty(
-				"--grid-margin-top",
-				`${(viewportHeight - totalGridHeight * scale) / 2}px`,
-			);
-		} else {
-			this.gridWrapper.style.setProperty("--grid-scale", "1");
-			this.gridWrapper.style.setProperty("--grid-margin", "0px");
-			this.gridWrapper.style.setProperty("--grid-margin-top", "0px");
-		}
+		const ratio = this.gridHeight > 0 ? this.gridWidth / this.gridHeight : 16 / 9;
+		this.gridWrapper.style.setProperty("--grid-aspect-ratio", String(ratio));
+		this.gridWrapper.style.setProperty("--grid-margin", "0px");
+		this.gridWrapper.style.setProperty("--grid-margin-top", "0px");
 	},
 
 	calculateGridDimensions() {

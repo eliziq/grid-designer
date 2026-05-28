@@ -294,7 +294,7 @@ class GridDesigner {
 			this.resolutions[layoutName]?.[0];
 
 		if (defaultResolution) {
-			this.setCurrentResolution(defaultResolution);
+			this.setCurrentResolution(defaultResolution, true);
 		} else {
 			this.currentResolution = { width: 1536, height: 864 };
 			this.calculateGridDimensions();
