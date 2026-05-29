@@ -3,14 +3,22 @@ Object.assign(GridDesigner.prototype, {
 		if (this.editorReady) return;
 		if (this.buildGridButton)
 			this.buildGridButton.addEventListener("click", this.handleBuildGrid.bind(this));
+		if (this.justifyContentSelect)
+			this.justifyContentSelect.addEventListener(
+				"change",
+				this.handleGridAlignmentChange.bind(this),
+			);
+		if (this.alignItemsSelect)
+			this.alignItemsSelect.addEventListener(
+				"change",
+				this.handleGridAlignmentChange.bind(this),
+			);
 		if (this.clearGridButton)
 			this.clearGridButton.addEventListener("click", this.handleClearGrid.bind(this));
 		if (this.exportCssButton)
 			this.exportCssButton.addEventListener("click", this.handleExportCss.bind(this));
 		if (this.exportJsonButton)
 			this.exportJsonButton.addEventListener("click", this.handleExportJson.bind(this));
-		if (this.savePatternButton)
-			this.savePatternButton.addEventListener("click", this.handleSavePattern.bind(this));
 		if (this.deletePatternButton)
 			this.deletePatternButton.addEventListener("click", this.handleDeletePattern.bind(this));
 		if (this.loadDesignButton)
@@ -143,6 +151,12 @@ Object.assign(GridDesigner.prototype, {
 		this.refreshWorkspaceView();
 	},
 
+	handleGridAlignmentChange() {
+		this.state.justifyContent = this.justifyContentSelect?.value || "center";
+		this.state.alignItems = this.alignItemsSelect?.value || "center";
+		this.updateCssPreview();
+	},
+
 	handleClearGrid() {
 		this.initMatrix();
 		this.state.areas = {};
@@ -178,6 +192,8 @@ Object.assign(GridDesigner.prototype, {
 		const pattern = {
 			rows: this.state.rows,
 			cols: this.state.cols,
+			justifyContent: this.state.justifyContent,
+			alignItems: this.state.alignItems,
 			gridMatrix: this.state.gridMatrix.map((row) => [...row]),
 			elements: [...this.state.elements],
 			areas: GridDesigner.cloneData(this.state.areas, {}) || {},

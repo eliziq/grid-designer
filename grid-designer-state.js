@@ -316,6 +316,8 @@ Object.assign(GridDesigner.prototype, {
 		return {
 			rows: 4,
 			cols,
+			justifyContent: "center",
+			alignItems: "center",
 			rowHeights: Array(4).fill("1fr"),
 			areas: {},
 			finished: false,
@@ -330,6 +332,8 @@ Object.assign(GridDesigner.prototype, {
 		return {
 			rows,
 			cols,
+			justifyContent: source?.justifyContent || fallback.justifyContent || "center",
+			alignItems: source?.alignItems || fallback.alignItems || "center",
 			rowHeights: Array.isArray(source?.rowHeights)
 				? source.rowHeights.map((row) => row || "1fr")
 				: Array(rows).fill("1fr"),
@@ -343,11 +347,15 @@ Object.assign(GridDesigner.prototype, {
 	applyGridStateSnapshot(snapshot) {
 		this.state.rows = snapshot.rows;
 		this.state.cols = snapshot.cols;
+		this.state.justifyContent = snapshot.justifyContent || "center";
+		this.state.alignItems = snapshot.alignItems || "center";
 		this.state.rowHeights = [...snapshot.rowHeights];
 		this.state.areas = GridDesigner.cloneData(snapshot.areas, {}) || {};
 		this.state.gridMatrix = snapshot.gridMatrix.map((row) => [...row]);
 		if (this.colCountInput) this.colCountInput.value = this.state.cols;
 		if (this.rowCountInput) this.rowCountInput.value = this.state.rows;
+		if (this.justifyContentSelect) this.justifyContentSelect.value = this.state.justifyContent;
+		if (this.alignItemsSelect) this.alignItemsSelect.value = this.state.alignItems;
 	},
 
 	getCurrentPatternKey() {
@@ -392,6 +400,8 @@ Object.assign(GridDesigner.prototype, {
 		this.setResolutionState(index, {
 			rows: this.state.rows,
 			cols: this.state.cols,
+			justifyContent: this.state.justifyContent,
+			alignItems: this.state.alignItems,
 			rowHeights: this.state.rowHeights,
 			areas: this.state.areas,
 			gridMatrix: this.state.gridMatrix,
@@ -427,11 +437,6 @@ Object.assign(GridDesigner.prototype, {
 		const hasSavedPattern = Boolean(this.savedPatterns[patternKey]);
 		if (this.deletePatternButton) {
 			this.deletePatternButton.style.display = hasSavedPattern ? "" : "none";
-		}
-		if (this.savePatternButton) {
-			this.savePatternButton.textContent = hasSavedPattern
-				? "Update Pattern"
-				: "Save Pattern";
 		}
 	},
 
@@ -597,6 +602,8 @@ Object.assign(GridDesigner.prototype, {
 			`${indent}display: grid;`,
 			`${indent}grid-template-columns: repeat(${cols}, 1fr);`,
 			`${indent}grid-template-rows: ${rowHeights.join(" ")};`,
+			`${indent}justify-content: ${state?.justifyContent || "center"};`,
+			`${indent}align-items: ${state?.alignItems || "center"};`,
 			`${indent}gap: 8px;`,
 			`${indent}grid-template-areas:`,
 			`${areaLines};`,
@@ -755,15 +762,11 @@ Object.assign(GridDesigner.prototype, {
 			? `[layoutid="${group.layoutId}"] ${cardSelector}`
 			: cardSelector;
 		if (!state) return "";
-		const baseRule = [
-			`${rootSelector} {`,
-			this.generateGridTemplate(state, "  "),
-			"}",
-		].join("\n");
+		const baseRule = [`${rootSelector} {`, this.generateGridTemplate(state, "  "), "}"].join(
+			"\n",
+		);
 		if (singleResolution?.type === "mobile") {
-			return ["@media (max-width: 800px) {", baseRule.replace(/^/gm, "  "), "}"].join(
-				"\n",
-			);
+			return ["@media (max-width: 800px) {", baseRule.replace(/^/gm, "  "), "}"].join("\n");
 		}
 		return baseRule;
 	},
@@ -782,11 +785,9 @@ Object.assign(GridDesigner.prototype, {
 
 		const mobileCss = this.renderCssResolutionSet(rootSelector, partitioned.mobile);
 		if (mobileCss) {
-			blocks.push([
-				"@media (max-width: 800px) {",
-				mobileCss.replace(/^/gm, "  "),
-				"}",
-			].join("\n"));
+			blocks.push(
+				["@media (max-width: 800px) {", mobileCss.replace(/^/gm, "  "), "}"].join("\n"),
+			);
 		}
 
 		return blocks.join("\n\n");

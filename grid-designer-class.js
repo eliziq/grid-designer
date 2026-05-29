@@ -9,6 +9,8 @@ class GridDesigner {
 		this.state = {
 			rows: 4,
 			cols: 24,
+			justifyContent: "stretch",
+			alignItems: "stretch",
 			areas: {},
 			rowHeights: Array(4).fill("1fr"),
 			gridMatrix: [],
@@ -38,11 +40,12 @@ class GridDesigner {
 		this.grid = this.q("grid");
 		this.colCountInput = this.q("colCount");
 		this.rowCountInput = this.q("rowCount");
+		this.justifyContentSelect = this.q("justifyContent");
+		this.alignItemsSelect = this.q("alignItems");
 		this.buildGridButton = this.q("buildGrid");
 		this.clearGridButton = this.q("clearGrid");
 		this.exportCssButton = this.q("exportCss");
 		this.exportJsonButton = this.q("exportJson");
-		this.savePatternButton = this.q("savePattern");
 		this.deletePatternButton = this.q("deletePattern");
 		this.loadDesignButton = this.q("loadDesign");
 		this.importStateInput = this.q("importState");

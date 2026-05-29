@@ -28,12 +28,34 @@
 					Rows:
 					<input id="rowCount" type="number" value="4" min="1" max="20" />
 				</label>
+
+				<label>
+					Justify content:
+					<select id="justifyContent">
+						<option value="start">Start</option>
+						<option value="center">Center</option>
+						<option value="end">End</option>
+						<option value="stretch" selected>Stretch</option>
+						<option value="space-between">Space between</option>
+						<option value="space-around">Space around</option>
+						<option value="space-evenly">Space evenly</option>
+					</select>
+				</label>
+
+				<label>
+					Align items:
+					<select id="alignItems">
+						<option value="start">Start</option>
+						<option value="center">Center</option>
+						<option value="end">End</option>
+						<option value="stretch" selected>Stretch</option>
+					</select>
+				</label>
 			</div>
 
 			<div class="control-actions">
 				<button id="buildGrid">Build Grid</button>
 				<button id="clearGrid">Clear</button>
-				<button id="savePattern">Save Pattern</button>
 				<button id="deletePattern" style="display: none">Delete Pattern</button>
 				<button id="loadDesign">Load Design</button>
 				<input type="file" id="importState" accept=".json" style="display: none" />
