@@ -1,0 +1,917 @@
+{
+	"id": 39,
+	"layoutDefinitions": {
+		"20016 Slider 1 Test": {
+			"id": 20016,
+			"width": 1536,
+			"type": "Controle deslizante de imagem",
+			"sizes": [
+				{
+					"width": 1536,
+					"height": 640,
+					"type": "grid"
+				},
+				{
+					"width": 672,
+					"height": 420,
+					"type": "mobile"
+				}
+			]
+		},
+		"20011 Main Page Test": {
+			"id": 20011,
+			"width": 1536,
+			"type": "P&#225;gina principal",
+			"sizes": [
+				{
+					"width": 384,
+					"height": 384,
+					"type": "grid"
+				},
+				{
+					"width": 672,
+					"height": 420,
+					"type": "mobile"
+				},
+				{
+					"width": 1152,
+					"height": 384,
+					"type": "custom"
+				},
+				{
+					"width": 768,
+					"height": 384,
+					"type": "custom"
+				},
+				{
+					"width": 1536,
+					"height": 640,
+					"type": "custom"
+				}
+			]
+		}
+	},
+	"tags": [
+		{
+			"id": "Membership_ProductStadiumName",
+			"name": "Nome do estádio",
+			"gridArea": "stadiumname",
+			"ctrls": [
+				{
+					"name": "Nome do estádio",
+					"selected": "false",
+					"tag": "StadiumName"
+				}
+			],
+			"controlType": "checkbox"
+		},
+		{
+			"id": "Membership_Buy",
+			"name": "MembershipBuy",
+			"gridArea": "btnbuy",
+			"ctrls": [
+				{
+					"name": "MembershipBuy",
+					"selected": "false",
+					"tag": "BuyButton"
+				}
+			],
+			"controlType": "checkbox"
+		},
+		{
+			"id": "Membership_ProductName",
+			"name": "Nome do Produto",
+			"gridArea": "name",
+			"ctrls": [
+				{
+					"name": "Nome do Produto",
+					"selected": "false",
+					"tag": "Name"
+				}
+			],
+			"controlType": "checkbox"
+		},
+		{
+			"id": "Membership_ProductDescriptionHeader",
+			"name": "Status de vendas",
+			"gridArea": "saleinfo",
+			"ctrls": [
+				{
+					"name": "Status de vendas",
+					"selected": "false",
+					"tag": "DescriptionHeader"
+				}
+			],
+			"controlType": "checkbox"
+		},
+		{
+			"id": "Membership_ProductShortDescription",
+			"name": "Breve descrição do produto (máx. 300 caracteres)",
+			"gridArea": "shortdsc",
+			"ctrls": [
+				{
+					"name": "Breve descrição do produto (máx. 300 caracteres)",
+					"selected": "false",
+					"tag": "ShortDescription"
+				}
+			],
+			"controlType": "checkbox"
+		},
+		{
+			"id": "Membership_ProductInfoUrl",
+			"name": "Link para mais informações sobre o produto",
+			"gridArea": "btninfo",
+			"ctrls": [
+				{
+					"name": "Link para mais informações sobre o produto",
+					"selected": "false",
+					"tag": "InfoUrl"
+				}
+			],
+			"controlType": "checkbox"
+		},
+		{
+			"id": "Membership_DefaultPrice",
+			"name": "Preço padrão",
+			"gridArea": "defaultprice",
+			"ctrls": [
+				{
+					"name": "Preço padrão",
+					"selected": "false",
+					"tag": "DefaultPrice"
+				}
+			],
+			"controlType": "checkbox"
+		}
+	],
+	"state": {
+		"id": "39",
+		"currentLayoutName": "20011 Main Page Test",
+		"currentResolutionIndex": 4,
+		"elements": [
+			{
+				"id": "Membership_ProductName",
+				"name": "Nome do Produto",
+				"gridArea": "name",
+				"controlType": "checkbox",
+				"ctrls": [
+					{
+						"id": "Nome do Produto-Nome do Produto",
+						"name": "Nome do Produto",
+						"selected": false
+					}
+				]
+			},
+			{
+				"id": "Membership_ProductShortDescription",
+				"name": "Breve descrição do produto (máx. 300 caracteres)",
+				"gridArea": "shortdsc",
+				"controlType": "checkbox",
+				"ctrls": [
+					{
+						"id": "Breve descrição do produto (máx. 300 caracteres)-Breve descrição do produto (máx. 300 caracteres)",
+						"name": "Breve descrição do produto (máx. 300 caracteres)",
+						"selected": false
+					}
+				]
+			},
+			{
+				"id": "Membership_ProductInfoUrl",
+				"name": "Link para mais informações sobre o produto",
+				"gridArea": "btninfo",
+				"controlType": "checkbox",
+				"ctrls": [
+					{
+						"id": "Link para mais informações sobre o produto-Link para mais informações sobre o produto",
+						"name": "Link para mais informações sobre o produto",
+						"selected": false
+					}
+				]
+			}
+		],
+		"resolutionStates": {
+			"20016 Slider 1 Test": [
+				{
+					"rows": 4,
+					"cols": 24,
+					"justifyContent": "center",
+					"alignItems": "center",
+					"rowHeights": ["1fr", "1fr", "1fr", "1fr"],
+					"areas": {
+						"Membership_ProductName": {
+							"id": "Membership_ProductName",
+							"rowStart": 0,
+							"rowEnd": 0,
+							"colStart": 0,
+							"colEnd": 13
+						},
+						"Membership_ProductShortDescription": {
+							"id": "Membership_ProductShortDescription",
+							"rowStart": 1,
+							"rowEnd": 1,
+							"colStart": 0,
+							"colEnd": 13
+						},
+						"Membership_ProductInfoUrl": {
+							"id": "Membership_ProductInfoUrl",
+							"rowStart": 2,
+							"rowEnd": 2,
+							"colStart": 0,
+							"colEnd": 13
+						}
+					},
+					"gridMatrix": [
+						[
+							"Membership_ProductName",
+							"Membership_ProductName",
+							"Membership_ProductName",
+							"Membership_ProductName",
+							"Membership_ProductName",
+							"Membership_ProductName",
+							"Membership_ProductName",
+							"Membership_ProductName",
+							"Membership_ProductName",
+							"Membership_ProductName",
+							"Membership_ProductName",
+							"Membership_ProductName",
+							"Membership_ProductName",
+							"Membership_ProductName",
+							null,
+							null,
+							null,
+							null,
+							null,
+							null,
+							null,
+							null,
+							null,
+							null
+						],
+						[
+							"Membership_ProductShortDescription",
+							"Membership_ProductShortDescription",
+							"Membership_ProductShortDescription",
+							"Membership_ProductShortDescription",
+							"Membership_ProductShortDescription",
+							"Membership_ProductShortDescription",
+							"Membership_ProductShortDescription",
+							"Membership_ProductShortDescription",
+							"Membership_ProductShortDescription",
+							"Membership_ProductShortDescription",
+							"Membership_ProductShortDescription",
+							"Membership_ProductShortDescription",
+							"Membership_ProductShortDescription",
+							"Membership_ProductShortDescription",
+							null,
+							null,
+							null,
+							null,
+							null,
+							null,
+							null,
+							null,
+							null,
+							null
+						],
+						[
+							"Membership_ProductInfoUrl",
+							"Membership_ProductInfoUrl",
+							"Membership_ProductInfoUrl",
+							"Membership_ProductInfoUrl",
+							"Membership_ProductInfoUrl",
+							"Membership_ProductInfoUrl",
+							"Membership_ProductInfoUrl",
+							"Membership_ProductInfoUrl",
+							"Membership_ProductInfoUrl",
+							"Membership_ProductInfoUrl",
+							"Membership_ProductInfoUrl",
+							"Membership_ProductInfoUrl",
+							"Membership_ProductInfoUrl",
+							"Membership_ProductInfoUrl",
+							null,
+							null,
+							null,
+							null,
+							null,
+							null,
+							null,
+							null,
+							null,
+							null
+						],
+						[
+							null,
+							null,
+							null,
+							null,
+							null,
+							null,
+							null,
+							null,
+							null,
+							null,
+							null,
+							null,
+							null,
+							null,
+							null,
+							null,
+							null,
+							null,
+							null,
+							null,
+							null,
+							null,
+							null,
+							null
+						]
+					],
+					"finished": true
+				},
+				{
+					"rows": 4,
+					"cols": 11,
+					"justifyContent": "center",
+					"alignItems": "center",
+					"rowHeights": ["1fr", "1fr", "1fr", "1fr"],
+					"areas": {
+						"Membership_ProductName": {
+							"id": "Membership_ProductName",
+							"rowStart": 0,
+							"rowEnd": 0,
+							"colStart": 0,
+							"colEnd": 6
+						},
+						"Membership_ProductShortDescription": {
+							"id": "Membership_ProductShortDescription",
+							"rowStart": 1,
+							"rowEnd": 1,
+							"colStart": 0,
+							"colEnd": 6
+						},
+						"Membership_ProductInfoUrl": {
+							"id": "Membership_ProductInfoUrl",
+							"rowStart": 2,
+							"rowEnd": 2,
+							"colStart": 0,
+							"colEnd": 6
+						}
+					},
+					"gridMatrix": [
+						[
+							"Membership_ProductName",
+							"Membership_ProductName",
+							"Membership_ProductName",
+							"Membership_ProductName",
+							"Membership_ProductName",
+							"Membership_ProductName",
+							"Membership_ProductName",
+							null,
+							null,
+							null,
+							null
+						],
+						[
+							"Membership_ProductShortDescription",
+							"Membership_ProductShortDescription",
+							"Membership_ProductShortDescription",
+							"Membership_ProductShortDescription",
+							"Membership_ProductShortDescription",
+							"Membership_ProductShortDescription",
+							"Membership_ProductShortDescription",
+							null,
+							null,
+							null,
+							null
+						],
+						[
+							"Membership_ProductInfoUrl",
+							"Membership_ProductInfoUrl",
+							"Membership_ProductInfoUrl",
+							"Membership_ProductInfoUrl",
+							"Membership_ProductInfoUrl",
+							"Membership_ProductInfoUrl",
+							"Membership_ProductInfoUrl",
+							null,
+							null,
+							null,
+							null
+						],
+						[null, null, null, null, null, null, null, null, null, null, null]
+					],
+					"finished": true
+				}
+			],
+			"20011 Main Page Test": [
+				{
+					"rows": 4,
+					"cols": 6,
+					"justifyContent": "center",
+					"alignItems": "center",
+					"rowHeights": ["1fr", "1fr", "1fr", "1fr"],
+					"areas": {
+						"Membership_ProductName": {
+							"id": "Membership_ProductName",
+							"rowStart": 0,
+							"rowEnd": 0,
+							"colStart": 0,
+							"colEnd": 5
+						},
+						"Membership_ProductShortDescription": {
+							"id": "Membership_ProductShortDescription",
+							"rowStart": 1,
+							"rowEnd": 1,
+							"colStart": 0,
+							"colEnd": 5
+						},
+						"Membership_ProductInfoUrl": {
+							"id": "Membership_ProductInfoUrl",
+							"rowStart": 2,
+							"rowEnd": 2,
+							"colStart": 0,
+							"colEnd": 5
+						}
+					},
+					"gridMatrix": [
+						[
+							"Membership_ProductName",
+							"Membership_ProductName",
+							"Membership_ProductName",
+							"Membership_ProductName",
+							"Membership_ProductName",
+							"Membership_ProductName"
+						],
+						[
+							"Membership_ProductShortDescription",
+							"Membership_ProductShortDescription",
+							"Membership_ProductShortDescription",
+							"Membership_ProductShortDescription",
+							"Membership_ProductShortDescription",
+							"Membership_ProductShortDescription"
+						],
+						[
+							"Membership_ProductInfoUrl",
+							"Membership_ProductInfoUrl",
+							"Membership_ProductInfoUrl",
+							"Membership_ProductInfoUrl",
+							"Membership_ProductInfoUrl",
+							"Membership_ProductInfoUrl"
+						],
+						[null, null, null, null, null, null]
+					],
+					"finished": true
+				},
+				{
+					"rows": 4,
+					"cols": 11,
+					"justifyContent": "center",
+					"alignItems": "center",
+					"rowHeights": ["1fr", "1fr", "1fr", "1fr"],
+					"areas": {
+						"Membership_ProductName": {
+							"id": "Membership_ProductName",
+							"rowStart": 0,
+							"rowEnd": 0,
+							"colStart": 0,
+							"colEnd": 8
+						},
+						"Membership_ProductShortDescription": {
+							"id": "Membership_ProductShortDescription",
+							"rowStart": 1,
+							"rowEnd": 1,
+							"colStart": 0,
+							"colEnd": 8
+						},
+						"Membership_ProductInfoUrl": {
+							"id": "Membership_ProductInfoUrl",
+							"rowStart": 2,
+							"rowEnd": 2,
+							"colStart": 0,
+							"colEnd": 8
+						}
+					},
+					"gridMatrix": [
+						[
+							"Membership_ProductName",
+							"Membership_ProductName",
+							"Membership_ProductName",
+							"Membership_ProductName",
+							"Membership_ProductName",
+							"Membership_ProductName",
+							"Membership_ProductName",
+							"Membership_ProductName",
+							"Membership_ProductName",
+							null,
+							null
+						],
+						[
+							"Membership_ProductShortDescription",
+							"Membership_ProductShortDescription",
+							"Membership_ProductShortDescription",
+							"Membership_ProductShortDescription",
+							"Membership_ProductShortDescription",
+							"Membership_ProductShortDescription",
+							"Membership_ProductShortDescription",
+							"Membership_ProductShortDescription",
+							"Membership_ProductShortDescription",
+							null,
+							null
+						],
+						[
+							"Membership_ProductInfoUrl",
+							"Membership_ProductInfoUrl",
+							"Membership_ProductInfoUrl",
+							"Membership_ProductInfoUrl",
+							"Membership_ProductInfoUrl",
+							"Membership_ProductInfoUrl",
+							"Membership_ProductInfoUrl",
+							"Membership_ProductInfoUrl",
+							"Membership_ProductInfoUrl",
+							null,
+							null
+						],
+						[null, null, null, null, null, null, null, null, null, null, null]
+					],
+					"finished": true
+				},
+				{
+					"rows": 4,
+					"cols": 18,
+					"justifyContent": "center",
+					"alignItems": "center",
+					"rowHeights": ["1fr", "1fr", "1fr", "1fr"],
+					"areas": {
+						"Membership_ProductName": {
+							"id": "Membership_ProductName",
+							"rowStart": 0,
+							"rowEnd": 0,
+							"colStart": 0,
+							"colEnd": 11
+						},
+						"Membership_ProductShortDescription": {
+							"id": "Membership_ProductShortDescription",
+							"rowStart": 1,
+							"rowEnd": 1,
+							"colStart": 0,
+							"colEnd": 10
+						},
+						"Membership_ProductInfoUrl": {
+							"id": "Membership_ProductInfoUrl",
+							"rowStart": 2,
+							"rowEnd": 2,
+							"colStart": 0,
+							"colEnd": 13
+						}
+					},
+					"gridMatrix": [
+						[
+							"Membership_ProductName",
+							"Membership_ProductName",
+							"Membership_ProductName",
+							"Membership_ProductName",
+							"Membership_ProductName",
+							"Membership_ProductName",
+							"Membership_ProductName",
+							"Membership_ProductName",
+							"Membership_ProductName",
+							"Membership_ProductName",
+							"Membership_ProductName",
+							"Membership_ProductName",
+							null,
+							null,
+							null,
+							null,
+							null,
+							null
+						],
+						[
+							"Membership_ProductShortDescription",
+							"Membership_ProductShortDescription",
+							"Membership_ProductShortDescription",
+							"Membership_ProductShortDescription",
+							"Membership_ProductShortDescription",
+							"Membership_ProductShortDescription",
+							"Membership_ProductShortDescription",
+							"Membership_ProductShortDescription",
+							"Membership_ProductShortDescription",
+							"Membership_ProductShortDescription",
+							"Membership_ProductShortDescription",
+							null,
+							null,
+							null,
+							null,
+							null,
+							null,
+							null
+						],
+						[
+							"Membership_ProductInfoUrl",
+							"Membership_ProductInfoUrl",
+							"Membership_ProductInfoUrl",
+							"Membership_ProductInfoUrl",
+							"Membership_ProductInfoUrl",
+							"Membership_ProductInfoUrl",
+							"Membership_ProductInfoUrl",
+							"Membership_ProductInfoUrl",
+							"Membership_ProductInfoUrl",
+							"Membership_ProductInfoUrl",
+							"Membership_ProductInfoUrl",
+							"Membership_ProductInfoUrl",
+							"Membership_ProductInfoUrl",
+							"Membership_ProductInfoUrl",
+							null,
+							null,
+							null,
+							null
+						],
+						[
+							null,
+							null,
+							null,
+							null,
+							null,
+							null,
+							null,
+							null,
+							null,
+							null,
+							null,
+							null,
+							null,
+							null,
+							null,
+							null,
+							null,
+							null
+						]
+					],
+					"finished": true
+				},
+				{
+					"rows": 4,
+					"cols": 12,
+					"justifyContent": "center",
+					"alignItems": "center",
+					"rowHeights": ["1fr", "1fr", "1fr", "1fr"],
+					"areas": {
+						"Membership_ProductName": {
+							"id": "Membership_ProductName",
+							"rowStart": 0,
+							"rowEnd": 0,
+							"colStart": 0,
+							"colEnd": 8
+						},
+						"Membership_ProductShortDescription": {
+							"id": "Membership_ProductShortDescription",
+							"rowStart": 1,
+							"rowEnd": 1,
+							"colStart": 0,
+							"colEnd": 9
+						},
+						"Membership_ProductInfoUrl": {
+							"id": "Membership_ProductInfoUrl",
+							"rowStart": 2,
+							"rowEnd": 2,
+							"colStart": 0,
+							"colEnd": 8
+						}
+					},
+					"gridMatrix": [
+						[
+							"Membership_ProductName",
+							"Membership_ProductName",
+							"Membership_ProductName",
+							"Membership_ProductName",
+							"Membership_ProductName",
+							"Membership_ProductName",
+							"Membership_ProductName",
+							"Membership_ProductName",
+							"Membership_ProductName",
+							null,
+							null,
+							null
+						],
+						[
+							"Membership_ProductShortDescription",
+							"Membership_ProductShortDescription",
+							"Membership_ProductShortDescription",
+							"Membership_ProductShortDescription",
+							"Membership_ProductShortDescription",
+							"Membership_ProductShortDescription",
+							"Membership_ProductShortDescription",
+							"Membership_ProductShortDescription",
+							"Membership_ProductShortDescription",
+							"Membership_ProductShortDescription",
+							null,
+							null
+						],
+						[
+							"Membership_ProductInfoUrl",
+							"Membership_ProductInfoUrl",
+							"Membership_ProductInfoUrl",
+							"Membership_ProductInfoUrl",
+							"Membership_ProductInfoUrl",
+							"Membership_ProductInfoUrl",
+							"Membership_ProductInfoUrl",
+							"Membership_ProductInfoUrl",
+							"Membership_ProductInfoUrl",
+							null,
+							null,
+							null
+						],
+						[null, null, null, null, null, null, null, null, null, null, null, null]
+					],
+					"finished": true
+				},
+				{
+					"rows": 4,
+					"cols": 24,
+					"justifyContent": "center",
+					"alignItems": "center",
+					"rowHeights": ["1fr", "1fr", "1fr", "1fr"],
+					"areas": {
+						"Membership_ProductName": {
+							"id": "Membership_ProductName",
+							"rowStart": 0,
+							"rowEnd": 0,
+							"colStart": 0,
+							"colEnd": 18
+						},
+						"Membership_ProductShortDescription": {
+							"id": "Membership_ProductShortDescription",
+							"rowStart": 1,
+							"rowEnd": 1,
+							"colStart": 0,
+							"colEnd": 16
+						},
+						"Membership_ProductInfoUrl": {
+							"id": "Membership_ProductInfoUrl",
+							"rowStart": 2,
+							"rowEnd": 2,
+							"colStart": 0,
+							"colEnd": 16
+						}
+					},
+					"gridMatrix": [
+						[
+							"Membership_ProductName",
+							"Membership_ProductName",
+							"Membership_ProductName",
+							"Membership_ProductName",
+							"Membership_ProductName",
+							"Membership_ProductName",
+							"Membership_ProductName",
+							"Membership_ProductName",
+							"Membership_ProductName",
+							"Membership_ProductName",
+							"Membership_ProductName",
+							"Membership_ProductName",
+							"Membership_ProductName",
+							"Membership_ProductName",
+							"Membership_ProductName",
+							"Membership_ProductName",
+							"Membership_ProductName",
+							"Membership_ProductName",
+							"Membership_ProductName",
+							null,
+							null,
+							null,
+							null,
+							null
+						],
+						[
+							"Membership_ProductShortDescription",
+							"Membership_ProductShortDescription",
+							"Membership_ProductShortDescription",
+							"Membership_ProductShortDescription",
+							"Membership_ProductShortDescription",
+							"Membership_ProductShortDescription",
+							"Membership_ProductShortDescription",
+							"Membership_ProductShortDescription",
+							"Membership_ProductShortDescription",
+							"Membership_ProductShortDescription",
+							"Membership_ProductShortDescription",
+							"Membership_ProductShortDescription",
+							"Membership_ProductShortDescription",
+							"Membership_ProductShortDescription",
+							"Membership_ProductShortDescription",
+							"Membership_ProductShortDescription",
+							"Membership_ProductShortDescription",
+							null,
+							null,
+							null,
+							null,
+							null,
+							null,
+							null
+						],
+						[
+							"Membership_ProductInfoUrl",
+							"Membership_ProductInfoUrl",
+							"Membership_ProductInfoUrl",
+							"Membership_ProductInfoUrl",
+							"Membership_ProductInfoUrl",
+							"Membership_ProductInfoUrl",
+							"Membership_ProductInfoUrl",
+							"Membership_ProductInfoUrl",
+							"Membership_ProductInfoUrl",
+							"Membership_ProductInfoUrl",
+							"Membership_ProductInfoUrl",
+							"Membership_ProductInfoUrl",
+							"Membership_ProductInfoUrl",
+							"Membership_ProductInfoUrl",
+							"Membership_ProductInfoUrl",
+							"Membership_ProductInfoUrl",
+							"Membership_ProductInfoUrl",
+							null,
+							null,
+							null,
+							null,
+							null,
+							null,
+							null
+						],
+						[
+							null,
+							null,
+							null,
+							null,
+							null,
+							null,
+							null,
+							null,
+							null,
+							null,
+							null,
+							null,
+							null,
+							null,
+							null,
+							null,
+							null,
+							null,
+							null,
+							null,
+							null,
+							null,
+							null,
+							null
+						]
+					],
+					"finished": true
+				}
+			]
+		},
+		"layoutDefinitions": {
+			"20016 Slider 1 Test": {
+				"id": 20016,
+				"width": 1536,
+				"type": "Controle deslizante de imagem",
+				"sizes": [
+					{
+						"width": 1536,
+						"height": 640,
+						"type": "grid"
+					},
+					{
+						"width": 672,
+						"height": 420,
+						"type": "mobile"
+					}
+				]
+			},
+			"20011 Main Page Test": {
+				"id": 20011,
+				"width": 1536,
+				"type": "P&#225;gina principal",
+				"sizes": [
+					{
+						"width": 384,
+						"height": 384,
+						"type": "grid"
+					},
+					{
+						"width": 672,
+						"height": 420,
+						"type": "mobile"
+					},
+					{
+						"width": 1152,
+						"height": 384,
+						"type": "custom"
+					},
+					{
+						"width": 768,
+						"height": 384,
+						"type": "custom"
+					},
+					{
+						"width": 1536,
+						"height": 640,
+						"type": "custom"
+					}
+				]
+			}
+		}
+	}
+}

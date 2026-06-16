@@ -54,27 +54,46 @@ Object.assign(GridDesigner.prototype, {
 		};
 	},
 
+	getCellFromPointer(clientX, clientY) {
+		if (!this.grid) return null;
+		const blocks = Array.from(this.grid.querySelectorAll(".area-block"));
+		blocks.forEach((block) => {
+			block.style.pointerEvents = "none";
+		});
+		const hit = document.elementFromPoint(clientX, clientY);
+		blocks.forEach((block) => {
+			block.style.pointerEvents = "";
+		});
+		if (!(hit instanceof Element)) return null;
+		const cell = hit.closest(".cell");
+		return cell instanceof HTMLElement ? cell : null;
+	},
+
 	cellToGridPos(clientX, clientY) {
+		const cell = this.getCellFromPointer(clientX, clientY);
+		if (cell) {
+			const row = Number(cell.dataset.row);
+			const col = Number(cell.dataset.col);
+			if (Number.isFinite(row) && Number.isFinite(col)) {
+				return {
+					row: Math.min(this.state.rows - 1, Math.max(0, row)),
+					col: Math.min(this.state.cols - 1, Math.max(0, col)),
+				};
+			}
+		}
+
 		const gridRect = this.grid.getBoundingClientRect();
-		const x = clientX - gridRect.left;
-		const y = clientY - gridRect.top;
-		const computed = getComputedStyle(this.grid);
-		const gap = parseFloat(computed.gap) || 0;
-		const scale = parseFloat(
-			getComputedStyle(this.gridWrapper).getPropertyValue("--grid-scale") || "1",
-		);
-
-		const { colWidth: colSize, rowHeight: rowSize } = this.getGridMetrics();
-
-		const scaledX = x / scale;
-		const scaledY = y / scale;
+		const safeWidth = Math.max(1, gridRect.width);
+		const safeHeight = Math.max(1, gridRect.height);
+		const x = Math.min(Math.max(0, clientX - gridRect.left), safeWidth - 0.001);
+		const y = Math.min(Math.max(0, clientY - gridRect.top), safeHeight - 0.001);
 		const col = Math.min(
 			this.state.cols - 1,
-			Math.max(0, Math.floor(scaledX / (colSize + gap))),
+			Math.max(0, Math.floor((x / safeWidth) * this.state.cols)),
 		);
 		const row = Math.min(
 			this.state.rows - 1,
-			Math.max(0, Math.floor(scaledY / (rowSize + gap))),
+			Math.max(0, Math.floor((y / safeHeight) * this.state.rows)),
 		);
 		return { row, col };
 	},

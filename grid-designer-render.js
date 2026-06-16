@@ -6,8 +6,6 @@ GridDesigner.generateAreaColor = function (id) {
 Object.assign(GridDesigner.prototype, {
 	applyGridBaseStyles() {
 		if (!this.grid) return;
-		this.grid.style.gridTemplateColumns = `repeat(${this.state.cols}, 1fr)`;
-		this.grid.style.gridTemplateRows = `repeat(${this.state.rows}, minmax(60px, 1fr))`;
 		this.grid.style.aspectRatio = `${this.gridWidth} / ${this.gridHeight}`;
 		this.grid.style.minHeight = "auto";
 		this.updateGridScaling();
@@ -39,6 +37,17 @@ Object.assign(GridDesigner.prototype, {
 
 		this.grid.innerHTML = "";
 		this.applyGridBaseStyles();
+		const gridTemplateColumns = `repeat(${this.state.cols}, 1fr)`;
+		const gridTemplateRows = `repeat(${this.state.rows}, minmax(60px, 1fr))`;
+		const cellLayer = document.createElement("div");
+		cellLayer.className = "grid-layer grid-layer--cells";
+		cellLayer.style.gridTemplateColumns = gridTemplateColumns;
+		cellLayer.style.gridTemplateRows = gridTemplateRows;
+		const overlayLayer = document.createElement("div");
+		overlayLayer.className = "grid-layer grid-layer--areas";
+		overlayLayer.style.gridTemplateColumns = gridTemplateColumns;
+		overlayLayer.style.gridTemplateRows = gridTemplateRows;
+		overlayLayer.setAttribute("aria-hidden", "true");
 		for (let r = 0; r < this.state.rows; r++) {
 			for (let c = 0; c < this.state.cols; c++) {
 				const cell = document.createElement("div");
@@ -48,21 +57,29 @@ Object.assign(GridDesigner.prototype, {
 				cell.draggable = false;
 				cell.addEventListener("dragover", (e) => e.preventDefault());
 				cell.addEventListener("drop", this.handleDrop.bind(this));
-				this.grid.appendChild(cell);
+				cellLayer.appendChild(cell);
 			}
 		}
-		this.renderAreas();
+		this.grid.appendChild(cellLayer);
+		this.grid.appendChild(overlayLayer);
+		this.renderAreas(overlayLayer);
 		const lateReapply = () => {
 			if (!this.grid?.isConnected || !this.gridWrapper?.isConnected) this.cacheDomElements();
 			this.applyGridBaseStyles();
+			const layers = this.grid?.querySelectorAll(".grid-layer");
+			if (layers?.length) {
+				layers.forEach((layer) => {
+					layer.style.gridTemplateColumns = gridTemplateColumns;
+					layer.style.gridTemplateRows = gridTemplateRows;
+				});
+			}
 		};
 		window.setTimeout(lateReapply, 120);
 	},
 
-	renderAreas() {
-		if (!this.grid) return;
-		const gap = 8;
-		const { colWidth: cellWidth, rowHeight: cellHeight } = this.getGridMetrics();
+	renderAreas(overlayLayer = null) {
+		const host = overlayLayer || this.grid;
+		if (!host) return;
 
 		Object.values(this.state.areas).forEach((area) => {
 			const element = this.state.elements.find((el) => el.id === area.id);
@@ -70,17 +87,8 @@ Object.assign(GridDesigner.prototype, {
 			block.className = "area-block";
 			block.draggable = false;
 			block.dataset.areaId = area.id;
-			const x = area.colStart * (cellWidth + gap);
-			const y = area.rowStart * (cellHeight + gap);
-			const width =
-				(area.colEnd - area.colStart + 1) * cellWidth + (area.colEnd - area.colStart) * gap;
-			const height =
-				(area.rowEnd - area.rowStart + 1) * cellHeight +
-				(area.rowEnd - area.rowStart) * gap;
-			block.style.left = `${x}px`;
-			block.style.top = `${y}px`;
-			block.style.width = `${width}px`;
-			block.style.height = `${height}px`;
+			block.style.gridColumn = `${area.colStart + 1} / ${area.colEnd + 2}`;
+			block.style.gridRow = `${area.rowStart + 1} / ${area.rowEnd + 2}`;
 			const color =
 				this.areaColors[area.id] ||
 				(this.areaColors[area.id] = GridDesigner.generateAreaColor(area.id));
@@ -141,7 +149,7 @@ Object.assign(GridDesigner.prototype, {
 			});
 			block.addEventListener("dragover", (e) => e.preventDefault());
 			block.addEventListener("drop", this.handleDrop.bind(this));
-			this.grid.appendChild(block);
+			host.appendChild(block);
 		});
 	},
 

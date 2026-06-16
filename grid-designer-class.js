@@ -246,12 +246,26 @@ class GridDesigner {
 		this.allowedTags = this.allowedTags.map((tag) => {
 			const selected = selectedTagIds.has(tag.id.toLowerCase());
 			const selectedCtrlIds = selectedControlsByTag.get(tag.id.toLowerCase());
+			const hasExplicitSelectedCtrls = Boolean(selectedCtrlIds && selectedCtrlIds.size);
+			const isSingleCtrl = (tag.ctrls || []).length <= 1;
 			let ctrls = (tag.ctrls || []).map((ctrl) => ({
 				...ctrl,
-				selected: selectedCtrlIds
+				selected: hasExplicitSelectedCtrls
 					? selectedCtrlIds.has(ctrl.id.toLowerCase())
-					: ctrl.selected,
+					: selected && isSingleCtrl
+						? true
+						: ctrl.selected,
 			}));
+
+			if (
+				selected &&
+				tag.controlType === "checkbox" &&
+				!isSingleCtrl &&
+				!hasExplicitSelectedCtrls &&
+				ctrls.length
+			) {
+				ctrls = ctrls.map((ctrl, index) => ({ ...ctrl, selected: index === 0 }));
+			}
 
 			if (
 				tag.controlType === "radio" &&
