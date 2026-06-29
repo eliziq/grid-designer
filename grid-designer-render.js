@@ -136,7 +136,7 @@ Object.assign(GridDesigner.prototype, {
 				if (edge.edge) {
 					block.style.cursor = edge.left || edge.right ? "ew-resize" : "ns-resize";
 				} else {
-					block.style.cursor = "default";
+					block.style.cursor = "move";
 				}
 			});
 			block.addEventListener("pointerleave", () => {

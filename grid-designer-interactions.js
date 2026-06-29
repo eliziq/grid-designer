@@ -265,7 +265,7 @@ Object.assign(GridDesigner.prototype, {
 
 	handlePointerMove(event) {
 		if (!this.resizeState || !this.resizeState.dragging) return;
-		const { id, edge, startArea } = this.resizeState;
+		const { id, edge, startArea, mode = "resize" } = this.resizeState;
 		const gridRect = this.grid.getBoundingClientRect();
 		const scale = parseFloat(
 			getComputedStyle(this.gridWrapper).getPropertyValue("--grid-scale") || "1",
@@ -285,6 +285,48 @@ Object.assign(GridDesigner.prototype, {
 			}
 			return 0;
 		};
+
+		if (mode === "move") {
+			const startPointerX = this.resizeState.startPointerX;
+			const startPointerY = this.resizeState.startPointerY;
+			const desiredColShift = snapDelta(pointerX - startPointerX, stepX);
+			const desiredRowShift = snapDelta(pointerY - startPointerY, stepY);
+			const shiftedArea = this.getShiftedAreaByFreeEdge(
+				startArea,
+				id,
+				desiredRowShift,
+				desiredColShift,
+			);
+
+			if (
+				shiftedArea.rowStart === this.state.areas[id]?.rowStart &&
+				shiftedArea.rowEnd === this.state.areas[id]?.rowEnd &&
+				shiftedArea.colStart === this.state.areas[id]?.colStart &&
+				shiftedArea.colEnd === this.state.areas[id]?.colEnd
+			) {
+				return;
+			}
+
+			this.state.areas[id] = {
+				id,
+				rowStart: shiftedArea.rowStart,
+				rowEnd: shiftedArea.rowEnd,
+				colStart: shiftedArea.colStart,
+				colEnd: shiftedArea.colEnd,
+				label: startArea.label,
+			};
+			this.initMatrix();
+			Object.values(this.state.areas).forEach((area) => {
+				for (let rr = area.rowStart; rr <= area.rowEnd; rr++) {
+					for (let cc = area.colStart; cc <= area.colEnd; cc++) {
+						this.state.gridMatrix[rr][cc] = area.id;
+					}
+				}
+			});
+			this.renderGrid();
+			this.updateCssPreview();
+			return;
+		}
 
 		let { rowStart, rowEnd, colStart, colEnd } = startArea;
 
@@ -385,21 +427,34 @@ Object.assign(GridDesigner.prototype, {
 		const area = this.state.areas[id];
 		if (!area) return;
 		const edge = this.isEdgePosition(event, block);
-		if (!edge.edge) return;
+		const moveMode = !edge.edge;
 		block.classList.toggle("edge-top", edge.top);
 		block.classList.toggle("edge-bottom", edge.bottom);
 		block.classList.toggle("edge-left", edge.left);
 		block.classList.toggle("edge-right", edge.right);
+		const gridRect = this.grid.getBoundingClientRect();
+		const scale = parseFloat(
+			getComputedStyle(this.gridWrapper).getPropertyValue("--grid-scale") || "1",
+		);
 		this.resizeState = {
 			id,
 			edge,
+			mode: moveMode ? "move" : "resize",
 			startArea: { ...area },
+			startPointerX: (event.clientX - gridRect.left) / scale,
+			startPointerY: (event.clientY - gridRect.top) / scale,
 			dragging: true,
 		};
 
 		this.handlePointerMoveBound = this.handlePointerMove.bind(this);
 		window.addEventListener("pointermove", this.handlePointerMoveBound);
 		document.body.style.cursor =
-			edge.top || edge.bottom ? "ns-resize" : edge.left || edge.right ? "ew-resize" : "move";
+			moveMode
+				? "grabbing"
+				: edge.top || edge.bottom
+					? "ns-resize"
+					: edge.left || edge.right
+						? "ew-resize"
+						: "default";
 	},
 });

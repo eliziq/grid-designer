@@ -42,6 +42,97 @@ Object.assign(GridDesigner.prototype, {
 		return true;
 	},
 
+	canShiftAreaByOne(area, id, dRow, dCol) {
+		if (!area || !id) return false;
+		this.ensureGridMatrixIntegrity();
+
+		if (dRow < 0) {
+			const targetRow = area.rowStart - 1;
+			if (targetRow < 0) return false;
+			for (let c = area.colStart; c <= area.colEnd; c++) {
+				const current = this.state.gridMatrix[targetRow]?.[c];
+				if (current && current !== id) return false;
+			}
+			return true;
+		}
+
+		if (dRow > 0) {
+			const targetRow = area.rowEnd + 1;
+			if (targetRow >= this.state.rows) return false;
+			for (let c = area.colStart; c <= area.colEnd; c++) {
+				const current = this.state.gridMatrix[targetRow]?.[c];
+				if (current && current !== id) return false;
+			}
+			return true;
+		}
+
+		if (dCol < 0) {
+			const targetCol = area.colStart - 1;
+			if (targetCol < 0) return false;
+			for (let r = area.rowStart; r <= area.rowEnd; r++) {
+				const current = this.state.gridMatrix[r]?.[targetCol];
+				if (current && current !== id) return false;
+			}
+			return true;
+		}
+
+		if (dCol > 0) {
+			const targetCol = area.colEnd + 1;
+			if (targetCol >= this.state.cols) return false;
+			for (let r = area.rowStart; r <= area.rowEnd; r++) {
+				const current = this.state.gridMatrix[r]?.[targetCol];
+				if (current && current !== id) return false;
+			}
+			return true;
+		}
+
+		return true;
+	},
+
+	getShiftedAreaByFreeEdge(area, id, desiredRowShift, desiredColShift) {
+		if (!area || !id) return area;
+
+		const horizontalFirst = Math.abs(desiredColShift) >= Math.abs(desiredRowShift);
+		const preferredAxis = horizontalFirst ? "col" : "row";
+		const fallbackAxis = horizontalFirst ? "row" : "col";
+
+		const applyAxisShift = (sourceArea, axis) => {
+			const desiredShift = axis === "col" ? desiredColShift : desiredRowShift;
+			if (!desiredShift) {
+				return { nextArea: sourceArea, moved: false };
+			}
+
+			const direction = desiredShift < 0 ? -1 : 1;
+			const steps = Math.abs(desiredShift);
+			const nextArea = { ...sourceArea };
+			let moved = false;
+
+			for (let i = 0; i < steps; i++) {
+				const canShift =
+					axis === "col"
+						? this.canShiftAreaByOne(nextArea, id, 0, direction)
+						: this.canShiftAreaByOne(nextArea, id, direction, 0);
+				if (!canShift) break;
+
+				if (axis === "col") {
+					nextArea.colStart += direction;
+					nextArea.colEnd += direction;
+				} else {
+					nextArea.rowStart += direction;
+					nextArea.rowEnd += direction;
+				}
+				moved = true;
+			}
+
+			return { nextArea, moved };
+		};
+
+		let { nextArea } = applyAxisShift(area, preferredAxis);
+		({ nextArea } = applyAxisShift(nextArea, fallbackAxis));
+
+		return nextArea;
+	},
+
 	getGridMetrics() {
 		const gap = 8;
 		const { cols, rows } = this.state;
