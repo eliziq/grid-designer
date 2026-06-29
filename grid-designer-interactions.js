@@ -57,6 +57,7 @@ Object.assign(GridDesigner.prototype, {
 			if (!tagItem) return;
 			const isChecked = target.checked;
 			tagItem.querySelectorAll(".tag-selector__ctrl input").forEach((ctrlInput) => {
+				if (!isChecked) ctrlInput.checked = false;
 				ctrlInput.disabled = !isChecked;
 			});
 			return;

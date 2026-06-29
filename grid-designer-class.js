@@ -269,6 +269,7 @@ class GridDesigner {
 
 			if (
 				tag.controlType === "radio" &&
+				selected &&
 				ctrls.length &&
 				!ctrls.some((ctrl) => ctrl.selected)
 			) {
