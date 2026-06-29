@@ -254,6 +254,15 @@
 	display: grid;
 	gap: 0.5rem;
 }
+.tag-selector__notice {
+	padding: 0.6rem 0.7rem;
+	border: 1px solid #f1c071;
+	border-radius: 7px;
+	background: #fff6e8;
+	color: #8a4d00;
+	font-size: 0.9rem;
+	line-height: 1.35;
+}
 .tag-selector__item {
 	padding: 0.6rem;
 	border: 1px solid #dce1ef;

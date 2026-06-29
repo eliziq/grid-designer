@@ -14,6 +14,7 @@ Object.assign(GridDesigner.prototype, {
 	refreshGridView() {
 		this.renderGrid();
 		this.renderElementList();
+		this.renderTagSelectionPanel();
 		this.updateCssPreview();
 	},
 
@@ -21,6 +22,7 @@ Object.assign(GridDesigner.prototype, {
 		this.renderGrid();
 		this.renderElementList();
 		this.renderRowControls();
+		this.renderTagSelectionPanel();
 		this.updateCssPreview();
 	},
 
@@ -212,7 +214,6 @@ Object.assign(GridDesigner.prototype, {
 		const editBtn = panel.querySelector("#tagSelectionEdit");
 		if (saveBtn) saveBtn.style.display = isLocked ? "none" : "";
 		if (editBtn) editBtn.style.display = isLocked ? "" : "none";
-
 		const list = panel.querySelector("#tagSelectorList");
 		if (!list) return;
 		list.innerHTML = "";
@@ -282,6 +283,23 @@ Object.assign(GridDesigner.prototype, {
 	renderElementList() {
 		if (!this.elementList) return;
 		this.elementList.innerHTML = "";
+
+		const requiredElementIds = new Set(
+			(this.state.elements || []).map((element) => element.id),
+		);
+		const placedAreaIds = new Set(Object.keys(this.state.areas || {}));
+		const hasUnplacedSelectedElements = [...requiredElementIds].some(
+			(id) => !placedAreaIds.has(id),
+		);
+
+		if (requiredElementIds.size > 0 && hasUnplacedSelectedElements) {
+			const notice = document.createElement("div");
+			notice.className = "tag-selector__notice";
+			notice.textContent =
+				"This design is not finished yet. Place all selected elements before it can be saved.";
+			this.elementList.appendChild(notice);
+		}
+
 		const placedIds = new Set(Object.keys(this.state.areas || {}));
 		this.state.elements.forEach((element) => {
 			const tag = document.createElement("div");

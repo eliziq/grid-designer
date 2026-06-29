@@ -818,6 +818,7 @@ Object.assign(GridDesigner.prototype, {
 		this.saveResolutionState(this.state.currentResolutionIndex);
 		this.refreshFinishedStates();
 		this.updateResolutionTabState();
+		this.renderTagSelectionPanel();
 		this.cssCode.textContent = this.generateCss();
 	},
 
