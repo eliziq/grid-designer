@@ -5,7 +5,9 @@
 		"grid-designer-css.js",
 		"grid-designer-layout.js",
 		"grid-designer-render.js",
+
 		"grid-designer-interactions.js",
+		"grid-designer-pointer.js",
 		"grid-designer-api.js",
 		"use-script.js",
 	];
