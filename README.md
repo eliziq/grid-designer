@@ -16,6 +16,7 @@ Simple vanilla JavaScript grid designer for quickly prototyping CSS grid layouts
 - `script.js` – Entry point loader (loads all project scripts)
 - `grid-designer-class.js` – Core GridDesigner class + static normalization helpers
 - `grid-designer-state.js` – Resolution state, persistence, and CSS generation
+- `grid-designer-css.js` – CSS generation logic for finished resolution states
 - `grid-designer-layout.js` – Grid geometry and area conflict/layout helpers
 - `grid-designer-render.js` – Rendering logic for grid, areas, controls, and scaling
 - `grid-designer-interactions.js` – Event handlers and interaction flow

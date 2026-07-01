@@ -2,6 +2,7 @@
 	const scriptsToLoad = [
 		"grid-designer-class.js",
 		"grid-designer-state.js",
+		"grid-designer-css.js",
 		"grid-designer-layout.js",
 		"grid-designer-render.js",
 		"grid-designer-interactions.js",
@@ -27,5 +28,3 @@
 		console.error(error);
 	});
 })();
-
-
