@@ -44,6 +44,58 @@
 	gap: 0.5rem;
 	align-items: center;
 }
+.control-field {
+	display: flex;
+	gap: 0.5rem;
+	align-items: center;
+}
+.control-label {
+	font-size: 0.95rem;
+	color: #1f2328;
+}
+.icon-radio-group {
+	display: inline-flex;
+	gap: 0.125rem;
+	margin: 0;
+	padding: 0.125rem;
+	border: 1px solid #ccc;
+	border-radius: 0.45rem;
+	background: #fff;
+}
+.icon-radio {
+	position: relative;
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	width: 2.2rem;
+	height: 2rem;
+	border-radius: 0.3rem;
+	border: 1px solid transparent;
+	color: #525760;
+	cursor: pointer;
+	transition: background-color 120ms ease, border-color 120ms ease, color 120ms ease;
+}
+.icon-radio input {
+	position: absolute;
+	opacity: 0;
+	inset: 0;
+	margin: 0;
+	cursor: pointer;
+}
+.icon-radio .material-symbols-outlined {
+	font-size: 1.25rem;
+	line-height: 1;
+	pointer-events: none;
+}
+.icon-radio:hover {
+	background: #f3f6ff;
+	border-color: #bfc9e4;
+}
+.icon-radio:has(input:checked) {
+	background: #e9efff;
+	border-color: #8ea8ef;
+	color: #1f4ad1;
+}
 #gridWrapper {
 	margin-bottom: 0.5rem;
 	border: 2px solid #656dff;

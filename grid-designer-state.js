@@ -354,8 +354,8 @@ Object.assign(GridDesigner.prototype, {
 		this.state.gridMatrix = snapshot.gridMatrix.map((row) => [...row]);
 		if (this.colCountInput) this.colCountInput.value = this.state.cols;
 		if (this.rowCountInput) this.rowCountInput.value = this.state.rows;
-		if (this.justifyContentSelect) this.justifyContentSelect.value = this.state.justifyContent;
-		if (this.alignItemsSelect) this.alignItemsSelect.value = this.state.alignItems;
+		this.setJustifyContentControlValue(this.state.justifyContent);
+		this.setAlignItemsControlValue(this.state.alignItems);
 	},
 
 	getCurrentPatternKey() {

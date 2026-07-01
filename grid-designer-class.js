@@ -41,7 +41,13 @@ class GridDesigner {
 		this.colCountInput = this.q("colCount");
 		this.rowCountInput = this.q("rowCount");
 		this.justifyContentSelect = this.q("justifyContent");
+		this.justifyContentRadios = Array.from(
+			this.containerElement.querySelectorAll('input[name="justifyContent"]'),
+		);
 		this.alignItemsSelect = this.q("alignItems");
+		this.alignItemsRadios = Array.from(
+			this.containerElement.querySelectorAll('input[name="alignItems"]'),
+		);
 		this.buildGridButton = this.q("buildGrid");
 		this.clearGridButton = this.q("clearGrid");
 		this.exportCssButton = this.q("exportCss");
@@ -63,6 +69,54 @@ class GridDesigner {
 
 	q(id) {
 		return this.containerElement.querySelector(`#${id}`);
+	}
+
+	bindJustifyContentControlChange(handler) {
+		if (this.justifyContentSelect) {
+			this.justifyContentSelect.addEventListener("change", handler);
+		}
+		this.justifyContentRadios.forEach((radio) => {
+			radio.addEventListener("change", handler);
+		});
+	}
+
+	getJustifyContentControlValue() {
+		if (this.justifyContentSelect) return this.justifyContentSelect.value;
+		const checkedRadio = this.justifyContentRadios.find((radio) => radio.checked);
+		return checkedRadio?.value || "center";
+	}
+
+	setJustifyContentControlValue(value) {
+		if (this.justifyContentSelect) {
+			this.justifyContentSelect.value = value;
+			return;
+		}
+		const targetRadio = this.justifyContentRadios.find((radio) => radio.value === value);
+		if (targetRadio) targetRadio.checked = true;
+	}
+
+	bindAlignItemsControlChange(handler) {
+		if (this.alignItemsSelect) {
+			this.alignItemsSelect.addEventListener("change", handler);
+		}
+		this.alignItemsRadios.forEach((radio) => {
+			radio.addEventListener("change", handler);
+		});
+	}
+
+	getAlignItemsControlValue() {
+		if (this.alignItemsSelect) return this.alignItemsSelect.value;
+		const checkedRadio = this.alignItemsRadios.find((radio) => radio.checked);
+		return checkedRadio?.value || "center";
+	}
+
+	setAlignItemsControlValue(value) {
+		if (this.alignItemsSelect) {
+			this.alignItemsSelect.value = value;
+			return;
+		}
+		const targetRadio = this.alignItemsRadios.find((radio) => radio.value === value);
+		if (targetRadio) targetRadio.checked = true;
 	}
 
 	static cloneData(value, fallback = null) {

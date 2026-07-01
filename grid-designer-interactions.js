@@ -3,16 +3,8 @@ Object.assign(GridDesigner.prototype, {
 		if (this.editorReady) return;
 		if (this.buildGridButton)
 			this.buildGridButton.addEventListener("click", this.handleBuildGrid.bind(this));
-		if (this.justifyContentSelect)
-			this.justifyContentSelect.addEventListener(
-				"change",
-				this.handleGridAlignmentChange.bind(this),
-			);
-		if (this.alignItemsSelect)
-			this.alignItemsSelect.addEventListener(
-				"change",
-				this.handleGridAlignmentChange.bind(this),
-			);
+		this.bindJustifyContentControlChange(this.handleGridAlignmentChange.bind(this));
+		this.bindAlignItemsControlChange(this.handleGridAlignmentChange.bind(this));
 		if (this.clearGridButton)
 			this.clearGridButton.addEventListener("click", this.handleClearGrid.bind(this));
 		if (this.exportCssButton)
@@ -153,8 +145,8 @@ Object.assign(GridDesigner.prototype, {
 	},
 
 	handleGridAlignmentChange() {
-		this.state.justifyContent = this.justifyContentSelect?.value || "center";
-		this.state.alignItems = this.alignItemsSelect?.value || "center";
+		this.state.justifyContent = this.getJustifyContentControlValue();
+		this.state.alignItems = this.getAlignItemsControlValue();
 		this.updateCssPreview();
 	},
 
