@@ -57,6 +57,8 @@ class GridDesigner {
 		this.importStateInput = this.q("importState");
 		this.cssCode = this.q("cssCode");
 		this.elementList = this.q("elementList");
+		this.elementListItems = this.q("elementListItems");
+		this.unfinishedDesignNotice = this.q("unfinishedDesignNotice");
 		this.gridWrapper = this.q("gridWrapper");
 		this.resolutionTabs = this.q("resolutionTabs");
 		this.rowControls = this.q("controlsContainer");

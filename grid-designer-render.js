@@ -209,12 +209,9 @@ Object.assign(GridDesigner.prototype, {
 			(id) => !placedAreaIds.has(id),
 		);
 
-		if (requiredElementIds.size > 0 && hasUnplacedSelectedElements) {
-			const notice = document.createElement("div");
-			notice.className = "tag-selector__notice";
-			notice.textContent =
-				"This design is not finished yet. Place all selected elements before it can be saved.";
-			this.elementList.appendChild(notice);
+		if (this.unfinishedDesignNotice) {
+			this.unfinishedDesignNotice.hidden =
+				requiredElementIds.size === 0 || !hasUnplacedSelectedElements;
 		}
 
 		const placedIds = new Set(Object.keys(this.state.areas || {}));
