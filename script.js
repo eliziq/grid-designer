@@ -2,6 +2,7 @@
 	const scriptsToLoad = [
 		"grid-designer-class.js",
 		"grid-designer-state.js",
+		"grid-designer-resolutions.js",
 		"grid-designer-css.js",
 		"grid-designer-layout.js",
 		"grid-designer-render.js",
