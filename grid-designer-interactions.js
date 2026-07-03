@@ -11,8 +11,6 @@ Object.assign(GridDesigner.prototype, {
 			this.exportCssButton.addEventListener("click", this.handleExportCss.bind(this));
 		if (this.exportJsonButton)
 			this.exportJsonButton.addEventListener("click", this.handleExportJson.bind(this));
-		if (this.deletePatternButton)
-			this.deletePatternButton.addEventListener("click", this.handleDeletePattern.bind(this));
 		if (this.loadDesignButton)
 			this.loadDesignButton.addEventListener("click", () => this.importStateInput?.click());
 		if (this.importStateInput)
@@ -194,15 +192,6 @@ Object.assign(GridDesigner.prototype, {
 		};
 		this.savedPatterns[key] = pattern;
 		this.savePatternsToStorage();
-		this.updatePatternButtons();
-		this.updateCssPreview();
-	},
-
-	handleDeletePattern() {
-		const key = this.getCurrentPatternKey();
-		delete this.savedPatterns[key];
-		this.savePatternsToStorage();
-		this.updatePatternButtons();
 		this.updateCssPreview();
 	},
 

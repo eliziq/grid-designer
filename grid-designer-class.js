@@ -52,7 +52,6 @@ class GridDesigner {
 		this.clearGridButton = this.q("clearGrid");
 		this.exportCssButton = this.q("exportCss");
 		this.exportJsonButton = this.q("exportJson");
-		this.deletePatternButton = this.q("deletePattern");
 		this.loadDesignButton = this.q("loadDesign");
 		this.importStateInput = this.q("importState");
 		this.cssCode = this.q("cssCode");

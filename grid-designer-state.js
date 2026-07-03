@@ -23,14 +23,6 @@ Object.assign(GridDesigner.prototype, {
 		});
 	},
 
-	updatePatternButtons() {
-		const patternKey = this.getCurrentPatternKey();
-		const hasSavedPattern = Boolean(this.savedPatterns[patternKey]);
-		if (this.deletePatternButton) {
-			this.deletePatternButton.style.display = hasSavedPattern ? "" : "none";
-		}
-	},
-
 	isResolutionStateFinished(state) {
 		const requiredElementIds = (this.state.elements || []).map((element) => element.id);
 		if (!requiredElementIds.length) return false;

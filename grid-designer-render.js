@@ -29,7 +29,6 @@ Object.assign(GridDesigner.prototype, {
 	refreshResolutionUi() {
 		this.refreshWorkspaceView();
 		this.updateResolutionTabState();
-		this.updatePatternButtons();
 		this.renderTagSelectionPanel();
 	},
 
