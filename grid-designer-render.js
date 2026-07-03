@@ -221,8 +221,14 @@ Object.assign(GridDesigner.prototype, {
 			tag.draggable = true;
 			tag.title = isPlaced ? "Placed on grid" : "Still needs placement";
 
+			const icon = document.createElement("span");
+			icon.className = "material-symbols-outlined";
+			icon.textContent = "drag_indicator";
+
 			const label = document.createElement("span");
 			label.textContent = element.name;
+
+			tag.appendChild(icon);
 			tag.appendChild(label);
 
 			if (!this.areaColors[element.id]) {

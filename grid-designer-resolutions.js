@@ -49,7 +49,9 @@ Object.assign(GridDesigner.prototype, {
 
 		const ensureGroup = (type, captionText) => {
 			let group = this.resolutionTabs.querySelector(`[data-resolution-type="${type}"]`);
+			let isNewGroup = false;
 			if (!group) {
+				isNewGroup = true;
 				group = document.createElement("div");
 				group.className = "resolution-group";
 				group.dataset.resolutionType = type;
@@ -66,7 +68,9 @@ Object.assign(GridDesigner.prototype, {
 			}
 
 			const caption = group.querySelector(".resolution-group-caption");
-			if (caption) caption.textContent = captionText;
+			if (caption && (isNewGroup || !caption.textContent.trim())) {
+				caption.textContent = captionText;
+			}
 
 			let options = group.querySelector(".resolution-group-options");
 			if (!options) {
