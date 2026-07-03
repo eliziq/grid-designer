@@ -1,0 +1,788 @@
+{
+    "id": "1112",
+    "layoutDefinitions": {
+        "1089 Test Grid Generator": {
+            "id": 1089,
+            "width": 1536,
+            "type": "Main Page",
+            "sizes": [
+                {
+                    "width": 512,
+                    "height": 640,
+                    "type": "grid"
+                },
+                {
+                    "width": 672,
+                    "height": 840,
+                    "type": "mobile"
+                },
+                {
+                    "width": 1536,
+                    "height": 576,
+                    "type": "custom"
+                },
+                {
+                    "width": 1024,
+                    "height": 640,
+                    "type": "custom"
+                }
+            ]
+        }
+    },
+    "tags": [
+        {
+            "id": "Event_NameAndLogo",
+            "name": "TicketTags_Name, TicketTags_TeamsLogo",
+            "gridArea": "nameemblem",
+            "ctrls": [
+                {
+                    "name": "TicketTags_Name",
+                    "selected": "true",
+                    "tag": "Name"
+                },
+                {
+                    "name": "TicketTags_TeamsLogo",
+                    "selected": "false",
+                    "tag": "TeamsLogo"
+                }
+            ],
+            "controlType": "checkbox"
+        },
+        {
+            "id": "Event_Date",
+            "name": "TicketTags_Day, TicketTags_Hour, TicketTags_DisplayDate",
+            "gridArea": "boxdates",
+            "ctrls": [
+                {
+                    "name": "TicketTags_Day",
+                    "selected": "false",
+                    "tag": "Day"
+                },
+                {
+                    "name": "TicketTags_Hour",
+                    "selected": "false",
+                    "tag": "Hour"
+                },
+                {
+                    "name": "TicketTags_DisplayDate",
+                    "selected": "false",
+                    "tag": "DisplayDate"
+                }
+            ],
+            "controlType": "radio"
+        },
+        {
+            "id": "Event_Place",
+            "name": "TicketTags_StadiumName, TicketTags_Place",
+            "gridArea": "boxplaces",
+            "ctrls": [
+                {
+                    "name": "TicketTags_StadiumName",
+                    "selected": "true",
+                    "tag": "StadiumName"
+                },
+                {
+                    "name": "TicketTags_Place",
+                    "selected": "false",
+                    "tag": "Place"
+                }
+            ],
+            "controlType": "checkbox"
+        },
+        {
+            "id": "Event_DescriptionHeader",
+            "name": "TicketTags_DescriptionHeader",
+            "gridArea": "saleinfo",
+            "ctrls": [
+                {
+                    "name": "TicketTags_DescriptionHeader",
+                    "selected": "false",
+                    "tag": "DescriptionHeader"
+                }
+            ],
+            "controlType": "checkbox"
+        },
+        {
+            "id": "Event_ShortDescription",
+            "name": "TicketTags_ShortDescription",
+            "gridArea": "shortdsc",
+            "ctrls": [
+                {
+                    "name": "TicketTags_ShortDescription",
+                    "selected": "false",
+                    "tag": "ShortDescription"
+                }
+            ],
+            "controlType": "checkbox"
+        },
+        {
+            "id": "Event_Tournament",
+            "name": "TicketTags_Tournament",
+            "gridArea": "tournament",
+            "ctrls": [
+                {
+                    "name": "TicketTags_Tournament",
+                    "selected": "false",
+                    "tag": "Tournament"
+                }
+            ],
+            "controlType": "checkbox"
+        },
+        {
+            "id": "Event_Counter",
+            "name": "TicketTags_Counter",
+            "gridArea": "prodcnt",
+            "ctrls": [
+                {
+                    "name": "TicketTags_Counter",
+                    "selected": "false",
+                    "tag": "Counter"
+                }
+            ],
+            "controlType": "checkbox"
+        },
+        {
+            "id": "Event_Parking",
+            "name": "TicketTags_BuyUrlParking",
+            "gridArea": "btnparking",
+            "ctrls": [
+                {
+                    "name": "TicketTags_BuyUrlParking",
+                    "selected": "true",
+                    "tag": "BuyUrlParking"
+                }
+            ],
+            "controlType": "checkbox"
+        },
+        {
+            "id": "Event_Info",
+            "name": "TicketTags_InfoUrl",
+            "gridArea": "btninfo",
+            "ctrls": [
+                {
+                    "name": "TicketTags_InfoUrl",
+                    "selected": "true",
+                    "tag": "InfoUrl"
+                }
+            ],
+            "controlType": "checkbox"
+        },
+        {
+            "id": "Event_DefaultPrice",
+            "name": "TicketTags_DefaultPrice",
+            "gridArea": "defaultprice",
+            "ctrls": [
+                {
+                    "name": "TicketTags_DefaultPrice",
+                    "selected": "false",
+                    "tag": "DefaultPrice"
+                }
+            ],
+            "controlType": "checkbox"
+        },
+        {
+            "id": "Event_Buy",
+            "name": "TicketTags_BuyButton",
+            "gridArea": "btnbuy",
+            "ctrls": [
+                {
+                    "name": "TicketTags_BuyButton",
+                    "selected": "true",
+                    "tag": "BuyButton"
+                }
+            ],
+            "controlType": "checkbox"
+        }
+    ],
+    "state": {
+        "id": "1112",
+        "currentLayoutName": "1089 Test Grid Generator",
+        "currentResolutionIndex": 3,
+        "elements": [
+            {
+                "id": "Event_NameAndLogo",
+                "name": "TicketTags_Name",
+                "gridArea": "nameemblem",
+                "controlType": "checkbox",
+                "ctrls": [
+                    {
+                        "id": "TicketTags_Name, TicketTags_TeamsLogo-TicketTags_Name",
+                        "name": "TicketTags_Name",
+                        "selected": true
+                    },
+                    {
+                        "id": "TicketTags_Name, TicketTags_TeamsLogo-TicketTags_TeamsLogo",
+                        "name": "TicketTags_TeamsLogo",
+                        "selected": false
+                    }
+                ]
+            },
+            {
+                "id": "Event_Place",
+                "name": "TicketTags_StadiumName",
+                "gridArea": "boxplaces",
+                "controlType": "checkbox",
+                "ctrls": [
+                    {
+                        "id": "TicketTags_StadiumName, TicketTags_Place-TicketTags_StadiumName",
+                        "name": "TicketTags_StadiumName",
+                        "selected": true
+                    },
+                    {
+                        "id": "TicketTags_StadiumName, TicketTags_Place-TicketTags_Place",
+                        "name": "TicketTags_Place",
+                        "selected": false
+                    }
+                ]
+            },
+            {
+                "id": "Event_Parking",
+                "name": "TicketTags_BuyUrlParking",
+                "gridArea": "btnparking",
+                "controlType": "checkbox",
+                "ctrls": [
+                    {
+                        "id": "TicketTags_BuyUrlParking-TicketTags_BuyUrlParking",
+                        "name": "TicketTags_BuyUrlParking",
+                        "selected": true
+                    }
+                ]
+            },
+            {
+                "id": "Event_Info",
+                "name": "TicketTags_InfoUrl",
+                "gridArea": "btninfo",
+                "controlType": "checkbox",
+                "ctrls": [
+                    {
+                        "id": "TicketTags_InfoUrl-TicketTags_InfoUrl",
+                        "name": "TicketTags_InfoUrl",
+                        "selected": true
+                    }
+                ]
+            },
+            {
+                "id": "Event_Buy",
+                "name": "TicketTags_BuyButton",
+                "gridArea": "btnbuy",
+                "controlType": "checkbox",
+                "ctrls": [
+                    {
+                        "id": "TicketTags_BuyButton-TicketTags_BuyButton",
+                        "name": "TicketTags_BuyButton",
+                        "selected": true
+                    }
+                ]
+            }
+        ],
+        "resolutionStates": {
+            "1089 Test Grid Generator": [
+                {
+                    "rows": 4,
+                    "cols": 8,
+                    "justifyContent": "center",
+                    "alignItems": "center",
+                    "rowHeights": [
+                        "max-content",
+                        "1fr",
+                        "1fr",
+                        "max-content"
+                    ],
+                    "areas": {
+                        "Event_Buy": {
+                            "id": "Event_Buy",
+                            "rowStart": 3,
+                            "rowEnd": 3,
+                            "colStart": 6,
+                            "colEnd": 7
+                        },
+                        "Event_Info": {
+                            "id": "Event_Info",
+                            "rowStart": 0,
+                            "rowEnd": 0,
+                            "colStart": 7,
+                            "colEnd": 7
+                        },
+                        "Event_Parking": {
+                            "id": "Event_Parking",
+                            "rowStart": 0,
+                            "rowEnd": 0,
+                            "colStart": 6,
+                            "colEnd": 6
+                        },
+                        "Event_Place": {
+                            "id": "Event_Place",
+                            "rowStart": 3,
+                            "rowEnd": 3,
+                            "colStart": 0,
+                            "colEnd": 4
+                        },
+                        "Event_NameAndLogo": {
+                            "id": "Event_NameAndLogo",
+                            "rowStart": 2,
+                            "rowEnd": 2,
+                            "colStart": 0,
+                            "colEnd": 7
+                        }
+                    },
+                    "gridMatrix": [
+                        [
+                            null,
+                            null,
+                            null,
+                            null,
+                            null,
+                            null,
+                            "Event_Parking",
+                            "Event_Info"
+                        ],
+                        [
+                            null,
+                            null,
+                            null,
+                            null,
+                            null,
+                            null,
+                            null,
+                            null
+                        ],
+                        [
+                            "Event_NameAndLogo",
+                            "Event_NameAndLogo",
+                            "Event_NameAndLogo",
+                            "Event_NameAndLogo",
+                            "Event_NameAndLogo",
+                            "Event_NameAndLogo",
+                            "Event_NameAndLogo",
+                            "Event_NameAndLogo"
+                        ],
+                        [
+                            "Event_Place",
+                            "Event_Place",
+                            "Event_Place",
+                            "Event_Place",
+                            "Event_Place",
+                            null,
+                            "Event_Buy",
+                            "Event_Buy"
+                        ]
+                    ],
+                    "finished": true
+                },
+                {
+                    "rows": 4,
+                    "cols": 11,
+                    "justifyContent": "center",
+                    "alignItems": "center",
+                    "rowHeights": [
+                        "max-content",
+                        "1fr",
+                        "1fr",
+                        "max-content"
+                    ],
+                    "areas": {
+                        "Event_Buy": {
+                            "id": "Event_Buy",
+                            "rowStart": 3,
+                            "rowEnd": 3,
+                            "colStart": 9,
+                            "colEnd": 10
+                        },
+                        "Event_Info": {
+                            "id": "Event_Info",
+                            "rowStart": 0,
+                            "rowEnd": 0,
+                            "colStart": 10,
+                            "colEnd": 10
+                        },
+                        "Event_Parking": {
+                            "id": "Event_Parking",
+                            "rowStart": 0,
+                            "rowEnd": 0,
+                            "colStart": 9,
+                            "colEnd": 9
+                        },
+                        "Event_NameAndLogo": {
+                            "id": "Event_NameAndLogo",
+                            "rowStart": 2,
+                            "rowEnd": 2,
+                            "colStart": 0,
+                            "colEnd": 10
+                        },
+                        "Event_Place": {
+                            "id": "Event_Place",
+                            "rowStart": 3,
+                            "rowEnd": 3,
+                            "colStart": 0,
+                            "colEnd": 6
+                        }
+                    },
+                    "gridMatrix": [
+                        [
+                            null,
+                            null,
+                            null,
+                            null,
+                            null,
+                            null,
+                            null,
+                            null,
+                            null,
+                            "Event_Parking",
+                            "Event_Info"
+                        ],
+                        [
+                            null,
+                            null,
+                            null,
+                            null,
+                            null,
+                            null,
+                            null,
+                            null,
+                            null,
+                            null,
+                            null
+                        ],
+                        [
+                            "Event_NameAndLogo",
+                            "Event_NameAndLogo",
+                            "Event_NameAndLogo",
+                            "Event_NameAndLogo",
+                            "Event_NameAndLogo",
+                            "Event_NameAndLogo",
+                            "Event_NameAndLogo",
+                            "Event_NameAndLogo",
+                            "Event_NameAndLogo",
+                            "Event_NameAndLogo",
+                            "Event_NameAndLogo"
+                        ],
+                        [
+                            "Event_Place",
+                            "Event_Place",
+                            "Event_Place",
+                            "Event_Place",
+                            "Event_Place",
+                            "Event_Place",
+                            "Event_Place",
+                            null,
+                            null,
+                            "Event_Buy",
+                            "Event_Buy"
+                        ]
+                    ],
+                    "finished": true
+                },
+                {
+                    "rows": 4,
+                    "cols": 24,
+                    "justifyContent": "center",
+                    "alignItems": "center",
+                    "rowHeights": [
+                        "max-content",
+                        "1fr",
+                        "1fr",
+                        "max-content"
+                    ],
+                    "areas": {
+                        "Event_NameAndLogo": {
+                            "id": "Event_NameAndLogo",
+                            "rowStart": 2,
+                            "rowEnd": 2,
+                            "colStart": 0,
+                            "colEnd": 15
+                        },
+                        "Event_Buy": {
+                            "id": "Event_Buy",
+                            "rowStart": 3,
+                            "rowEnd": 3,
+                            "colStart": 22,
+                            "colEnd": 23
+                        },
+                        "Event_Info": {
+                            "id": "Event_Info",
+                            "rowStart": 0,
+                            "rowEnd": 0,
+                            "colStart": 23,
+                            "colEnd": 23
+                        },
+                        "Event_Parking": {
+                            "id": "Event_Parking",
+                            "rowStart": 0,
+                            "rowEnd": 0,
+                            "colStart": 22,
+                            "colEnd": 22
+                        },
+                        "Event_Place": {
+                            "id": "Event_Place",
+                            "rowStart": 3,
+                            "rowEnd": 3,
+                            "colStart": 0,
+                            "colEnd": 11
+                        }
+                    },
+                    "gridMatrix": [
+                        [
+                            null,
+                            null,
+                            null,
+                            null,
+                            null,
+                            null,
+                            null,
+                            null,
+                            null,
+                            null,
+                            null,
+                            null,
+                            null,
+                            null,
+                            null,
+                            null,
+                            null,
+                            null,
+                            null,
+                            null,
+                            null,
+                            null,
+                            "Event_Parking",
+                            "Event_Info"
+                        ],
+                        [
+                            null,
+                            null,
+                            null,
+                            null,
+                            null,
+                            null,
+                            null,
+                            null,
+                            null,
+                            null,
+                            null,
+                            null,
+                            null,
+                            null,
+                            null,
+                            null,
+                            null,
+                            null,
+                            null,
+                            null,
+                            null,
+                            null,
+                            null,
+                            null
+                        ],
+                        [
+                            "Event_NameAndLogo",
+                            "Event_NameAndLogo",
+                            "Event_NameAndLogo",
+                            "Event_NameAndLogo",
+                            "Event_NameAndLogo",
+                            "Event_NameAndLogo",
+                            "Event_NameAndLogo",
+                            "Event_NameAndLogo",
+                            "Event_NameAndLogo",
+                            "Event_NameAndLogo",
+                            "Event_NameAndLogo",
+                            "Event_NameAndLogo",
+                            "Event_NameAndLogo",
+                            "Event_NameAndLogo",
+                            "Event_NameAndLogo",
+                            "Event_NameAndLogo",
+                            null,
+                            null,
+                            null,
+                            null,
+                            null,
+                            null,
+                            null,
+                            null
+                        ],
+                        [
+                            "Event_Place",
+                            "Event_Place",
+                            "Event_Place",
+                            "Event_Place",
+                            "Event_Place",
+                            "Event_Place",
+                            "Event_Place",
+                            "Event_Place",
+                            "Event_Place",
+                            "Event_Place",
+                            "Event_Place",
+                            "Event_Place",
+                            null,
+                            null,
+                            null,
+                            null,
+                            null,
+                            null,
+                            null,
+                            null,
+                            null,
+                            null,
+                            "Event_Buy",
+                            "Event_Buy"
+                        ]
+                    ],
+                    "finished": true
+                },
+                {
+                    "rows": 4,
+                    "cols": 16,
+                    "justifyContent": "center",
+                    "alignItems": "center",
+                    "rowHeights": [
+                        "max-content",
+                        "1fr",
+                        "1fr",
+                        "max-content"
+                    ],
+                    "areas": {
+                        "Event_Buy": {
+                            "id": "Event_Buy",
+                            "rowStart": 3,
+                            "rowEnd": 3,
+                            "colStart": 13,
+                            "colEnd": 14
+                        },
+                        "Event_Place": {
+                            "id": "Event_Place",
+                            "rowStart": 3,
+                            "rowEnd": 3,
+                            "colStart": 0,
+                            "colEnd": 8
+                        },
+                        "Event_NameAndLogo": {
+                            "id": "Event_NameAndLogo",
+                            "rowStart": 2,
+                            "rowEnd": 2,
+                            "colStart": 0,
+                            "colEnd": 10
+                        },
+                        "Event_Info": {
+                            "id": "Event_Info",
+                            "rowStart": 0,
+                            "rowEnd": 0,
+                            "colStart": 15,
+                            "colEnd": 15
+                        },
+                        "Event_Parking": {
+                            "id": "Event_Parking",
+                            "rowStart": 3,
+                            "rowEnd": 3,
+                            "colStart": 15,
+                            "colEnd": 15
+                        }
+                    },
+                    "gridMatrix": [
+                        [
+                            null,
+                            null,
+                            null,
+                            null,
+                            null,
+                            null,
+                            null,
+                            null,
+                            null,
+                            null,
+                            null,
+                            null,
+                            null,
+                            null,
+                            null,
+                            "Event_Info"
+                        ],
+                        [
+                            null,
+                            null,
+                            null,
+                            null,
+                            null,
+                            null,
+                            null,
+                            null,
+                            null,
+                            null,
+                            null,
+                            null,
+                            null,
+                            null,
+                            null,
+                            null
+                        ],
+                        [
+                            "Event_NameAndLogo",
+                            "Event_NameAndLogo",
+                            "Event_NameAndLogo",
+                            "Event_NameAndLogo",
+                            "Event_NameAndLogo",
+                            "Event_NameAndLogo",
+                            "Event_NameAndLogo",
+                            "Event_NameAndLogo",
+                            "Event_NameAndLogo",
+                            "Event_NameAndLogo",
+                            "Event_NameAndLogo",
+                            null,
+                            null,
+                            null,
+                            null,
+                            null
+                        ],
+                        [
+                            "Event_Place",
+                            "Event_Place",
+                            "Event_Place",
+                            "Event_Place",
+                            "Event_Place",
+                            "Event_Place",
+                            "Event_Place",
+                            "Event_Place",
+                            "Event_Place",
+                            null,
+                            null,
+                            null,
+                            null,
+                            "Event_Buy",
+                            "Event_Buy",
+                            "Event_Parking"
+                        ]
+                    ],
+                    "finished": true
+                }
+            ]
+        },
+        "layoutDefinitions": {
+            "1089 Test Grid Generator": {
+                "id": 1089,
+                "width": 1536,
+                "type": "Main Page",
+                "sizes": [
+                    {
+                        "width": 512,
+                        "height": 640,
+                        "type": "grid"
+                    },
+                    {
+                        "width": 672,
+                        "height": 840,
+                        "type": "mobile"
+                    },
+                    {
+                        "width": 1536,
+                        "height": 576,
+                        "type": "custom"
+                    },
+                    {
+                        "width": 1024,
+                        "height": 640,
+                        "type": "custom"
+                    }
+                ]
+            }
+        }
+    }
+}

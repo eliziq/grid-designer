@@ -1,0 +1,50 @@
+<style>
+	.element-test {
+		background-color: rgb(172, 203, 174);
+		padding: 8px;
+		margin: 8px;
+	}
+	.grid-test {
+		display: grid;
+		height: 70vh;
+		grid-template-columns: repeat(6, 1fr);
+		grid-template-rows: max-content 1fr 1fr max-content;
+		align-items: stretch;
+		justify-items: stretch;
+		grid-template-areas:
+			"area1 area1 area1 area3 area3 area3"
+			"area2 area2 area2 area3 area3 area3"
+			"area4 area4 area4 area5 area5 area5"
+			"area6 area6 area6 area6 area6 area6";
+		background-color: lightgray;
+		padding: 8px;
+		margin: 8px;
+	}
+	.area1 {
+		grid-area: area1;
+	}
+	.area2 {
+		grid-area: area2;
+	}
+	.area3 {
+		grid-area: area3;
+	}
+	.area4 {
+		grid-area: area4;
+	}
+	.area5 {
+		grid-area: area5;
+	}
+	.area6 {
+		grid-area: area6;
+	}
+</style>
+
+<section class="grid-test">
+	<div class="element-test area1"><div>complex nested element</div></div>
+	<div class="element-test area2">random text1</div>
+	<button class="element-test area3">random text2</button>
+	<p class="element-test area4">random text3</p>
+	<span class="element-test area5">random text4</span>
+	<div class="element-test area6">random text5</div>
+</section>
