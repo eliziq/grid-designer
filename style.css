@@ -112,6 +112,8 @@
 	height: auto;
 	aspect-ratio: var(--grid-aspect-ratio, 16 / 10);
 	overflow: hidden;
+	--area-preview-justify: center;
+	--area-preview-align: center;
 }
 .grid-layer {
 	position: absolute;
@@ -140,6 +142,7 @@
 	user-select: none;
 	position: relative;
 	overflow: hidden;
+	padding: 6px;
 }
 .cell.assigned {
 	background: #e6efff;
@@ -159,8 +162,8 @@
 	position: relative;
 	z-index: 10;
 	display: flex;
-	align-items: center;
-	justify-content: center;
+	align-items: var(--area-preview-align);
+	justify-content: var(--area-preview-justify);
 	align-self: stretch;
 	justify-self: stretch;
 	min-width: 0;
@@ -179,7 +182,7 @@
 .area-block__label {
 	max-width: 100%;
 	min-width: 0;
-	padding: 0 26px 0 6px;
+	padding: 4px 26px 4px 6px;
 	white-space: pre-wrap;
 	overflow-wrap: normal;
 	word-break: normal;

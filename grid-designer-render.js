@@ -4,10 +4,31 @@ GridDesigner.generateAreaColor = function (id) {
 };
 
 Object.assign(GridDesigner.prototype, {
+	normalizePreviewAlignment(value, axis) {
+		const raw = String(value || "").trim();
+		const fallback = axis === "justify" ? "center" : "center";
+		if (!raw) return fallback;
+		if (raw === "start") return "flex-start";
+		if (raw === "end") return "flex-end";
+		if (raw === "center") return "center";
+		if (raw === "stretch") return "stretch";
+		if (axis === "justify" && raw.startsWith("space-")) return raw;
+		return fallback;
+	},
+
+	applyGridAlignmentPreview() {
+		if (!this.grid) return;
+		const justify = this.normalizePreviewAlignment(this.state.justifyContent, "justify");
+		const align = this.normalizePreviewAlignment(this.state.alignItems, "align");
+		this.grid.style.setProperty("--area-preview-justify", justify);
+		this.grid.style.setProperty("--area-preview-align", align);
+	},
+
 	applyGridBaseStyles() {
 		if (!this.grid) return;
 		this.grid.style.aspectRatio = `${this.gridWidth} / ${this.gridHeight}`;
 		this.grid.style.minHeight = "auto";
+		this.applyGridAlignmentPreview();
 		this.updateGridScaling();
 	},
 
@@ -74,6 +95,7 @@ Object.assign(GridDesigner.prototype, {
 					layer.style.gridTemplateRows = gridTemplateRows;
 				});
 			}
+			this.applyGridAlignmentPreview();
 		};
 		window.setTimeout(lateReapply, 120);
 	},

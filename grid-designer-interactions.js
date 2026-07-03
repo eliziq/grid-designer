@@ -145,6 +145,7 @@ Object.assign(GridDesigner.prototype, {
 	handleGridAlignmentChange() {
 		this.state.justifyContent = this.getJustifyContentControlValue();
 		this.state.alignItems = this.getAlignItemsControlValue();
+		this.applyGridAlignmentPreview();
 		this.updateCssPreview();
 	},
 
