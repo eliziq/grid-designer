@@ -1,4 +1,14 @@
 Object.assign(GridDesigner.prototype, {
+	normalizeGridItemAlignmentValue(value, axis) {
+		const raw = String(value || "").trim();
+		if (raw === "start") return "start";
+		if (raw === "end") return "end";
+		if (raw === "center") return "center";
+		if (raw === "stretch") return "center";
+		if (axis === "justify" && raw.startsWith("space-")) return "center";
+		return "center";
+	},
+
 	generateGridTemplate(state, indent = "") {
 		const areaNameById = new Map(
 			(this.state.elements || []).map((element) => [
@@ -26,11 +36,21 @@ Object.assign(GridDesigner.prototype, {
 			`${indent}display: grid;`,
 			`${indent}grid-template-columns: repeat(${cols}, 1fr);`,
 			`${indent}grid-template-rows: ${rowHeights.join(" ")};`,
-			`${indent}justify-content: ${state?.justifyContent || "center"};`,
-			`${indent}align-items: ${state?.alignItems || "center"};`,
 			`${indent}gap: 8px;`,
 			`${indent}grid-template-areas:`,
 			`${areaLines};`,
+		].join("\n");
+	},
+
+	renderGridItemAlignmentRule(rootSelector, state, indent = "") {
+		const justifySelf = this.normalizeGridItemAlignmentValue(state?.justifyContent, "justify");
+		const alignSelf = this.normalizeGridItemAlignmentValue(state?.alignItems, "align");
+
+		return [
+			`${indent}${rootSelector} > * {`,
+			`${indent}  justify-self: ${justifySelf};`,
+			`${indent}  align-self: ${alignSelf};`,
+			`${indent}}`,
 		].join("\n");
 	},
 
@@ -92,6 +112,7 @@ Object.assign(GridDesigner.prototype, {
 			`${indent}${rootSelector} {`,
 			this.generateGridTemplate(resolution.state, `${indent}  `),
 			`${indent}}`,
+			this.renderGridItemAlignmentRule(rootSelector, resolution.state, indent),
 		].join("\n");
 	},
 
@@ -186,9 +207,7 @@ Object.assign(GridDesigner.prototype, {
 			? `[layoutid="${group.layoutId}"] ${cardSelector}`
 			: cardSelector;
 		if (!state) return "";
-		const baseRule = [`${rootSelector} {`, this.generateGridTemplate(state, "  "), "}"].join(
-			"\n",
-		);
+		const baseRule = this.renderCssResolutionBlock(rootSelector, singleResolution);
 		if (singleResolution?.type === "mobile") {
 			return ["@media (max-width: 800px) {", baseRule.replace(/^/gm, "  "), "}"].join("\n");
 		}

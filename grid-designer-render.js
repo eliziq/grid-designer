@@ -11,8 +11,8 @@ Object.assign(GridDesigner.prototype, {
 		if (raw === "start") return "flex-start";
 		if (raw === "end") return "flex-end";
 		if (raw === "center") return "center";
-		if (raw === "stretch") return "stretch";
-		if (axis === "justify" && raw.startsWith("space-")) return raw;
+		if (raw === "stretch") return "center";
+		if (axis === "justify" && raw.startsWith("space-")) return "center";
 		return fallback;
 	},
 
@@ -116,7 +116,7 @@ Object.assign(GridDesigner.prototype, {
 				this.areaColors[area.id] ||
 				(this.areaColors[area.id] = GridDesigner.generateAreaColor(area.id));
 			block.style.borderColor = color;
-			block.style.background = "rgba(100, 160, 255, 0.2)";
+			block.style.background = "hsl(220 20% 76% / 0.16)";
 			block.style.boxShadow = `0 0 0 1px ${color}`;
 
 			const label = document.createElement("span");

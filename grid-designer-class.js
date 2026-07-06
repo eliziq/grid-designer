@@ -9,8 +9,8 @@ class GridDesigner {
 		this.state = {
 			rows: 4,
 			cols: 24,
-			justifyContent: "stretch",
-			alignItems: "stretch",
+			justifyContent: "center",
+			alignItems: "center",
 			areas: {},
 			rowHeights: Array(4).fill("1fr"),
 			gridMatrix: [],
