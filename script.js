@@ -1,6 +1,8 @@
 ﻿(function () {
 	const scriptsToLoad = [
 		"grid-designer-class.js",
+		"confirm-dialog.js",
+		"grid-designer-complex-tags.js",
 		"grid-designer-state.js",
 		"grid-designer-resolutions.js",
 		"grid-designer-css.js",

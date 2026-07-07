@@ -2,7 +2,7 @@ Object.assign(GridDesigner.prototype, {
 	attachEditorListeners() {
 		if (this.editorReady) return;
 		if (this.buildGridButton)
-			this.buildGridButton.addEventListener("click", this.handleBuildGrid.bind(this));
+			this.buildGridButton.addEventListener("click", this.confirmBuildGrid.bind(this));
 		this.bindJustifyContentControlChange(this.handleGridAlignmentChange.bind(this));
 		this.bindAlignItemsControlChange(this.handleGridAlignmentChange.bind(this));
 		if (this.clearGridButton)
@@ -124,6 +124,22 @@ Object.assign(GridDesigner.prototype, {
 		this.tagSelectionLocked = true;
 		this.renderTagSelectionPanel();
 		this.refreshWorkspaceView();
+	},
+
+	confirmBuildGrid() {
+		const hasPlacedAreas = Object.keys(this.state?.areas || {}).length > 0;
+		if (!hasPlacedAreas) {
+			this.handleBuildGrid();
+			return;
+		}
+
+		const message = `Are you sure you want to rebuild the grid? All current areas will be cleared.`;
+		const onConfirm = async () => {
+			this.handleBuildGrid();
+		};
+
+		const confirmDialog = new ConfirmDialog(message, onConfirm);
+		confirmDialog.open();
 	},
 
 	handleBuildGrid() {
