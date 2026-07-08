@@ -1,0 +1,362 @@
+{
+	"id": "2",
+	"currentLayoutName": "101 Main Page",
+	"currentResolutionIndex": 4,
+	"elements": [
+		{
+			"id": "Event_NameAndLogo",
+			"name": "Event_NameAndLogo, Event_NameAndLogo",
+			"gridArea": "nameemblem",
+			"controlType": "checkbox",
+			"ctrls": [
+				{
+					"id": "Event_NameAndLogo, Event_NameAndLogo-Event_NameAndLogo",
+					"name": "Event_NameAndLogo",
+					"selected": false
+				},
+				{
+					"id": "Event_NameAndLogo, Event_NameAndLogo-Event_NameAndLogo",
+					"name": "Event_NameAndLogo",
+					"selected": false
+				}
+			]
+		},
+		{
+			"id": "Event_Buy",
+			"name": "Event_Buy",
+			"gridArea": "btnbuy",
+			"controlType": "checkbox",
+			"ctrls": [
+				{
+					"id": "Event_Buy-Event_Buy",
+					"name": "Event_Buy",
+					"selected": false
+				}
+			]
+		},
+		{
+			"id": "Event_Date",
+			"name": "Event_Date",
+			"gridArea": "boxdates",
+			"controlType": "radio",
+			"ctrls": [
+				{
+					"id": "Event_Date, Event_Date, Event_Date-Event_Date",
+					"name": "Event_Date",
+					"selected": true
+				},
+				{
+					"id": "Event_Date, Event_Date, Event_Date-Event_Date",
+					"name": "Event_Date",
+					"selected": false
+				},
+				{
+					"id": "Event_Date, Event_Date, Event_Date-Event_Date",
+					"name": "Event_Date",
+					"selected": false
+				}
+			]
+		}
+	],
+	"resolutionStates": {
+		"101 Main Page": [
+			{
+				"rows": 4,
+				"cols": 8,
+				"justifyContent": "center",
+				"alignItems": "center",
+				"rowHeights": ["1fr", "1fr", "1fr", "1fr"],
+				"areas": {},
+				"gridMatrix": [
+					[null, null, null, null, null, null, null, null],
+					[null, null, null, null, null, null, null, null],
+					[null, null, null, null, null, null, null, null],
+					[null, null, null, null, null, null, null, null]
+				],
+				"finished": false
+			},
+			{
+				"rows": 4,
+				"cols": 10,
+				"justifyContent": "center",
+				"alignItems": "center",
+				"rowHeights": ["1fr", "1fr", "1fr", "1fr"],
+				"areas": {},
+				"gridMatrix": [
+					[null, null, null, null, null, null, null, null, null, null],
+					[null, null, null, null, null, null, null, null, null, null],
+					[null, null, null, null, null, null, null, null, null, null],
+					[null, null, null, null, null, null, null, null, null, null]
+				],
+				"finished": false
+			},
+			{
+				"rows": 4,
+				"cols": 24,
+				"justifyContent": "center",
+				"alignItems": "center",
+				"rowHeights": ["1fr", "1fr", "1fr", "1fr"],
+				"areas": {},
+				"gridMatrix": [
+					[
+						null,
+						null,
+						null,
+						null,
+						null,
+						null,
+						null,
+						null,
+						null,
+						null,
+						null,
+						null,
+						null,
+						null,
+						null,
+						null,
+						null,
+						null,
+						null,
+						null,
+						null,
+						null,
+						null,
+						null
+					],
+					[
+						null,
+						null,
+						null,
+						null,
+						null,
+						null,
+						null,
+						null,
+						null,
+						null,
+						null,
+						null,
+						null,
+						null,
+						null,
+						null,
+						null,
+						null,
+						null,
+						null,
+						null,
+						null,
+						null,
+						null
+					],
+					[
+						null,
+						null,
+						null,
+						null,
+						null,
+						null,
+						null,
+						null,
+						null,
+						null,
+						null,
+						null,
+						null,
+						null,
+						null,
+						null,
+						null,
+						null,
+						null,
+						null,
+						null,
+						null,
+						null,
+						null
+					],
+					[
+						null,
+						null,
+						null,
+						null,
+						null,
+						null,
+						null,
+						null,
+						null,
+						null,
+						null,
+						null,
+						null,
+						null,
+						null,
+						null,
+						null,
+						null,
+						null,
+						null,
+						null,
+						null,
+						null,
+						null
+					]
+				],
+				"finished": false
+			},
+			{
+				"rows": 4,
+				"cols": 16,
+				"justifyContent": "center",
+				"alignItems": "center",
+				"rowHeights": ["1fr", "1fr", "1fr", "1fr"],
+				"areas": {},
+				"gridMatrix": [
+					[
+						null,
+						null,
+						null,
+						null,
+						null,
+						null,
+						null,
+						null,
+						null,
+						null,
+						null,
+						null,
+						null,
+						null,
+						null,
+						null
+					],
+					[
+						null,
+						null,
+						null,
+						null,
+						null,
+						null,
+						null,
+						null,
+						null,
+						null,
+						null,
+						null,
+						null,
+						null,
+						null,
+						null
+					],
+					[
+						null,
+						null,
+						null,
+						null,
+						null,
+						null,
+						null,
+						null,
+						null,
+						null,
+						null,
+						null,
+						null,
+						null,
+						null,
+						null
+					],
+					[
+						null,
+						null,
+						null,
+						null,
+						null,
+						null,
+						null,
+						null,
+						null,
+						null,
+						null,
+						null,
+						null,
+						null,
+						null,
+						null
+					]
+				],
+				"finished": false
+			},
+			{
+				"rows": 2,
+				"cols": 3,
+				"justifyContent": "center",
+				"alignItems": "center",
+				"rowHeights": ["1fr", "1fr"],
+				"areas": {
+					"Event_NameAndLogo": {
+						"id": "Event_NameAndLogo",
+						"rowStart": 0,
+						"rowEnd": 0,
+						"colStart": 0,
+						"colEnd": 2
+					},
+					"Event_Date": {
+						"id": "Event_Date",
+						"rowStart": 1,
+						"rowEnd": 1,
+						"colStart": 0,
+						"colEnd": 0
+					},
+					"Event_Buy": {
+						"id": "Event_Buy",
+						"rowStart": 1,
+						"rowEnd": 1,
+						"colStart": 1,
+						"colEnd": 2
+					}
+				},
+				"gridMatrix": [
+					["Event_NameAndLogo", "Event_NameAndLogo", "Event_NameAndLogo"],
+					["Event_Date", "Event_Buy", "Event_Buy"]
+				],
+				"finished": true
+			}
+		]
+	},
+	"layoutDefinitions": {
+		"101 Main Page": {
+			"id": 101,
+			"width": 1664,
+			"type": "Main Page",
+			"sizes": [
+				{
+					"width": 552,
+					"height": 690,
+					"type": "grid"
+				},
+				{
+					"width": 672,
+					"height": 756,
+					"type": "mobile"
+				},
+				{
+					"width": 1656,
+					"height": 621,
+					"type": "custom"
+				},
+				{
+					"width": 1104,
+					"height": 690,
+					"type": "custom"
+				},
+				{
+					"width": 1656,
+					"height": 483,
+					"type": "custom"
+				}
+			]
+		}
+	}
+}

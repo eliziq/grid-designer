@@ -51,6 +51,7 @@ Object.assign(GridDesigner.prototype, {
 		};
 
 		if (mode === "move") {
+			const existingArea = this.state.areas[id] || {};
 			const startPointerX = this.resizeState.startPointerX;
 			const startPointerY = this.resizeState.startPointerY;
 			const desiredColShift = snapDelta(pointerX - startPointerX, stepX);
@@ -72,6 +73,7 @@ Object.assign(GridDesigner.prototype, {
 			}
 
 			this.state.areas[id] = {
+				...existingArea,
 				id,
 				rowStart: shiftedArea.rowStart,
 				rowEnd: shiftedArea.rowEnd,
@@ -119,6 +121,7 @@ Object.assign(GridDesigner.prototype, {
 		}
 
 		this.state.areas[id] = {
+			...this.state.areas[id],
 			id,
 			rowStart,
 			rowEnd,
@@ -133,6 +136,7 @@ Object.assign(GridDesigner.prototype, {
 
 	handleAreaPointerDown(event) {
 		if (event.target.closest(".area-block__label")) return;
+		if (event.target.closest(".area-layout-controls")) return;
 		event.preventDefault();
 		event.stopPropagation();
 		if (event.button !== 0) return;
@@ -162,13 +166,12 @@ Object.assign(GridDesigner.prototype, {
 
 		this.handlePointerMoveBound = this.handlePointerMove.bind(this);
 		window.addEventListener("pointermove", this.handlePointerMoveBound);
-		document.body.style.cursor =
-			moveMode
-				? "grabbing"
-				: edge.top || edge.bottom
-					? "ns-resize"
-					: edge.left || edge.right
-						? "ew-resize"
-						: "default";
+		document.body.style.cursor = moveMode
+			? "grabbing"
+			: edge.top || edge.bottom
+				? "ns-resize"
+				: edge.left || edge.right
+					? "ew-resize"
+					: "default";
 	},
 });

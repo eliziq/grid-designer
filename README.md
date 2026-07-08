@@ -20,6 +20,7 @@ Simple vanilla JavaScript grid designer for quickly prototyping CSS grid layouts
 - `grid-designer-css.js` – CSS generation logic for finished resolution states
 - `grid-designer-layout.js` – Grid geometry and area conflict/layout helpers
 - `grid-designer-render.js` – Rendering logic for grid, areas, controls, and scaling
+- `grid-designer-tag-layout-controls.js` – Per-area content alignment controls and override behavior
 - `grid-designer-tag-panel.js` – Tag selection panel rendering
 - `grid-designer-interactions.js` – Event handlers and interaction flow
 - `grid-designer-pointer.js` – Pointer move/resize interaction handlers for area blocks

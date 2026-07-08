@@ -8,6 +8,8 @@
 		"grid-designer-css.js",
 		"grid-designer-layout.js",
 		"grid-designer-render.js",
+		"grid-designer-area-layout-controls-class.js",
+		"grid-designer-tag-layout-controls.js",
 		"grid-designer-tag-panel.js",
 		"grid-designer-interactions.js",
 		"grid-designer-pointer.js",

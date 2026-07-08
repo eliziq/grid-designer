@@ -15,6 +15,14 @@ Object.assign(GridDesigner.prototype, {
 			this.loadDesignButton.addEventListener("click", () => this.importStateInput?.click());
 		if (this.importStateInput)
 			this.importStateInput.addEventListener("change", this.handleImportJson.bind(this));
+		this.containerElement.addEventListener(
+			"click",
+			this.handleAreaLayoutControlClick.bind(this),
+		);
+		this.containerElement.addEventListener(
+			"change",
+			this.handleAreaLayoutControlChange.bind(this),
+		);
 		this.containerElement.addEventListener("click", this.handleTagSelectionClick.bind(this));
 		this.containerElement.addEventListener("change", this.handleTagSelectionChange.bind(this));
 		window.addEventListener("resize", this.handleResize.bind(this));
@@ -162,6 +170,7 @@ Object.assign(GridDesigner.prototype, {
 		this.state.justifyContent = this.getJustifyContentControlValue();
 		this.state.alignItems = this.getAlignItemsControlValue();
 		this.applyGridAlignmentPreview();
+		this.syncAreaLayoutControls?.();
 		this.updateCssPreview();
 	},
 

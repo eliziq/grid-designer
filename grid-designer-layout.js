@@ -27,13 +27,21 @@ Object.assign(GridDesigner.prototype, {
 
 	assignArea(id, r0, c0, r1, c1) {
 		this.ensureGridMatrixIntegrity();
+		const existingArea = this.state.areas[id] || {};
 		const rowStart = Math.min(r0, r1);
 		const rowEnd = Math.max(r0, r1);
 		const colStart = Math.min(c0, c1);
 		const colEnd = Math.max(c0, c1);
 		if (this.hasConflict(rowStart, colStart, rowEnd, colEnd, id)) return false;
 		this.removeArea(id);
-		this.state.areas[id] = { id, rowStart, rowEnd, colStart, colEnd };
+		this.state.areas[id] = {
+			...existingArea,
+			id,
+			rowStart,
+			rowEnd,
+			colStart,
+			colEnd,
+		};
 		for (let r = rowStart; r <= rowEnd; r++) {
 			for (let c = colStart; c <= colEnd; c++) {
 				this.state.gridMatrix[r][c] = id;

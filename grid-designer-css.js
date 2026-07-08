@@ -1,12 +1,56 @@
 Object.assign(GridDesigner.prototype, {
-	normalizeGridItemAlignmentValue(value, axis) {
-		const raw = String(value || "").trim();
-		if (raw === "start") return "start";
-		if (raw === "end") return "end";
-		if (raw === "center") return "center";
-		if (raw === "stretch") return "center";
-		if (axis === "justify" && raw.startsWith("space-")) return "center";
-		return "center";
+	cssEscapeString(value) {
+		return String(value || "")
+			.replace(/\\/g, "\\\\")
+			.replace(/"/g, '\\"');
+	},
+
+	buildAreaContentSelector(rootSelector, gridAreaName) {
+		const escapedGridArea = this.cssEscapeString(gridAreaName);
+		return `${rootSelector} > [data-grid-area="${escapedGridArea}"]`;
+	},
+
+	renderAreaSpecificContentRules(rootSelector, state, indent = "") {
+		const areas = state?.areas || {};
+		const elementsById = new Map(
+			(this.state.elements || []).map((element) => [String(element.id), element]),
+		);
+		const globalJustify = state?.justifyContent || "center";
+		const globalAlign = state?.alignItems || "center";
+
+		const rules = Object.entries(areas)
+			.map(([areaId, area]) => {
+				if (!area || typeof area !== "object") return "";
+
+				const hasJustify = Object.prototype.hasOwnProperty.call(area, "justifyContent");
+				const hasAlign = Object.prototype.hasOwnProperty.call(area, "alignItems");
+				if (!hasJustify && !hasAlign) return "";
+
+				const config = this.getAreaLayoutConfig(area, state);
+				const mappedElement = elementsById.get(String(areaId));
+				const gridAreaName = mappedElement?.gridArea || mappedElement?.id || areaId;
+				const selector = this.buildAreaContentSelector(rootSelector, gridAreaName);
+
+				const lines = [`${indent}${selector} {`];
+				if (hasJustify) {
+					const localJustify = config.justifyContent || "center";
+					if (localJustify !== globalJustify) {
+						lines.push(`${indent}  justify-self: ${localJustify};`);
+					}
+				}
+				if (hasAlign) {
+					const localAlign = config.alignItems || "center";
+					if (localAlign !== globalAlign) {
+						lines.push(`${indent}  align-self: ${localAlign};`);
+					}
+				}
+				if (lines.length === 1) return "";
+				lines.push(`${indent}}`);
+				return lines.join("\n");
+			})
+			.filter(Boolean);
+
+		return rules.join("\n");
 	},
 
 	generateGridTemplate(state, indent = "") {
@@ -43,15 +87,7 @@ Object.assign(GridDesigner.prototype, {
 	},
 
 	renderGridItemAlignmentRule(rootSelector, state, indent = "") {
-		const justifySelf = this.normalizeGridItemAlignmentValue(state?.justifyContent, "justify");
-		const alignSelf = this.normalizeGridItemAlignmentValue(state?.alignItems, "align");
-
-		return [
-			`${indent}${rootSelector} > * {`,
-			`${indent}  justify-self: ${justifySelf};`,
-			`${indent}  align-self: ${alignSelf};`,
-			`${indent}}`,
-		].join("\n");
+		return this.renderAreaSpecificContentRules(rootSelector, state, indent);
 	},
 
 	buildCssRangeQuery(atRule, items, idx, dimension = "width") {
@@ -108,12 +144,20 @@ Object.assign(GridDesigner.prototype, {
 	},
 
 	renderCssResolutionBlock(rootSelector, resolution, indent = "") {
+		const justifyItems = resolution?.state?.justifyContent || "center";
+		const alignItems = resolution?.state?.alignItems || "center";
+		const areaOverrides = this.renderGridItemAlignmentRule(rootSelector, resolution.state, indent);
+
 		return [
 			`${indent}${rootSelector} {`,
 			this.generateGridTemplate(resolution.state, `${indent}  `),
+			`${indent}  justify-items: ${justifyItems};`,
+			`${indent}  align-items: ${alignItems};`,
 			`${indent}}`,
-			this.renderGridItemAlignmentRule(rootSelector, resolution.state, indent),
-		].join("\n");
+			areaOverrides,
+		]
+			.filter(Boolean)
+			.join("\n");
 	},
 
 	renderCssHeightBlocks(rootSelector, resolutions, indent = "") {

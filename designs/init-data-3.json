@@ -728,7 +728,7 @@
 					"cols": 24,
 					"justifyContent": "center",
 					"alignItems": "center",
-					"rowHeights": ["1fr", "1fr", "1fr", "1fr"],
+					"rowHeights": ["1fr", "max-content", "1fr", "1fr"],
 					"areas": {
 						"Membership_ProductName": {
 							"id": "Membership_ProductName",

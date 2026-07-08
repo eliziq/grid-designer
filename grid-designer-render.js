@@ -4,22 +4,17 @@ GridDesigner.generateAreaColor = function (id) {
 };
 
 Object.assign(GridDesigner.prototype, {
-	normalizePreviewAlignment(value, axis) {
+	normalizePreviewAlignment(value) {
 		const raw = String(value || "").trim();
-		const fallback = axis === "justify" ? "center" : "center";
-		if (!raw) return fallback;
 		if (raw === "start") return "flex-start";
 		if (raw === "end") return "flex-end";
-		if (raw === "center") return "center";
-		if (raw === "stretch") return "center";
-		if (axis === "justify" && raw.startsWith("space-")) return "center";
-		return fallback;
+		return "center";
 	},
 
 	applyGridAlignmentPreview() {
 		if (!this.grid) return;
-		const justify = this.normalizePreviewAlignment(this.state.justifyContent, "justify");
-		const align = this.normalizePreviewAlignment(this.state.alignItems, "align");
+		const justify = this.normalizePreviewAlignment(this.state.justifyContent);
+		const align = this.normalizePreviewAlignment(this.state.alignItems);
 		this.grid.style.setProperty("--area-preview-justify", justify);
 		this.grid.style.setProperty("--area-preview-align", align);
 	},
@@ -118,6 +113,7 @@ Object.assign(GridDesigner.prototype, {
 			block.style.borderColor = color;
 			block.style.background = "hsl(220 20% 76% / 0.16)";
 			block.style.boxShadow = `0 0 0 1px ${color}`;
+			this.applyAreaLayoutPreviewStyles(block, area);
 
 			const label = document.createElement("span");
 			label.className = "area-block__label";
@@ -140,7 +136,11 @@ Object.assign(GridDesigner.prototype, {
 			const removeButton = document.createElement("button");
 			removeButton.type = "button";
 			removeButton.className = "area-block__remove";
-			removeButton.textContent = "\u00D7";
+			const removeIcon = document.createElement("span");
+			removeIcon.className = "material-symbols-outlined";
+			removeIcon.setAttribute("aria-hidden", "true");
+			removeIcon.textContent = "close";
+			removeButton.appendChild(removeIcon);
 			removeButton.title = "Remove from grid";
 			removeButton.addEventListener("pointerdown", (e) => {
 				e.preventDefault();
@@ -152,6 +152,8 @@ Object.assign(GridDesigner.prototype, {
 				this.handleRemoveTagFromGrid(area.id);
 			});
 			block.appendChild(removeButton);
+
+			block.appendChild(this.createAreaLayoutControls(area));
 
 			block.addEventListener("pointerdown", this.handleAreaPointerDown.bind(this));
 			block.addEventListener("pointermove", (e) => {
