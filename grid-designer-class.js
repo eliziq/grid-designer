@@ -60,7 +60,6 @@ class GridDesigner {
 		this.unfinishedDesignNotice = this.q("unfinishedDesignNotice");
 		this.gridWrapper = this.q("gridWrapper");
 		this.resolutionTabs = this.q("resolutionTabs");
-		this.rowControls = this.q("controlsContainer");
 		this.mainMaxWidthSelect = this.q("mainMaxWidth");
 		this.tagSelectionPanel = this.q("tagSelectionPanel");
 		this.tagSelectorList = this.q("tagSelectorList");

@@ -131,6 +131,44 @@
 	z-index: 2;
 	pointer-events: none;
 }
+.grid-layer--row-heights {
+	z-index: 3;
+	pointer-events: none;
+}
+.row-height-cell {
+	position: relative;
+	pointer-events: none;
+}
+.row-height-btn {
+	position: absolute;
+	left: 6px;
+	top: 50%;
+	transform: translateY(-50%);
+	pointer-events: auto;
+	background: rgba(255, 255, 255, 0.9);
+	border: 1px solid #8fa0d1;
+	border-radius: 4px;
+	font-size: 0.7rem;
+	font-weight: 700;
+	color: #1a2b6f;
+	padding: 2px 7px;
+	cursor: pointer;
+	line-height: 1.5;
+	z-index: 4;
+	transition:
+		background 0.15s,
+		border-color 0.15s;
+	white-space: nowrap;
+}
+.row-height-btn:hover {
+	background: #dce8ff;
+	border-color: #3c6edc;
+}
+.row-height-btn--max {
+	background: rgba(220, 232, 255, 0.95);
+	border-color: #3c6edc;
+	color: #1a2b6f;
+}
 .cell {
 	pointer-events: auto;
 	border: 1px dashed #bbb;
@@ -413,35 +451,6 @@
 #tagSelectionEdit:hover {
 	background: #3367d1;
 }
-#rowControls {
-	margin-top: 1rem;
-	padding: 1rem;
-	border: 1px solid #ddd;
-	border-radius: 6px;
-	background: #f5f5f5;
-}
-
-#rowControls h3 {
-	margin: 0 0 0.75rem 0;
-	font-size: 0.95rem;
-	color: #333;
-}
-
-#rowControls label {
-	display: flex;
-	gap: 0.5rem;
-	align-items: center;
-	margin-bottom: 0.5rem;
-}
-
-#rowControls label span {
-	min-width: 60px;
-}
-
-#rowControls select {
-	min-width: 120px;
-}
-
 #output {
 	margin-top: 0.5rem;
 }

@@ -27,8 +27,16 @@ Object.assign(GridDesigner.prototype, {
 		this.updateGridScaling();
 	},
 
+	getGridTemplateRows() {
+		return Array.from({ length: this.state.rows }, (_, rowIndex) => {
+			const rowHeight = this.state.rowHeights[rowIndex] || "1fr";
+			return rowHeight === "max-content" ? "minmax(46px, max-content)" : "minmax(60px, 1fr)";
+		}).join(" ");
+	},
+
 	refreshGridView() {
 		this.renderGrid();
+		this.renderRowControls();
 		this.renderElementList();
 		this.renderTagSelectionPanel();
 		this.updateCssPreview();
@@ -55,7 +63,7 @@ Object.assign(GridDesigner.prototype, {
 		this.grid.innerHTML = "";
 		this.applyGridBaseStyles();
 		const gridTemplateColumns = `repeat(${this.state.cols}, 1fr)`;
-		const gridTemplateRows = `repeat(${this.state.rows}, minmax(60px, 1fr))`;
+		const gridTemplateRows = this.getGridTemplateRows();
 		const cellLayer = document.createElement("div");
 		cellLayer.className = "grid-layer grid-layer--cells";
 		cellLayer.style.gridTemplateColumns = gridTemplateColumns;
@@ -180,44 +188,50 @@ Object.assign(GridDesigner.prototype, {
 	},
 
 	renderRowControls() {
-		const existingControls = this.rowControls.querySelectorAll("label");
-		if (existingControls) existingControls.forEach((el) => el.remove());
-		const controlsContainer = this.rowControls;
+		if (!this.grid) return;
 
-		const options = [
-			{ value: "1fr", label: "Flexible (1fr)" },
-			{ value: "max-content", label: "Content height" },
-			{ value: "min-content", label: "Min content" },
-			{ value: "auto", label: "Auto" },
-		];
+		const existingLayer = this.grid.querySelector(".grid-layer--row-heights");
+		if (existingLayer) existingLayer.remove();
+
+		const gridTemplateColumns = `repeat(${this.state.cols}, 1fr)`;
+		const gridTemplateRows = this.getGridTemplateRows();
+
+		const layer = document.createElement("div");
+		layer.className = "grid-layer grid-layer--row-heights";
+		layer.style.gridTemplateColumns = gridTemplateColumns;
+		layer.style.gridTemplateRows = gridTemplateRows;
 
 		for (let i = 0; i < this.state.rows; i++) {
-			const rowControl = document.createElement("label");
-			const label = document.createElement("span");
-			label.textContent = `Row ${i + 1}:`;
-			const select = document.createElement("select");
-			select.dataset.rowIndex = i;
+			const cell = document.createElement("div");
+			cell.className = "row-height-cell";
+			cell.style.gridRow = String(i + 1);
+			cell.style.gridColumn = "1 / -1";
 
-			options.forEach((option) => {
-				const optionEl = document.createElement("option");
-				optionEl.value = option.value;
-				optionEl.textContent = option.label;
-				if (this.state.rowHeights[i] === option.value) {
-					optionEl.selected = true;
-				}
-				select.appendChild(optionEl);
+			const currentValue = this.state.rowHeights[i] || "1fr";
+			const isMax = currentValue === "max-content";
+
+			const btn = document.createElement("button");
+			btn.type = "button";
+			btn.className = "row-height-btn" + (isMax ? " row-height-btn--max" : "");
+			btn.dataset.rowIndex = String(i);
+			btn.textContent = isMax ? "max-c" : "1fr";
+			btn.title = isMax
+				? "Row height: max-content — click to set 1fr"
+				: "Row height: 1fr — click to set max-content";
+
+			btn.addEventListener("click", (e) => {
+				e.stopPropagation();
+				const rowIndex = parseInt(btn.dataset.rowIndex, 10);
+				this.state.rowHeights[rowIndex] =
+					this.state.rowHeights[rowIndex] === "max-content" ? "1fr" : "max-content";
+				this.refreshGridView();
 			});
 
-			select.addEventListener("change", (e) => {
-				const rowIndex = parseInt(e.target.dataset.rowIndex, 10);
-				this.state.rowHeights[rowIndex] = e.target.value;
-				this.updateCssPreview();
-			});
-
-			rowControl.appendChild(label);
-			rowControl.appendChild(select);
-			controlsContainer.appendChild(rowControl);
+			cell.appendChild(btn);
+			layer.appendChild(cell);
 		}
+
+		this.grid.appendChild(layer);
 	},
 
 	renderElementList() {
