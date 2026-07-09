@@ -8,7 +8,7 @@ class GridDesigner {
 
 		this.state = {
 			rows: 4,
-			cols: 24,
+			cols: 12,
 			justifyContent: "center",
 			alignItems: "center",
 			areas: {},

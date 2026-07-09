@@ -341,10 +341,10 @@ Object.assign(GridDesigner.prototype, {
 		if (isMobile) return 12;
 
 		const resolutionWidth = Number(res?.width) || layoutWidth;
-		if (!layoutWidth) return 24;
+		if (!layoutWidth) return 12;
 
-		const ratioBasedCols = Math.round((resolutionWidth / layoutWidth) * 24);
-		return Math.max(1, Math.min(24, ratioBasedCols));
+		const ratioBasedCols = Math.round((resolutionWidth / layoutWidth) * 12);
+		return Math.max(1, Math.min(12, ratioBasedCols));
 	},
 
 	createDefaultResolutionState(res, layoutName = this.state.currentLayoutName) {

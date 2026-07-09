@@ -12,8 +12,8 @@
 		align-items: stretch;
 		justify-items: stretch;
 		grid-template-areas:
-			"area1 area1 area1 area3 area3 area3"
-			"area2 area2 area2 area3 area3 area3"
+			"area1 area1 area1 area-3 area-3 area-3"
+			"area2 area2 area2 area-3 area-3 area-3"
 			"area4 area4 area4 area5 area5 area5"
 			"area6 area6 area6 area6 area6 area6";
 		background-color: lightgray;
@@ -26,8 +26,8 @@
 	.area2 {
 		grid-area: area2;
 	}
-	.area3 {
-		grid-area: area3;
+	.area-3 {
+		grid-area: area-3;
 	}
 	.area4 {
 		grid-area: area4;
@@ -38,12 +38,15 @@
 	.area6 {
 		grid-area: area6;
 	}
+	.grid-test > [style*="grid-area: area1"] {
+		background-color: rgb(255, 0, 0);
+	}
 </style>
 
 <section class="grid-test">
 	<div class="element-test area1"><div>complex nested element</div></div>
 	<div class="element-test area2">random text1</div>
-	<button class="element-test area3">random text2</button>
+	<button class="element-test area-3">random text2</button>
 	<p class="element-test area4">random text3</p>
 	<span class="element-test area5">random text4</span>
 	<div class="element-test area6">random text5</div>

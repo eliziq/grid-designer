@@ -3,6 +3,7 @@
 		"grid-designer-class.js",
 		"confirm-dialog.js",
 		"grid-designer-state.js",
+		"grid-designer-tag-sync.js",
 		"grid-designer-resolutions.js",
 		"grid-designer-css.js",
 		"grid-designer-layout.js",
