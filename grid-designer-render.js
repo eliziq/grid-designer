@@ -88,6 +88,7 @@ Object.assign(GridDesigner.prototype, {
 		this.grid.appendChild(cellLayer);
 		this.grid.appendChild(overlayLayer);
 		this.renderAreas(overlayLayer);
+		this.renderRowControls();
 		const lateReapply = () => {
 			if (!this.grid?.isConnected || !this.gridWrapper?.isConnected) this.cacheDomElements();
 			this.applyGridBaseStyles();
