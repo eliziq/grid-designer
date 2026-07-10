@@ -211,8 +211,7 @@ Object.assign(GridDesigner.prototype, {
 			const currentValue = this.state.rowHeights[i] || "1fr";
 			const isMax = currentValue === "max-content";
 
-			const btn = document.createElement("button");
-			btn.type = "button";
+			const btn = document.createElement("span");
 			btn.className = "row-height-btn" + (isMax ? " row-height-btn--max" : "");
 			btn.dataset.rowIndex = String(i);
 			btn.textContent = isMax ? "max-c" : "1fr";
@@ -253,32 +252,32 @@ Object.assign(GridDesigner.prototype, {
 		}
 
 		const placedIds = new Set(Object.keys(this.state.areas || {}));
+
+		const fragment = document.createDocumentFragment();
+
 		this.state.elements.forEach((element) => {
-			const tag = document.createElement("div");
 			const isPlaced = placedIds.has(element.id);
-			tag.className = `element-tag ${isPlaced ? "placed" : "pending"}`;
-			tag.draggable = true;
-			tag.title = isPlaced ? "Placed on grid" : "Still needs placement";
-
-			const icon = document.createElement("span");
-			icon.className = "material-symbols-outlined";
-			icon.textContent = "drag_indicator";
-
-			const label = document.createElement("span");
-			label.textContent = element.name;
-
-			tag.appendChild(icon);
-			tag.appendChild(label);
 
 			if (!this.areaColors[element.id]) {
 				this.areaColors[element.id] = GridDesigner.generateAreaColor(element.id);
 			}
-			tag.style.borderColor = this.areaColors[element.id];
-			tag.addEventListener("dragstart", (e) => {
-				e.dataTransfer.setData("text/plain", element.id);
-			});
-			this.elementList.appendChild(tag);
+
+			const tag = new TagComponent({
+				id: element.id,
+				name: element.name,
+				color: this.areaColors[element.id],
+				isPlaced,
+				onDragStart: (e) => {
+					e.dataTransfer.setData("text/plain", element.id);
+				},
+			}).toElement();
+
+			if (tag) {
+				fragment.appendChild(tag);
+			}
 		});
+
+		this.elementList.appendChild(fragment);
 	},
 
 	updateGridScaling() {

@@ -101,29 +101,23 @@ Object.assign(GridDesigner.prototype, {
 				".resolution-group-options",
 			);
 			if (!currentGroupOptions) return;
-
-			const label = document.createElement("label");
-			const radio = document.createElement("input");
 			const isActive = index === this.state.currentResolutionIndex;
 			const resolutionState = this.getResolutionState(index);
 			const isFinished = Boolean(resolutionState?.finished);
-			label.classList.toggle("active", isActive);
-			label.classList.toggle("finished", isFinished);
 
-			radio.type = "radio";
-			radio.name = "resolution";
-			radio.value = index;
-			radio.checked = isActive;
+			const option = new ResolutionOptionComponent({
+				index,
+				width: res.width,
+				height: res.height,
+				isActive,
+				isFinished,
+				onChange: () => {
+					this.setCurrentResolution(res);
+				},
+			}).toElement();
 
-			radio.addEventListener("change", () => {
-				this.setCurrentResolution(res);
-			});
-
-			label.appendChild(radio);
-			label.appendChild(document.createTextNode(` ${res.width}x${res.height}`));
-
-			if (currentGroupOptions) {
-				currentGroupOptions.appendChild(label);
+			if (option) {
+				currentGroupOptions.appendChild(option);
 			}
 		});
 

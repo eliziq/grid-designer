@@ -1,4 +1,4 @@
-class GridDesignerAreaLayoutControls {
+class AreaControlsComponent {
 	constructor(areaId, config = {}) {
 		this.areaId = String(areaId || "");
 		this.config = {
@@ -16,10 +16,10 @@ class GridDesignerAreaLayoutControls {
 	}
 
 	buildRadio(groupName, fieldName, option, selected) {
-		const areaId = GridDesignerAreaLayoutControls.escapeAttr(this.areaId);
-		const value = GridDesignerAreaLayoutControls.escapeAttr(option.value);
-		const icon = GridDesignerAreaLayoutControls.escapeAttr(option.icon);
-		const title = GridDesignerAreaLayoutControls.escapeAttr(option.title);
+		const areaId = AreaControlsComponent.escapeAttr(this.areaId);
+		const value = AreaControlsComponent.escapeAttr(option.value);
+		const icon = AreaControlsComponent.escapeAttr(option.icon);
+		const title = AreaControlsComponent.escapeAttr(option.title);
 		const checked = selected ? "checked" : "";
 
 		return `
@@ -39,7 +39,7 @@ class GridDesignerAreaLayoutControls {
 	}
 
 	buildField(fieldName, title, options, value) {
-		const areaId = GridDesignerAreaLayoutControls.escapeAttr(this.areaId);
+		const areaId = AreaControlsComponent.escapeAttr(this.areaId);
 		const groupName = `area-${fieldName}-${areaId}`;
 		const optionsHtml = options
 			.map((option) => this.buildRadio(groupName, fieldName, option, option.value === value))
@@ -56,7 +56,7 @@ class GridDesignerAreaLayoutControls {
 	}
 
 	render() {
-		const areaId = GridDesignerAreaLayoutControls.escapeAttr(this.areaId);
+		const areaId = AreaControlsComponent.escapeAttr(this.areaId);
 		const justifyHtml = this.buildField(
 			"justifyContent",
 			"Justify content",

@@ -27,7 +27,7 @@ Object.assign(GridDesigner.prototype, {
 		const config = this.getAreaLayoutConfig(area);
 		const areaId = String(area?.id || "");
 
-		const controls = new GridDesignerAreaLayoutControls(areaId, config).toElement();
+		const controls = new AreaControlsComponent(areaId, config).toElement();
 		return controls || document.createElement("div");
 	},
 
