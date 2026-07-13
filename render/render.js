@@ -110,80 +110,29 @@ Object.assign(GridDesigner.prototype, {
 
 		Object.values(this.state.areas).forEach((area) => {
 			const element = this.state.elements.find((el) => el.id === area.id);
-			const block = document.createElement("div");
-			block.className = "area-block";
-			block.draggable = false;
-			block.dataset.areaId = area.id;
-			block.style.gridColumn = `${area.colStart + 1} / ${area.colEnd + 2}`;
-			block.style.gridRow = `${area.rowStart + 1} / ${area.rowEnd + 2}`;
 			const color =
 				this.areaColors[area.id] ||
 				(this.areaColors[area.id] = GridDesigner.generateAreaColor(area.id));
-			block.style.borderColor = color;
-			block.style.background = "hsl(220 20% 76% / 0.16)";
-			block.style.boxShadow = `0 0 0 1px ${color}`;
+
+			const block = new AreaBlockComponent({
+				area,
+				displayName: element ? element.name : area.id,
+				color,
+				onLabelInput: (areaId, value) => {
+					this.handleAreaLabelInput(areaId, value);
+				},
+				onRemove: (areaId) => {
+					this.handleRemoveTagFromGrid(areaId);
+				},
+				onPointerDown: this.handleAreaPointerDown.bind(this),
+				resolveEdge: (event, blockEl) => this.isEdgePosition(event, blockEl),
+				onDrop: this.handleDrop.bind(this),
+				createControlsElement: (sourceArea) => this.createAreaLayoutControls(sourceArea),
+			}).toElement();
+
+			if (!block) return;
+
 			this.applyAreaLayoutPreviewStyles(block, area);
-
-			const label = document.createElement("span");
-			label.className = "area-block__label";
-			label.setAttribute("contenteditable", "true");
-			label.setAttribute("spellcheck", "false");
-			label.textContent = area.label ?? (element ? element.name : area.id);
-			label.addEventListener("pointerdown", (e) => {
-				e.stopPropagation();
-			});
-			label.addEventListener("paste", (e) => {
-				e.preventDefault();
-				const text = e.clipboardData?.getData("text/plain") || "";
-				document.execCommand("insertText", false, text);
-			});
-			label.addEventListener("input", () => {
-				this.handleAreaLabelInput(area.id, label.innerText || "");
-			});
-			block.appendChild(label);
-
-			const removeButton = document.createElement("button");
-			removeButton.type = "button";
-			removeButton.className = "area-block__remove";
-			const removeIcon = document.createElement("span");
-			removeIcon.className = "material-symbols-outlined";
-			removeIcon.setAttribute("aria-hidden", "true");
-			removeIcon.textContent = "close";
-			removeButton.appendChild(removeIcon);
-			removeButton.title = "Remove from grid";
-			removeButton.addEventListener("pointerdown", (e) => {
-				e.preventDefault();
-				e.stopPropagation();
-			});
-			removeButton.addEventListener("click", (e) => {
-				e.preventDefault();
-				e.stopPropagation();
-				this.handleRemoveTagFromGrid(area.id);
-			});
-			block.appendChild(removeButton);
-
-			block.appendChild(this.createAreaLayoutControls(area));
-
-			block.addEventListener("pointerdown", this.handleAreaPointerDown.bind(this));
-			block.addEventListener("pointermove", (e) => {
-				const edge = this.isEdgePosition(e, block);
-				if (edge.edge) {
-					block.style.cursor = edge.left || edge.right ? "ew-resize" : "ns-resize";
-				} else {
-					block.style.cursor = "move";
-				}
-			});
-			block.addEventListener("pointerleave", () => {
-				block.style.cursor = "default";
-			});
-			block.addEventListener("dragstart", (e) => e.preventDefault());
-			block.addEventListener("selectstart", (e) => {
-				const target = e.target;
-				if (target instanceof Element && target.closest(".area-block__label")) return;
-				e.preventDefault();
-			});
-			block.addEventListener("dragover", (e) => e.preventDefault());
-			block.addEventListener("drop", this.handleDrop.bind(this));
 			host.appendChild(block);
 		});
 	},
