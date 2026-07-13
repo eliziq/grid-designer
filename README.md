@@ -12,20 +12,36 @@ Simple vanilla JavaScript grid designer for quickly prototyping CSS grid layouts
 ## Project files
 
 - `index.html` – UI skeleton
-- `style.css` – Base layout and cell styles
-- `script.js` – Entry point loader (loads all project scripts)
-- `grid-designer-class.js` – Core GridDesigner class + static normalization helpers
-- `grid-designer-state.js` – Shared state persistence and editor exports
-- `grid-designer-tag-sync.js` – Tag-state synchronization and area-pruning logic
-- `components/resolution-option-component.js` – Resolution option tab template component
-- `components/element-tag-component.js` – Element list tag template component
-- `grid-designer-resolutions.js` – Resolution lifecycle, import hydration, and selection UI
-- `grid-designer-css.js` – CSS generation logic for finished resolution states
-- `grid-designer-layout.js` – Grid geometry and area conflict/layout helpers
-- `grid-designer-render.js` – Rendering logic for grid, areas, controls, and scaling
-- `grid-designer-tag-layout-controls.js` – Per-area content alignment controls and override behavior
-- `grid-designer-tag-panel.js` – Tag selection panel rendering
-- `grid-designer-interactions.js` – Event handlers and interaction flow
-- `grid-designer-pointer.js` – Pointer move/resize interaction handlers for area blocks
-- `grid-designer-api.js` – Public `window.GridDesigner` API surface
-- `README.md` – Project instructions
+- `style.css` / `main.css` – Styles
+- `script.js` – Dynamic script loader (dev entry point)
+- `use-script.js` – Demo initialisation
+
+### core/
+- `core/class.js` – GridDesigner class definition, constructor, DOM cache, static helpers
+- `core/state.js` – State persistence and editor data exports
+- `core/tag-sync.js` – Tag-state synchronisation and area-pruning logic
+- `core/resolutions.js` – Resolution lifecycle, import hydration, and tab UI
+
+### components/
+- `components/confirm-dialog.js` – Reusable confirm dialog component
+- `components/resolution-option-component.js` – Resolution tab option template
+- `components/tag-component.js` – Element list tag template
+- `components/area-controls-component.js` – Per-area layout controls template
+
+### export/
+- `export/css-generator.js` – CSS output generation for finished resolution states
+
+### layout/
+- `layout/layout.js` – Grid geometry, area placement, conflict detection, pointer math
+
+### render/
+- `render/render.js` – Grid, area block, and element list rendering
+- `render/tag-panel.js` – Tag selection panel rendering
+- `render/tag-layout-controls.js` – Per-area alignment controls behaviour
+
+### interactions/
+- `interactions/interactions.js` – Editor event handlers (build, clear, import, export, tags)
+- `interactions/pointer.js` – Pointer move/resize/drop handlers for area blocks
+
+### api/
+- `api/api.js` – Public `window.GridDesigner` API surface
