@@ -15,7 +15,7 @@ function ensureEditorRoot() {
 
 async function replayInitSequence() {
 	ensureEditorRoot();
-	const design = await loadInitData("designs/init-data-3.json");
+	const design = await loadInitData("designs/init-data-4.json");
 	const init = (data) =>
 		window.GridDesigner.Init(editorCardId, data.layoutDefinitions, data.tags, {
 			...(data.state || {}),

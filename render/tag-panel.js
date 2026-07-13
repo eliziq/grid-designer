@@ -28,13 +28,15 @@ Object.assign(GridDesigner.prototype, {
 
 			const ctrls = tag.ctrls || [];
 			const isSubgroup = ctrls.length >= 2;
+			const hideParentCheckbox = isSubgroup && tag.controlType === "checkbox";
 
 			if (isSubgroup) {
 				const controlsMarkup = ctrls
 					.map((ctrl) => {
 						const inputType = tag.controlType === "radio" ? "radio" : "checkbox";
 						const checked = ctrl.selected ? "checked" : "";
-						const disabled = !tag.selected || isLocked ? "disabled" : "";
+						const disabled =
+							tag.controlType === "checkbox" ? isLocked : !tag.selected || isLocked;
 						const radioName = `tagctrl-${tag.id}`;
 						return `
 							<label class="tag-selector__ctrl">
@@ -51,19 +53,23 @@ Object.assign(GridDesigner.prototype, {
 					})
 					.join("");
 
-				item.innerHTML = `
-					<label class="tag-selector__tag">
-						<input
-							type="checkbox"
-							class="tag-selector__tag-check"
-							data-tag-id="${tag.id}"
-							${tag.selected ? "checked" : ""}
-							${isLocked ? "disabled" : ""}
-						/>
-						<span>${tag.name}</span>
-					</label>
-					<div class="tag-selector__ctrls">${controlsMarkup}</div>
-				`;
+				item.innerHTML = hideParentCheckbox
+					? `
+						<div class="tag-selector__ctrls">${controlsMarkup}</div>
+					`
+					: `
+						<label class="tag-selector__tag">
+							<input
+								type="checkbox"
+								class="tag-selector__tag-check"
+								data-tag-id="${tag.id}"
+								${tag.selected ? "checked" : ""}
+								${isLocked ? "disabled" : ""}
+							/>
+							<span>${tag.name}</span>
+						</label>
+						<div class="tag-selector__ctrls">${controlsMarkup}</div>
+					`;
 			} else {
 				item.innerHTML = `
 					<label class="tag-selector__tag">

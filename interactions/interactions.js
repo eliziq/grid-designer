@@ -33,6 +33,13 @@ Object.assign(GridDesigner.prototype, {
 	handleTagSelectionClick(event) {
 		const target = event.target;
 		if (!(target instanceof Element)) return;
+
+		const summary = target.closest("#tagSelectorDetails > summary");
+		if (summary) {
+			event.preventDefault();
+			if (target.id !== "tagSelectionSave" && target.id !== "tagSelectionEdit") return;
+		}
+
 		if (target.id === "tagSelectionSave") {
 			event.preventDefault();
 			this.handleSaveSelectedTags();
@@ -68,9 +75,11 @@ Object.assign(GridDesigner.prototype, {
 			const tag = this.allowedTags.find((item) => item.id === tagId);
 			if (!tag || tag.controlType !== "checkbox") return;
 
+			const tagCheckbox = tagItem.querySelector(".tag-selector__tag-check");
+			if (!tagCheckbox) return;
+
 			const controls = Array.from(tagItem.querySelectorAll(".tag-selector__ctrl input"));
 			const hasSelectedControl = controls.some((input) => input.checked);
-			const tagCheckbox = tagItem.querySelector(".tag-selector__tag-check");
 
 			if (!hasSelectedControl && tagCheckbox) {
 				tagCheckbox.checked = false;
@@ -89,8 +98,11 @@ Object.assign(GridDesigner.prototype, {
 			const tagItem = panel.querySelector(`.tag-selector__item[data-tag-id="${tag.id}"]`);
 			if (!tagItem) return { ...tag };
 
-			let isSelected = Boolean(tagItem.querySelector(".tag-selector__tag-check")?.checked);
 			const isSingleCtrl = (tag.ctrls || []).length <= 1;
+			const isCheckboxSubgroup = !isSingleCtrl && tag.controlType === "checkbox";
+			let isSelected = isCheckboxSubgroup
+				? false
+				: Boolean(tagItem.querySelector(".tag-selector__tag-check")?.checked);
 
 			let ctrls = (tag.ctrls || []).map((ctrl) => {
 				if (isSingleCtrl) {
@@ -102,6 +114,17 @@ Object.assign(GridDesigner.prototype, {
 					selected: isSelected ? Boolean(ctrlInput?.checked) : false,
 				};
 			});
+
+			if (isCheckboxSubgroup) {
+				ctrls = ctrls.map((ctrl) => {
+					const ctrlInput = tagItem.querySelector(`input[data-ctrl-id="${ctrl.id}"]`);
+					return {
+						...ctrl,
+						selected: Boolean(ctrlInput?.checked),
+					};
+				});
+				isSelected = ctrls.some((ctrl) => ctrl.selected);
+			}
 
 			if (!isSingleCtrl && tag.controlType === "checkbox" && isSelected && ctrls.length) {
 				isSelected = ctrls.some((ctrl) => ctrl.selected);
