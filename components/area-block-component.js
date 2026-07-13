@@ -3,8 +3,7 @@ class AreaBlockComponent {
 		this.area = config.area || null;
 		this.displayName = String(config.displayName || "");
 		this.color = String(config.color || "");
-		this.onLabelInput =
-			typeof config.onLabelInput === "function" ? config.onLabelInput : null;
+		this.onLabelInput = typeof config.onLabelInput === "function" ? config.onLabelInput : null;
 		this.onRemove = typeof config.onRemove === "function" ? config.onRemove : null;
 		this.onPointerDown =
 			typeof config.onPointerDown === "function" ? config.onPointerDown : null;
@@ -108,11 +107,14 @@ class AreaBlockComponent {
 		block.style.boxShadow = `0 0 0 1px ${this.color}`;
 
 		block.appendChild(this.createLabel(areaId));
-		block.appendChild(this.createRemoveButton(areaId));
+		const removeButton = this.createRemoveButton(areaId);
 
 		if (this.createControlsElement) {
 			const controls = this.createControlsElement(this.area);
-			if (controls) block.appendChild(controls);
+			if (controls) {
+				controls.appendChild(removeButton);
+				block.appendChild(controls);
+			}
 		}
 
 		this.attachBlockEvents(block);

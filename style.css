@@ -265,10 +265,13 @@
 }
 .area-layout-controls {
 	position: absolute;
-	top: 32px;
+	top: 2px;
 	right: 2px;
 	z-index: 3;
 	pointer-events: auto;
+	display: inline-flex;
+	align-items: center;
+	gap: 4px;
 }
 .area-layout-controls--open {
 	z-index: 20;
@@ -290,10 +293,15 @@
 	font-size: 16px;
 	line-height: 1;
 }
+.area-layout-controls .area-block__remove {
+	position: static;
+	top: auto;
+	right: auto;
+}
 .area-layout-controls__panel {
 	position: absolute;
 	top: -2px;
-	right: 26px;
+	right: calc(100% + 6px);
 	min-width: 164px;
 	padding: 0.5rem;
 	background: #eef2ff;

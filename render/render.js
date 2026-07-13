@@ -30,7 +30,7 @@ Object.assign(GridDesigner.prototype, {
 	getGridTemplateRows() {
 		return Array.from({ length: this.state.rows }, (_, rowIndex) => {
 			const rowHeight = this.state.rowHeights[rowIndex] || "1fr";
-			return rowHeight === "max-content" ? "minmax(46px, max-content)" : "minmax(60px, 1fr)";
+			return rowHeight === "max-content" ? "minmax(60px, max-content)" : "minmax(60px, 1fr)";
 		}).join(" ");
 	},
 
