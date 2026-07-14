@@ -62,6 +62,15 @@ class AreaBlockComponent {
 	}
 
 	attachBlockEvents(block) {
+		const isInsideLabel = (event) => {
+			const label = block.querySelector(".area-block__label");
+			if (!label) return false;
+			if (typeof event.composedPath === "function") {
+				return event.composedPath().includes(label);
+			}
+			return event.target instanceof Node ? label.contains(event.target) : false;
+		};
+
 		if (this.onPointerDown) {
 			block.addEventListener("pointerdown", this.onPointerDown);
 		}
@@ -82,8 +91,7 @@ class AreaBlockComponent {
 		});
 		block.addEventListener("dragstart", (event) => event.preventDefault());
 		block.addEventListener("selectstart", (event) => {
-			const target = event.target;
-			if (target instanceof Element && target.closest(".area-block__label")) return;
+			if (isInsideLabel(event)) return;
 			event.preventDefault();
 		});
 		block.addEventListener("dragover", (event) => event.preventDefault());
