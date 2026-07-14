@@ -98,12 +98,12 @@
 	border: 2px solid #656dff;
 	border-radius: 8px;
 	padding: 0.5rem;
-	overflow: hidden;
 	max-width: 100%;
 	display: block;
 	width: min(100%, calc(60vh * var(--grid-aspect-ratio, 1.6) + 20px));
 	margin-left: 0;
 	margin-top: 0;
+	container-type: inline-size;
 }
 #grid {
 	position: relative;
@@ -111,9 +111,9 @@
 	width: 100%;
 	height: auto;
 	aspect-ratio: var(--grid-aspect-ratio, 16 / 10);
-	overflow: hidden;
 	--area-preview-justify: center;
 	--area-preview-align: center;
+	--grid-row-min: 60px;
 }
 .grid-layer {
 	position: absolute;
@@ -326,6 +326,25 @@
 .area-layout-controls__panel .icon-radio-group {
 	width: fit-content;
 }
+
+@container (max-width: 920px) {
+	#grid {
+		--grid-row-min: 52px;
+	}
+}
+
+@container (max-width: 760px) {
+	#grid {
+		--grid-row-min: 44px;
+	}
+}
+
+@container (max-width: 560px) {
+	#grid {
+		--grid-row-min: 36px;
+	}
+}
+
 .area-block.edge-top,
 .area-block.edge-bottom {
 	cursor: ns-resize;
