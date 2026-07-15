@@ -2,8 +2,8 @@ class AreaControlsComponent {
 	constructor(areaId, config = {}) {
 		this.areaId = String(areaId || "");
 		this.config = {
-			justifyContent: config.justifyContent || "center",
-			alignItems: config.alignItems || "center",
+			justifyContent: config.justifyContent,
+			alignItems: config.alignItems,
 		};
 	}
 
@@ -61,6 +61,7 @@ class AreaControlsComponent {
 			"justifyContent",
 			"Justify content",
 			[
+				{ value: "__unset__", icon: "do_not_disturb_on", title: "Use global" },
 				{ value: "start", icon: "format_align_left", title: "Start" },
 				{ value: "center", icon: "format_align_center", title: "Center" },
 				{ value: "end", icon: "format_align_right", title: "End" },
@@ -71,6 +72,7 @@ class AreaControlsComponent {
 			"alignItems",
 			"Align items",
 			[
+				{ value: "__unset__", icon: "do_not_disturb_on", title: "Use global" },
 				{ value: "start", icon: "vertical_align_top", title: "Start" },
 				{ value: "center", icon: "vertical_align_center", title: "Center" },
 				{ value: "end", icon: "vertical_align_bottom", title: "End" },

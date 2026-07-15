@@ -49,8 +49,6 @@ Object.assign(GridDesigner.prototype, {
 			(this.state.elements || []).map((element) => [String(element.id), element]),
 		);
 		const tagsById = new Map((this.allowedTags || []).map((tag) => [String(tag.id), tag]));
-		const globalJustify = state?.justifyContent || "center";
-		const globalAlign = state?.alignItems || "center";
 
 		const rules = Object.entries(areas)
 			.map(([areaId, area]) => {
@@ -60,7 +58,7 @@ Object.assign(GridDesigner.prototype, {
 				const hasAlign = Object.prototype.hasOwnProperty.call(area, "alignItems");
 				if (!hasJustify && !hasAlign) return "";
 
-				const config = this.getAreaLayoutConfig(area, state);
+				const config = this.getAreaLayoutConfig(area);
 				const mappedElement = elementsById.get(String(areaId));
 				const mappedTag = tagsById.get(String(areaId));
 				const groupClass = this.resolveAreaClassName(mappedElement, mappedTag);
@@ -70,15 +68,11 @@ Object.assign(GridDesigner.prototype, {
 				const lines = [`${indent}${selector} {`];
 				if (hasJustify) {
 					const localJustify = config.justifyContent || "center";
-					if (localJustify !== globalJustify) {
-						lines.push(`${indent}  justify-self: ${localJustify};`);
-					}
+					lines.push(`${indent}  justify-self: ${localJustify};`);
 				}
 				if (hasAlign) {
 					const localAlign = config.alignItems || "center";
-					if (localAlign !== globalAlign) {
-						lines.push(`${indent}  align-self: ${localAlign};`);
-					}
+					lines.push(`${indent}  align-self: ${localAlign};`);
 				}
 				if (lines.length === 1) return "";
 				lines.push(`${indent}}`);

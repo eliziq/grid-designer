@@ -74,7 +74,6 @@ Object.assign(GridDesigner.prototype, {
 		overlayLayer.className = "grid-layer grid-layer--areas";
 		overlayLayer.style.gridTemplateColumns = gridTemplateColumns;
 		overlayLayer.style.gridTemplateRows = gridTemplateRows;
-		overlayLayer.setAttribute("aria-hidden", "true");
 		for (let r = 0; r < this.state.rows; r++) {
 			for (let c = 0; c < this.state.cols; c++) {
 				const cell = document.createElement("div");

@@ -1,22 +1,11 @@
 Object.assign(GridDesigner.prototype, {
-	getAreaLayoutConfig(area, fallbackState = this.state) {
+	getAreaLayoutConfig(area) {
 		const source = area && typeof area === "object" ? area : {};
-		const fallback = fallbackState && typeof fallbackState === "object" ? fallbackState : {};
 
 		return {
-			justifyContent: source.justifyContent ?? fallback.justifyContent ?? "center",
-			alignItems: source.alignItems ?? fallback.alignItems ?? "center",
+			justifyContent: source.justifyContent,
+			alignItems: source.alignItems,
 		};
-	},
-
-	getGlobalAreaLayoutValue(fieldName) {
-		if (fieldName === "justifyContent") {
-			return this.state?.justifyContent || "center";
-		}
-		if (fieldName === "alignItems") {
-			return this.state?.alignItems || "center";
-		}
-		return "center";
 	},
 
 	areaHasOwnProperty(area, key) {
@@ -121,14 +110,14 @@ Object.assign(GridDesigner.prototype, {
 
 		if (field === "justifyContent") {
 			const nextValue = target.value;
-			if (nextValue === this.getGlobalAreaLayoutValue("justifyContent")) {
+			if (nextValue === "__unset__") {
 				delete area.justifyContent;
 			} else {
 				area.justifyContent = nextValue;
 			}
 		} else if (field === "alignItems") {
 			const nextValue = target.value;
-			if (nextValue === this.getGlobalAreaLayoutValue("alignItems")) {
+			if (nextValue === "__unset__") {
 				delete area.alignItems;
 			} else {
 				area.alignItems = nextValue;
