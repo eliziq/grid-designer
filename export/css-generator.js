@@ -5,9 +5,42 @@ Object.assign(GridDesigner.prototype, {
 			.replace(/"/g, '\\"');
 	},
 
-	buildAreaContentSelector(rootSelector, gridAreaName) {
-		const escapedGridArea = this.cssEscapeString(gridAreaName);
-		return `${rootSelector} > [data-grid-area="${escapedGridArea}"]`;
+	cssEscapeClassName(value) {
+		const className = String(value || "")
+			.trim()
+			.replace(/^\.+/, "");
+		if (!className) return "";
+		if (typeof CSS !== "undefined" && typeof CSS.escape === "function") {
+			return CSS.escape(className);
+		}
+		return className.replace(/[^a-zA-Z0-9_-]/g, "\\$&");
+	},
+
+	resolveAreaClassName(mappedElement, mappedTag) {
+		const directGroupClass = mappedElement?.groupClass || mappedTag?.groupClass || "";
+		if (String(directGroupClass || "").trim()) {
+			return directGroupClass;
+		}
+
+		const elementCtrls = Array.isArray(mappedElement?.ctrls) ? mappedElement.ctrls : [];
+		if (elementCtrls.length === 1) {
+			const ctrlClass = elementCtrls[0]?.class;
+			if (String(ctrlClass || "").trim()) return ctrlClass;
+		}
+
+		const tagCtrls = Array.isArray(mappedTag?.ctrls) ? mappedTag.ctrls : [];
+		if (tagCtrls.length === 1) {
+			const ctrlClass = tagCtrls[0]?.class;
+			if (String(ctrlClass || "").trim()) return ctrlClass;
+		}
+
+		return "";
+	},
+
+	buildAreaContentSelector(rootSelector, groupClass) {
+		const escapedClass = this.cssEscapeClassName(groupClass);
+		if (!escapedClass) return "";
+		return `${rootSelector} > .${escapedClass}`;
 	},
 
 	renderAreaSpecificContentRules(rootSelector, state, indent = "") {
@@ -15,6 +48,7 @@ Object.assign(GridDesigner.prototype, {
 		const elementsById = new Map(
 			(this.state.elements || []).map((element) => [String(element.id), element]),
 		);
+		const tagsById = new Map((this.allowedTags || []).map((tag) => [String(tag.id), tag]));
 		const globalJustify = state?.justifyContent || "center";
 		const globalAlign = state?.alignItems || "center";
 
@@ -28,8 +62,10 @@ Object.assign(GridDesigner.prototype, {
 
 				const config = this.getAreaLayoutConfig(area, state);
 				const mappedElement = elementsById.get(String(areaId));
-				const gridAreaName = mappedElement?.gridArea || mappedElement?.id || areaId;
-				const selector = this.buildAreaContentSelector(rootSelector, gridAreaName);
+				const mappedTag = tagsById.get(String(areaId));
+				const groupClass = this.resolveAreaClassName(mappedElement, mappedTag);
+				const selector = this.buildAreaContentSelector(rootSelector, groupClass);
+				if (!selector) return "";
 
 				const lines = [`${indent}${selector} {`];
 				if (hasJustify) {
@@ -146,7 +182,11 @@ Object.assign(GridDesigner.prototype, {
 	renderCssResolutionBlock(rootSelector, resolution, indent = "") {
 		const justifyItems = resolution?.state?.justifyContent || "center";
 		const alignItems = resolution?.state?.alignItems || "center";
-		const areaOverrides = this.renderGridItemAlignmentRule(rootSelector, resolution.state, indent);
+		const areaOverrides = this.renderGridItemAlignmentRule(
+			rootSelector,
+			resolution.state,
+			indent,
+		);
 
 		return [
 			`${indent}${rootSelector} {`,

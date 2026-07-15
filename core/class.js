@@ -186,6 +186,7 @@ class GridDesigner {
 							: `Tag ${index + 1}`;
 			const controlType = tag.controlType === "radio" ? "radio" : "checkbox";
 			const gridArea = tag.gridArea != null ? String(tag.gridArea) : "";
+			const groupClass = tag.groupClass != null ? String(tag.groupClass) : "";
 			const ctrls = Array.isArray(tag.ctrls)
 				? tag.ctrls
 						.map((ctrl, ctrlIndex) =>
@@ -203,6 +204,7 @@ class GridDesigner {
 				id: String(tag.id ?? name ?? `tag_${index + 1}`),
 				name,
 				gridArea,
+				groupClass,
 				selected,
 				controlType,
 				ctrls,
@@ -217,6 +219,7 @@ class GridDesigner {
 		return {
 			id: String(ctrl.id ?? `${tagName}-${name}` ?? `ctrl_${index + 1}`),
 			name,
+			class: ctrl.class != null ? String(ctrl.class) : "",
 			tag: String(ctrl.tag || ""),
 			selected: GridDesigner.normalizeBoolean(ctrl.selected, false),
 		};
@@ -261,10 +264,12 @@ class GridDesigner {
 				id: tag.id,
 				name: this.getElementDisplayName(tag),
 				gridArea: tag.gridArea,
+				groupClass: tag.groupClass,
 				controlType: tag.controlType,
 				ctrls: (tag.ctrls || []).map((ctrl) => ({
 					id: ctrl.id,
 					name: ctrl.name,
+					class: ctrl.class,
 					selected: ctrl.selected,
 				})),
 			}));
