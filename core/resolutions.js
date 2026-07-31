@@ -47,29 +47,20 @@ Object.assign(GridDesigner.prototype, {
 	createResolutionTabs() {
 		if (!this.resolutionTabs) return;
 
-		const ensureGroup = (type, captionText) => {
+		const resolveResolutionGroupType = ({ type = "custom", device = "desktop" } = {}) => {
+			if (type === "custom") return device === "mobile" ? "custom-mobile" : "custom";
+			if (type === "grid" || type === "mobile") return type;
+			return device === "mobile" ? "mobile" : "grid";
+		};
+
+		const ensureGroup = (type) => {
 			let group = this.resolutionTabs.querySelector(`[data-resolution-type="${type}"]`);
-			let isNewGroup = false;
+
 			if (!group) {
-				isNewGroup = true;
 				group = document.createElement("div");
 				group.className = "resolution-group";
 				group.dataset.resolutionType = type;
-
-				const caption = document.createElement("div");
-				caption.className = "resolution-group-caption";
-				group.appendChild(caption);
-
-				const options = document.createElement("div");
-				options.className = "resolution-group-options";
-				group.appendChild(options);
-
 				this.resolutionTabs.appendChild(group);
-			}
-
-			const caption = group.querySelector(".resolution-group-caption");
-			if (caption && (isNewGroup || !caption.textContent.trim())) {
-				caption.textContent = captionText;
 			}
 
 			let options = group.querySelector(".resolution-group-options");
@@ -78,51 +69,54 @@ Object.assign(GridDesigner.prototype, {
 				options.className = "resolution-group-options";
 				group.appendChild(options);
 			}
-			options.innerHTML = "";
 
-			return group;
+			options.innerHTML = "";
+			return options;
 		};
 
 		const groups = {
-			grid: ensureGroup("grid", "GRID"),
-			mobile: ensureGroup("mobile", "MOBILE"),
-			custom: ensureGroup("custom", "CUSTOM"),
+			grid: ensureGroup("grid"),
+			mobile: ensureGroup("mobile"),
+			custom: ensureGroup("custom"),
+			"custom-mobile": ensureGroup("custom-mobile"),
 		};
 
 		const activeGroup = this.resolutions[this.state.currentLayoutName] || [];
 		let hasCustom = false;
+		let hasCustomMobile = false;
 
 		activeGroup.forEach((res, index) => {
-			const rawType = String(res?.type || "custom").toLowerCase();
-			const resolutionType =
-				rawType === "mobile" ? "mobile" : rawType === "custom" ? "custom" : "grid";
+			const resolutionType = resolveResolutionGroupType(res);
+
 			if (resolutionType === "custom") hasCustom = true;
-			const currentGroupOptions = groups[resolutionType]?.querySelector(
-				".resolution-group-options",
-			);
-			if (!currentGroupOptions) return;
+			if (resolutionType === "custom-mobile") hasCustomMobile = true;
+
+			const targetContainer = groups[resolutionType];
+			if (!targetContainer) return;
+
 			const isActive = index === this.state.currentResolutionIndex;
 			const resolutionState = this.getResolutionState(index);
-			const isFinished = Boolean(resolutionState?.finished);
 
 			const option = new ResolutionOptionComponent({
 				index,
 				width: res.width,
 				height: res.height,
 				isActive,
-				isFinished,
-				onChange: () => {
-					this.setCurrentResolution(res);
-				},
+				isFinished: Boolean(resolutionState?.finished),
+				onChange: () => this.setCurrentResolution(res),
 			}).toElement();
 
 			if (option) {
-				currentGroupOptions.appendChild(option);
+				targetContainer.appendChild(option);
 			}
 		});
 
-		if (!hasCustom && groups.custom) {
-			groups.custom.remove();
+
+		if (!hasCustom) {
+			groups.custom.closest(".resolution-group")?.remove();
+		}
+		if (!hasCustomMobile) {
+			groups["custom-mobile"].closest(".resolution-group")?.remove();
 		}
 
 		this.updateResolutionTabState();

@@ -1,0 +1,536 @@
+{
+	"id": "2",
+	"layoutDefinitions": {
+		"101 Main Page": {
+			"id": 101,
+			"width": 1664,
+			"type": "Main Page",
+			"sizes": [
+				{
+					"width": 552,
+					"height": 690,
+					"type": "grid",
+					"device": "desktop"
+				},
+				{
+					"width": 672,
+					"height": 756,
+					"type": "mobile",
+					"device": "mobile"
+				},
+				{
+					"width": 1656,
+					"height": 621,
+					"type": "custom",
+					"device": "desktop"
+				},
+				{
+					"width": 1104,
+					"height": 690,
+					"type": "custom",
+					"device": "desktop"
+				},
+				{
+					"width": 1656,
+					"height": 483,
+					"type": "custom",
+					"device": "desktop"
+				},
+				{
+					"width": 672,
+					"height": 336,
+					"type": "custom",
+					"device": "mobile"
+				}
+			]
+		}
+	},
+	"tags": [
+		{
+			"id": "Event_NameAndLogo",
+			"name": "TicketTags_Name, TicketTags_TeamsLogo",
+			"gridArea": "nameemblem",
+			"groupClass": "name-emblem",
+			"ctrls": [
+				{
+					"name": "TicketTags_Name",
+					"selected": "true",
+					"tag": "Name",
+					"class": "name"
+				},
+				{
+					"name": "TicketTags_TeamsLogo",
+					"selected": "false",
+					"tag": "TeamsLogo",
+					"class": "home-team away-team"
+				}
+			],
+			"controlType": "checkbox"
+		},
+		{
+			"id": "Event_Date",
+			"name": "TicketTags_Day, TicketTags_Hour, TicketTags_DisplayDate",
+			"gridArea": "boxdates",
+			"groupClass": "box-dates",
+			"ctrls": [
+				{
+					"name": "TicketTags_Day",
+					"selected": "true",
+					"tag": "Day",
+					"class": "day"
+				},
+				{
+					"name": "TicketTags_Hour",
+					"selected": "false",
+					"tag": "Hour",
+					"class": "hour"
+				},
+				{
+					"name": "TicketTags_DisplayDate",
+					"selected": "false",
+					"tag": "DisplayDate",
+					"class": "display-day"
+				}
+			],
+			"controlType": "radio"
+		},
+		{
+			"id": "Event_Place",
+			"name": "TicketTags_StadiumName, TicketTags_Place",
+			"gridArea": "boxplaces",
+			"groupClass": "box-places",
+			"ctrls": [
+				{
+					"name": "TicketTags_StadiumName",
+					"selected": "true",
+					"tag": "StadiumName",
+					"class": "stadium-name"
+				},
+				{
+					"name": "TicketTags_Place",
+					"selected": "false",
+					"tag": "Place",
+					"class": "place"
+				}
+			],
+			"controlType": "checkbox"
+		},
+		{
+			"id": "Event_DescriptionHeader",
+			"name": "TicketTags_DescriptionHeader",
+			"gridArea": "saleinfo",
+			"ctrls": [
+				{
+					"name": "TicketTags_DescriptionHeader",
+					"selected": "false",
+					"tag": "DescriptionHeader",
+					"class": "sale-info"
+				}
+			],
+			"controlType": "checkbox"
+		},
+		{
+			"id": "Event_ShortDescription",
+			"name": "TicketTags_ShortDescription",
+			"gridArea": "shortdsc",
+			"ctrls": [
+				{
+					"name": "TicketTags_ShortDescription",
+					"selected": "false",
+					"tag": "ShortDescription",
+					"class": "short-dsc"
+				}
+			],
+			"controlType": "checkbox"
+		},
+		{
+			"id": "Event_Tournament",
+			"name": "TicketTags_Tournament",
+			"gridArea": "tournament",
+			"ctrls": [
+				{
+					"name": "TicketTags_Tournament",
+					"selected": "false",
+					"tag": "Tournament",
+					"class": "tournament"
+				}
+			],
+			"controlType": "checkbox"
+		},
+		{
+			"id": "Event_Counter",
+			"name": "TicketTags_Counter",
+			"gridArea": "prodcnt",
+			"ctrls": [
+				{
+					"name": "TicketTags_Counter",
+					"selected": "false",
+					"tag": "Counter",
+					"class": "prod-cnt"
+				}
+			],
+			"controlType": "checkbox"
+		},
+		{
+			"id": "Event_Parking",
+			"name": "TicketTags_BuyUrlParking",
+			"gridArea": "btnparking",
+			"ctrls": [
+				{
+					"name": "TicketTags_BuyUrlParking",
+					"selected": "false",
+					"tag": "BuyUrlParking",
+					"class": "btn-park"
+				}
+			],
+			"controlType": "checkbox"
+		},
+		{
+			"id": "Event_Info",
+			"name": "TicketTags_InfoUrl",
+			"gridArea": "btninfo",
+			"ctrls": [
+				{
+					"name": "TicketTags_InfoUrl",
+					"selected": "false",
+					"tag": "InfoUrl",
+					"class": "btn-info"
+				}
+			],
+			"controlType": "checkbox"
+		},
+		{
+			"id": "Event_DefaultPrice",
+			"name": "TicketTags_DefaultPrice",
+			"gridArea": "defaultprice",
+			"ctrls": [
+				{
+					"name": "TicketTags_DefaultPrice",
+					"selected": "false",
+					"tag": "DefaultPrice",
+					"class": "default-price"
+				}
+			],
+			"controlType": "checkbox"
+		},
+		{
+			"id": "Event_Buy",
+			"name": "TicketTags_BuyButton",
+			"gridArea": "btnbuy",
+			"ctrls": [
+				{
+					"name": "TicketTags_BuyButton",
+					"selected": "true",
+					"tag": "BuyButton",
+					"class": "btn-buy"
+				}
+			],
+			"controlType": "checkbox"
+		}
+	],
+	"state": {
+		"id": "gridDesignerDemo",
+		"currentLayoutName": "101 Main Page",
+		"currentResolutionIndex": 3,
+		"elements": [
+			{
+				"id": "Event_NameAndLogo",
+				"name": "TicketTags_Name",
+				"gridArea": "nameemblem",
+				"groupClass": "name-emblem",
+				"controlType": "checkbox",
+				"ctrls": [
+					{
+						"id": "TicketTags_Name, TicketTags_TeamsLogo-TicketTags_Name",
+						"name": "TicketTags_Name",
+						"class": "name",
+						"selected": true
+					},
+					{
+						"id": "TicketTags_Name, TicketTags_TeamsLogo-TicketTags_TeamsLogo",
+						"name": "TicketTags_TeamsLogo",
+						"class": "home-team away-team",
+						"selected": false
+					}
+				]
+			},
+			{
+				"id": "Event_Date",
+				"name": "TicketTags_Day",
+				"gridArea": "boxdates",
+				"groupClass": "box-dates",
+				"controlType": "radio",
+				"ctrls": [
+					{
+						"id": "TicketTags_Day, TicketTags_Hour, TicketTags_DisplayDate-TicketTags_Day",
+						"name": "TicketTags_Day",
+						"class": "day",
+						"selected": true
+					},
+					{
+						"id": "TicketTags_Day, TicketTags_Hour, TicketTags_DisplayDate-TicketTags_Hour",
+						"name": "TicketTags_Hour",
+						"class": "hour",
+						"selected": false
+					},
+					{
+						"id": "TicketTags_Day, TicketTags_Hour, TicketTags_DisplayDate-TicketTags_DisplayDate",
+						"name": "TicketTags_DisplayDate",
+						"class": "display-day",
+						"selected": false
+					}
+				]
+			},
+			{
+				"id": "Event_Place",
+				"name": "TicketTags_StadiumName",
+				"gridArea": "boxplaces",
+				"groupClass": "box-places",
+				"controlType": "checkbox",
+				"ctrls": [
+					{
+						"id": "TicketTags_StadiumName, TicketTags_Place-TicketTags_StadiumName",
+						"name": "TicketTags_StadiumName",
+						"class": "stadium-name",
+						"selected": true
+					},
+					{
+						"id": "TicketTags_StadiumName, TicketTags_Place-TicketTags_Place",
+						"name": "TicketTags_Place",
+						"class": "place",
+						"selected": false
+					}
+				]
+			},
+			{
+				"id": "Event_Buy",
+				"name": "TicketTags_BuyButton",
+				"gridArea": "btnbuy",
+				"groupClass": "",
+				"controlType": "checkbox",
+				"ctrls": [
+					{
+						"id": "TicketTags_BuyButton-TicketTags_BuyButton",
+						"name": "TicketTags_BuyButton",
+						"class": "btn-buy",
+						"selected": true
+					}
+				]
+			}
+		],
+		"resolutionStates": {
+			"101 Main Page": [
+				{
+					"rows": 3,
+					"cols": 5,
+					"justifyContent": "center",
+					"alignItems": "end",
+					"rowHeights": ["1fr", "max-content", "max-content"],
+					"areas": {
+						"Event_NameAndLogo": {
+							"id": "Event_NameAndLogo",
+							"rowStart": 0,
+							"rowEnd": 0,
+							"colStart": 0,
+							"colEnd": 4
+						},
+						"Event_Date": {
+							"id": "Event_Date",
+							"rowStart": 2,
+							"rowEnd": 2,
+							"colStart": 0,
+							"colEnd": 1
+						},
+						"Event_Buy": {
+							"id": "Event_Buy",
+							"rowStart": 2,
+							"rowEnd": 2,
+							"colStart": 2,
+							"colEnd": 4
+						},
+						"Event_Place": {
+							"id": "Event_Place",
+							"rowStart": 1,
+							"rowEnd": 1,
+							"colStart": 0,
+							"colEnd": 4
+						}
+					},
+					"gridMatrix": [
+						[
+							"Event_NameAndLogo",
+							"Event_NameAndLogo",
+							"Event_NameAndLogo",
+							"Event_NameAndLogo",
+							"Event_NameAndLogo"
+						],
+						["Event_Place", "Event_Place", "Event_Place", "Event_Place", "Event_Place"],
+						["Event_Date", "Event_Date", "Event_Buy", "Event_Buy", "Event_Buy"]
+					],
+					"finished": true
+				},
+				{
+					"rows": 4,
+					"cols": 2,
+					"justifyContent": "center",
+					"alignItems": "center",
+					"rowHeights": ["1fr", "1fr", "1fr", "1fr"],
+					"areas": {},
+					"gridMatrix": [
+						[null, null],
+						[null, null],
+						[null, null],
+						[null, null]
+					],
+					"finished": false
+				},
+				{
+					"rows": 2,
+					"cols": 1,
+					"justifyContent": "center",
+					"alignItems": "center",
+					"rowHeights": ["1fr", "1fr"],
+					"areas": {
+						"Event_NameAndLogo": {
+							"id": "Event_NameAndLogo",
+							"rowStart": 0,
+							"rowEnd": 0,
+							"colStart": 0,
+							"colEnd": 0
+						},
+						"Event_Date": {
+							"id": "Event_Date",
+							"rowStart": 1,
+							"rowEnd": 1,
+							"colStart": 0,
+							"colEnd": 0
+						}
+					},
+					"gridMatrix": [["Event_NameAndLogo"], ["Event_Date"]],
+					"finished": false
+				},
+				{
+					"rows": 6,
+					"cols": 4,
+					"justifyContent": "center",
+					"alignItems": "center",
+					"rowHeights": [
+						"1fr",
+						"1fr",
+						"1fr",
+						"max-content",
+						"max-content",
+						"max-content"
+					],
+					"areas": {
+						"Event_Buy": {
+							"id": "Event_Buy",
+							"rowStart": 5,
+							"rowEnd": 5,
+							"colStart": 0,
+							"colEnd": 0,
+							"justifyContent": "start",
+							"alignItems": "start"
+						},
+						"Event_Date": {
+							"id": "Event_Date",
+							"rowStart": 4,
+							"rowEnd": 4,
+							"colStart": 0,
+							"colEnd": 1,
+							"justifyContent": "end",
+							"alignItems": "end"
+						},
+						"Event_Place": {
+							"id": "Event_Place",
+							"rowStart": 3,
+							"rowEnd": 3,
+							"colStart": 0,
+							"colEnd": 1,
+							"justifyContent": "end",
+							"alignItems": "start"
+						},
+						"Event_NameAndLogo": {
+							"id": "Event_NameAndLogo",
+							"rowStart": 1,
+							"rowEnd": 2,
+							"colStart": 0,
+							"colEnd": 3,
+							"justifyContent": "end",
+							"alignItems": "end"
+						}
+					},
+					"gridMatrix": [
+						[null, null, null, null],
+						[
+							"Event_NameAndLogo",
+							"Event_NameAndLogo",
+							"Event_NameAndLogo",
+							"Event_NameAndLogo"
+						],
+						[
+							"Event_NameAndLogo",
+							"Event_NameAndLogo",
+							"Event_NameAndLogo",
+							"Event_NameAndLogo"
+						],
+						["Event_Place", "Event_Place", null, null],
+						["Event_Date", "Event_Date", null, null],
+						["Event_Buy", null, null, null]
+					],
+					"finished": true
+				},
+				{
+					"rows": 4,
+					"cols": 6,
+					"justifyContent": "center",
+					"alignItems": "center",
+					"rowHeights": ["1fr", "1fr", "1fr", "1fr"],
+					"areas": {},
+					"gridMatrix": [
+						[null, null, null, null, null, null],
+						[null, null, null, null, null, null],
+						[null, null, null, null, null, null],
+						[null, null, null, null, null, null]
+					],
+					"finished": false
+				}
+			]
+		},
+		"layoutDefinitions": {
+			"101 Main Page": {
+				"id": 101,
+				"width": 1664,
+				"type": "Main Page",
+				"sizes": [
+					{
+						"width": 552,
+						"height": 690,
+						"type": "grid"
+					},
+					{
+						"width": 672,
+						"height": 756,
+						"type": "mobile"
+					},
+					{
+						"width": 1656,
+						"height": 621,
+						"type": "custom"
+					},
+					{
+						"width": 1104,
+						"height": 690,
+						"type": "custom"
+					},
+					{
+						"width": 1656,
+						"height": 483,
+						"type": "custom"
+					}
+				]
+			}
+		}
+	},
+	"initializedAt": "2026-07-14T10:06:05.880Z"
+}

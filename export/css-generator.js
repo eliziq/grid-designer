@@ -153,11 +153,13 @@ Object.assign(GridDesigner.prototype, {
 					const width = Number(res?.width);
 					const height = Number(res?.height);
 					if (!Number.isFinite(width) || !Number.isFinite(height)) return;
-					const type = String(res?.type || "custom");
-					resolutionsByPair.set(`${width}x${height}:${type}`, {
+					const type = res.type || "custom";
+					const device = res.device;
+					resolutionsByPair.set(`${width}x${height}:${type}:${device}`, {
 						width,
 						height,
 						type,
+						device,
 						state,
 					});
 				});
@@ -173,14 +175,23 @@ Object.assign(GridDesigner.prototype, {
 			.filter(Boolean);
 	},
 
-	renderCssResolutionBlock(rootSelector, resolution, indent = "") {
+	renderCssResolutionBlock(rootSelector, resolution, indent = "", areaOverrideMinWidth = null) {
 		const justifyItems = resolution?.state?.justifyContent || "center";
 		const alignItems = resolution?.state?.alignItems || "center";
-		const areaOverrides = this.renderGridItemAlignmentRule(
+		const rawAreaOverrides = this.renderGridItemAlignmentRule(
 			rootSelector,
 			resolution.state,
 			indent,
 		);
+		const hasAreaOverrideMinWidth =
+			areaOverrideMinWidth !== null && areaOverrideMinWidth !== undefined;
+		const minWidth = hasAreaOverrideMinWidth ? Number(areaOverrideMinWidth) : NaN;
+		const areaOverrides =
+			rawAreaOverrides && Number.isFinite(minWidth)
+				? [`${indent}@media (min-width: ${minWidth}px) {`, rawAreaOverrides.replace(/^/gm, `${indent}  `), `${indent}}`].join(
+					"\n",
+				)
+				: rawAreaOverrides;
 
 		return [
 			`${indent}${rootSelector} {`,
@@ -216,7 +227,7 @@ Object.assign(GridDesigner.prototype, {
 			.join("\n\n");
 	},
 
-	renderCssWidthGroup(rootSelector, widthGroup, widthIndex, widthItems, indent = "") {
+	renderCssWidthGroup(rootSelector, widthGroup, widthIndex, widthItems, indent = "", areaOverrideMinWidth = null) {
 		const widthQuery = this.buildCssRangeQuery(
 			"container box",
 			widthItems,
@@ -238,12 +249,13 @@ Object.assign(GridDesigner.prototype, {
 			rootSelector,
 			widthGroup.resolutions[0],
 			`${indent}  `,
+			!widthQuery ? areaOverrideMinWidth : null,
 		);
 		if (!widthQuery) return rule;
 		return [`${indent}${widthQuery} {`, rule, `${indent}}`].join("\n");
 	},
 
-	renderCssResolutionSet(rootSelector, resolutions) {
+	renderCssResolutionSet(rootSelector, resolutions, areaOverrideMinWidth = null) {
 		if (!resolutions.length) return "";
 		const widthGroupsByWidth = new Map();
 		resolutions.forEach((resolution) => {
@@ -259,7 +271,14 @@ Object.assign(GridDesigner.prototype, {
 
 		return widthGroups
 			.map((widthGroup, widthIndex, widthItems) =>
-				this.renderCssWidthGroup(rootSelector, widthGroup, widthIndex, widthItems),
+				this.renderCssWidthGroup(
+					rootSelector,
+					widthGroup,
+					widthIndex,
+					widthItems,
+					"",
+					areaOverrideMinWidth,
+				),
 			)
 			.join("\n\n");
 	},
@@ -267,7 +286,7 @@ Object.assign(GridDesigner.prototype, {
 	partitionResolutionsByType(resolutions) {
 		return resolutions.reduce(
 			(acc, resolution) => {
-				if (resolution.type === "mobile") {
+				if (resolution.device === "mobile") {
 					acc.mobile.push(resolution);
 				} else {
 					acc.nonMobile.push(resolution);
@@ -286,7 +305,7 @@ Object.assign(GridDesigner.prototype, {
 			: cardSelector;
 		if (!state) return "";
 		const baseRule = this.renderCssResolutionBlock(rootSelector, singleResolution);
-		if (singleResolution?.type === "mobile") {
+		if (singleResolution?.device === "mobile") {
 			return ["@media (max-width: 800px) {", baseRule.replace(/^/gm, "  "), "}"].join("\n");
 		}
 		return baseRule;
@@ -297,9 +316,15 @@ Object.assign(GridDesigner.prototype, {
 			? `[layoutid="${group.layoutId}"] ${cardSelector}`
 			: cardSelector;
 		const partitioned = this.partitionResolutionsByType(group.resolutions);
+		const shouldAddNonQueryAreaMedia =
+			partitioned.nonMobile.length === 1 && partitioned.mobile.length === 1;
 
 		const blocks = [];
-		const nonMobileCss = this.renderCssResolutionSet(rootSelector, partitioned.nonMobile);
+		const nonMobileCss = this.renderCssResolutionSet(
+			rootSelector,
+			partitioned.nonMobile,
+			shouldAddNonQueryAreaMedia ? 801 : null,
+		);
 		if (nonMobileCss) {
 			blocks.push(nonMobileCss);
 		}
