@@ -4,7 +4,19 @@ class AreaControlsComponent {
 		this.config = {
 			justifyContent: config.justifyContent,
 			alignItems: config.alignItems,
+			headerPreset: config.headerPreset,
+			enableHeaderPreset: Boolean(config.enableHeaderPreset),
 		};
+	}
+
+	getStaticHeaderPresetOptions() {
+		const baseUrl =
+			"https://robostaticcontentcommon.s3.eu-central-1.amazonaws.com/Cards/presetv";
+		return [1, 2, 3, 4].map((index) => ({
+			value: `preset${index}`,
+			label: `Preset ${index}`,
+			iconUrl: `${baseUrl}${index}.svg`,
+		}));
 	}
 
 	static escapeAttr(value) {
@@ -55,8 +67,44 @@ class AreaControlsComponent {
 		`;
 	}
 
+	buildHeaderPresetField() {
+		if (!this.config.enableHeaderPreset) return "";
+
+		const areaId = AreaControlsComponent.escapeAttr(this.areaId);
+		const selectedPreset = String(this.config.headerPreset || "preset1");
+		const presetButtons = this.getStaticHeaderPresetOptions()
+			.map((option) => {
+				const value = AreaControlsComponent.escapeAttr(option.value);
+				const iconUrl = AreaControlsComponent.escapeAttr(option.iconUrl);
+				const label = AreaControlsComponent.escapeAttr(option.label || option.value);
+				const isActive = selectedPreset === option.value;
+				return `
+					<button
+						type="button"
+						class="area-preset-btn${isActive ? " is-active" : ""}"
+						data-header-preset="${value}"
+						data-area-id="${areaId}"
+						title="${label}"
+					>
+						<img src="${iconUrl}" alt="${label}" />
+					</button>
+				`;
+			})
+			.join("");
+
+		return `
+			<div class="area-layout-control__field">
+				<span class="area-layout-control__label">Header preset</span>
+				<div class="area-layout-control__preset-grid">
+					${presetButtons}
+				</div>
+			</div>
+		`;
+	}
+
 	render() {
 		const areaId = AreaControlsComponent.escapeAttr(this.areaId);
+		const headerPresetField = this.buildHeaderPresetField();
 		const justifyHtml = this.buildField(
 			"justifyContent",
 			"Justify content",
@@ -82,6 +130,29 @@ class AreaControlsComponent {
 
 		return `
 			<div class="area-layout-controls">
+				${
+					headerPresetField
+						? `
+							<button
+								type="button"
+								class="area-layout-controls__toggle"
+								data-header-preset-toggle="1"
+								data-area-id="${areaId}"
+								title="Team name presets"
+							>
+								<span class="material-symbols-outlined" aria-hidden="true">grid_view</span>
+							</button>
+							<div
+								class="area-layout-controls__panel area-layout-controls__preset-panel"
+								data-header-preset-panel="1"
+								data-area-id="${areaId}"
+								hidden
+							>
+								${headerPresetField}
+							</div>
+						`
+						: ""
+				}
 				<button
 					type="button"
 					class="area-layout-controls__toggle"

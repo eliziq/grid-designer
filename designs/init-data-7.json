@@ -59,15 +59,22 @@
 	},
 	"tags": [
 		{
-			"id": "Event_Name",
-			"name": "TicketTags_Name",
-			"gridArea": "name",
+			"id": "Event_NameAndLogo",
+			"name": "TicketTags_Name, TicketTags_TeamsLogo",
+			"gridArea": "nameemblem",
+			"groupClass": "name-emblem",
 			"ctrls": [
 				{
 					"name": "TicketTags_Name",
-					"selected": "false",
+					"selected": "true",
 					"tag": "Name",
 					"class": "name"
+				},
+				{
+					"name": "TicketTags_TeamsLogo",
+					"selected": "true",
+					"tag": "TeamsLogo",
+					"class": "home-team away-team"
 				}
 			],
 			"controlType": "checkbox"
@@ -186,25 +193,19 @@
 		},
 		{
 			"id": "Event_TeamName",
-			"name": "TicketTags_TeamsLogo, TicketTags_HomeTeam, TicketTags_AwayTeam",
-			"gridArea": "nameemblem",
-			"groupClass": "name-emblem",
+			"name": "TicketTags_HomeTeam, TicketTags_AwayTeam",
+			"gridArea": "teamname",
+			"groupClass": "team-name",
 			"ctrls": [
 				{
-					"name": "TicketTags_TeamsLogo",
-					"selected": "true",
-					"tag": "TeamsLogo",
-					"class": "home-team away-team"
-				},
-				{
 					"name": "TicketTags_HomeTeam",
-					"selected": "true",
+					"selected": "false",
 					"tag": "HomeTeam",
 					"class": "home-team"
 				},
 				{
 					"name": "TicketTags_AwayTeam",
-					"selected": "true",
+					"selected": "false",
 					"tag": "AwayTeam",
 					"class": "away-team"
 				}
@@ -266,6 +267,27 @@
 		"currentResolutionIndex": 6,
 		"elements": [
 			{
+				"id": "Event_NameAndLogo",
+				"name": "TicketTags_Name, TicketTags_TeamsLogo",
+				"gridArea": "nameemblem",
+				"groupClass": "name-emblem",
+				"controlType": "checkbox",
+				"ctrls": [
+					{
+						"id": "TicketTags_Name, TicketTags_TeamsLogo-TicketTags_Name",
+						"name": "TicketTags_Name",
+						"class": "name",
+						"selected": true
+					},
+					{
+						"id": "TicketTags_Name, TicketTags_TeamsLogo-TicketTags_TeamsLogo",
+						"name": "TicketTags_TeamsLogo",
+						"class": "home-team away-team",
+						"selected": true
+					}
+				]
+			},
+			{
 				"id": "Event_Buy",
 				"name": "TicketTags_BuyButton",
 				"gridArea": "btnbuy",
@@ -276,33 +298,6 @@
 						"id": "TicketTags_BuyButton-TicketTags_BuyButton",
 						"name": "TicketTags_BuyButton",
 						"class": "btn-buy",
-						"selected": true
-					}
-				]
-			},
-			{
-				"id": "Event_TeamName",
-				"name": "TicketTags_TeamsLogo, TicketTags_HomeTeam, TicketTags_AwayTeam",
-				"gridArea": "nameemblem",
-				"groupClass": "name-emblem",
-				"controlType": "checkbox",
-				"ctrls": [
-					{
-						"id": "TicketTags_TeamsLogo, TicketTags_HomeTeam, TicketTags_AwayTeam-TicketTags_TeamsLogo",
-						"name": "TicketTags_TeamsLogo",
-						"class": "home-team away-team",
-						"selected": true
-					},
-					{
-						"id": "TicketTags_TeamsLogo, TicketTags_HomeTeam, TicketTags_AwayTeam-TicketTags_HomeTeam",
-						"name": "TicketTags_HomeTeam",
-						"class": "home-team",
-						"selected": true
-					},
-					{
-						"id": "TicketTags_TeamsLogo, TicketTags_HomeTeam, TicketTags_AwayTeam-TicketTags_AwayTeam",
-						"name": "TicketTags_AwayTeam",
-						"class": "away-team",
 						"selected": true
 					}
 				]
@@ -398,10 +393,10 @@
 							"justifyContent": "start",
 							"alignItems": "end"
 						},
-						"Event_TeamName": {
-							"id": "Event_TeamName",
-							"rowStart": 3,
-							"rowEnd": 3,
+						"Event_NameAndLogo": {
+							"id": "Event_NameAndLogo",
+							"rowStart": 2,
+							"rowEnd": 2,
 							"colStart": 0,
 							"colEnd": 4
 						}
@@ -409,14 +404,14 @@
 					"gridMatrix": [
 						[null, null, null, null, null],
 						[null, null, null, null, null],
-						[null, null, null, null, null],
 						[
-							"Event_TeamName",
-							"Event_TeamName",
-							"Event_TeamName",
-							"Event_TeamName",
-							"Event_TeamName"
+							"Event_NameAndLogo",
+							"Event_NameAndLogo",
+							"Event_NameAndLogo",
+							"Event_NameAndLogo",
+							"Event_NameAndLogo"
 						],
+						[null, null, null, null, null],
 						["Event_Place", "Event_Place", "Event_Place", null, null],
 						["Event_Date", "Event_Date", "Event_Date", "Event_Buy", "Event_Buy"]
 					],
@@ -453,18 +448,18 @@
 							"justifyContent": "start",
 							"alignItems": "end"
 						},
-						"Event_TeamName": {
-							"id": "Event_TeamName",
-							"rowStart": 2,
-							"rowEnd": 2,
+						"Event_NameAndLogo": {
+							"id": "Event_NameAndLogo",
+							"rowStart": 1,
+							"rowEnd": 1,
 							"colStart": 0,
 							"colEnd": 1
 						}
 					},
 					"gridMatrix": [
 						[null, null],
+						["Event_NameAndLogo", "Event_NameAndLogo"],
 						[null, null],
-						["Event_TeamName", "Event_TeamName"],
 						[null, null],
 						["Event_Date", null],
 						["Event_Place", "Event_Buy"]
@@ -499,11 +494,11 @@
 							"colStart": 1,
 							"colEnd": 2
 						},
-						"Event_TeamName": {
-							"id": "Event_TeamName",
-							"rowStart": 2,
-							"rowEnd": 2,
-							"colStart": 4,
+						"Event_NameAndLogo": {
+							"id": "Event_NameAndLogo",
+							"rowStart": 1,
+							"rowEnd": 1,
+							"colStart": 1,
 							"colEnd": 9
 						}
 					},
@@ -522,18 +517,31 @@
 							"Event_Place",
 							"Event_Place"
 						],
-						[null, null, null, null, null, null, null, null, null, null, null, null],
+						[
+							null,
+							"Event_NameAndLogo",
+							"Event_NameAndLogo",
+							"Event_NameAndLogo",
+							"Event_NameAndLogo",
+							"Event_NameAndLogo",
+							"Event_NameAndLogo",
+							"Event_NameAndLogo",
+							"Event_NameAndLogo",
+							"Event_NameAndLogo",
+							null,
+							null
+						],
 						[
 							null,
 							"Event_Date",
 							"Event_Date",
 							null,
-							"Event_TeamName",
-							"Event_TeamName",
-							"Event_TeamName",
-							"Event_TeamName",
-							"Event_TeamName",
-							"Event_TeamName",
+							null,
+							null,
+							null,
+							null,
+							null,
+							null,
 							null,
 							null
 						],
@@ -597,28 +605,28 @@
 							"colStart": 10,
 							"colEnd": 11
 						},
-						"Event_TeamName": {
-							"id": "Event_TeamName",
+						"Event_NameAndLogo": {
+							"id": "Event_NameAndLogo",
 							"rowStart": 0,
 							"rowEnd": 0,
-							"colStart": 6,
-							"colEnd": 11
+							"colStart": 1,
+							"colEnd": 10
 						}
 					},
 					"gridMatrix": [
 						[
 							null,
-							null,
-							null,
-							null,
-							null,
-							null,
-							"Event_TeamName",
-							"Event_TeamName",
-							"Event_TeamName",
-							"Event_TeamName",
-							"Event_TeamName",
-							"Event_TeamName"
+							"Event_NameAndLogo",
+							"Event_NameAndLogo",
+							"Event_NameAndLogo",
+							"Event_NameAndLogo",
+							"Event_NameAndLogo",
+							"Event_NameAndLogo",
+							"Event_NameAndLogo",
+							"Event_NameAndLogo",
+							"Event_NameAndLogo",
+							"Event_NameAndLogo",
+							null
 						],
 						[
 							"Event_Buy",
@@ -677,17 +685,29 @@
 							"colEnd": 1,
 							"alignItems": "end",
 							"justifyContent": "start"
+						},
+						"Event_NameAndLogo": {
+							"id": "Event_NameAndLogo",
+							"rowStart": 0,
+							"rowEnd": 0,
+							"colStart": 0,
+							"colEnd": 3
 						}
 					},
 					"gridMatrix": [
-						[null, null, null, null],
+						[
+							"Event_NameAndLogo",
+							"Event_NameAndLogo",
+							"Event_NameAndLogo",
+							"Event_NameAndLogo"
+						],
 						[null, null, null, null],
 						[null, null, null, null],
 						[null, null, null, null],
 						["Event_Place", "Event_Place", "Event_Buy", "Event_Buy"],
 						["Event_Date", "Event_Date", "Event_Buy", "Event_Buy"]
 					],
-					"finished": false
+					"finished": true
 				},
 				{
 					"rows": 4,
@@ -717,8 +737,8 @@
 							"colStart": 2,
 							"colEnd": 4
 						},
-						"Event_TeamName": {
-							"id": "Event_TeamName",
+						"Event_NameAndLogo": {
+							"id": "Event_NameAndLogo",
 							"rowStart": 0,
 							"rowEnd": 0,
 							"colStart": 1,
@@ -726,7 +746,7 @@
 						}
 					},
 					"gridMatrix": [
-						[null, "Event_TeamName", "Event_TeamName", "Event_TeamName", null],
+						[null, "Event_NameAndLogo", "Event_NameAndLogo", "Event_NameAndLogo", null],
 						[null, null, null, null, null],
 						["Event_Date", "Event_Date", "Event_Place", "Event_Place", "Event_Place"],
 						[null, null, null, "Event_Buy", "Event_Buy"]
@@ -808,5 +828,5 @@
 			}
 		}
 	},
-	"initializedAt": "2026-08-04T08:53:21.896Z"
+	"initializedAt": "2026-08-03T18:30:07.058Z"
 }

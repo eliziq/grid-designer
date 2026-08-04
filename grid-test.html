@@ -41,6 +41,87 @@
 	.grid-test > [style*="grid-area: area1"] {
 		background-color: rgb(255, 0, 0);
 	}
+
+	.name-emblem {
+		display: grid;
+		width: 100%;
+		padding: 24px 32px;
+		gap: 16px;
+		align-items: center;
+		justify-items: center;
+		color: #111;
+		background: #fff;
+		border: 1px solid #ddd;
+		font-family: Arial, sans-serif;
+	}
+
+	.name-emblem > .home-team-name,
+	.name-emblem > .away-team-name,
+	.name-emblem > .versus {
+		font-size: 72px;
+		line-height: 1;
+	}
+
+	.name-emblem > .home-team-emblem,
+	.name-emblem > .away-team-emblem {
+		width: 220px;
+		height: 220px;
+		border-radius: 50%;
+		background: #aaa;
+	}
+
+	.name-emblem > .home-team-name {
+		grid-area: hometeamneme;
+	}
+
+	.name-emblem > .away-team-name {
+		grid-area: awayteamname;
+	}
+
+	.name-emblem > .versus {
+		grid-area: versus;
+	}
+
+	.name-emblem > .home-team-emblem {
+		grid-area: hometeamemblem;
+	}
+
+	.name-emblem > .away-team-emblem {
+		grid-area: awayteamemblem;
+	}
+
+	.name-emblem {
+		display: grid;
+		align-items: center;
+	}
+
+	.name-emblem.preset1 {
+		grid-template-columns: 1fr auto 1fr;
+		grid-template-rows: 1fr auto;
+		grid-template-areas:
+			"hometeamemblem versus awayteamemblem"
+			"hometeamneme versus awayteamname";
+	}
+
+	.name-emblem.preset2 {
+		grid-template-columns: 1fr auto 1fr;
+		grid-template-rows: auto 1fr;
+		grid-template-areas:
+			"hometeamneme versus awayteamname"
+			"hometeamemblem versus awayteamemblem";
+	}
+
+	.name-emblem.preset3 {
+		grid-template-columns: auto 1fr auto 1fr auto;
+		grid-template-rows: auto;
+		grid-template-areas: "hometeamneme hometeamemblem versus awayteamemblem awayteamname";
+	}
+
+	.name-emblem.preset4 {
+		grid-template-columns: 1fr auto auto auto 1fr;
+		grid-template-rows: auto;
+		grid-template-areas: "hometeamemblem hometeamneme versus awayteamname awayteamemblem";
+	}
 </style>
 
 <section class="grid-test">
@@ -51,3 +132,11 @@
 	<span class="element-test area5">random text4</span>
 	<div class="element-test area6">random text5</div>
 </section>
+
+<div class="name-emblem preset1">
+	<span class="home-team-name">Athletic Madrid</span>
+	<span class="away-team-name">Paris FC</span>
+	<span class="versus">vs</span>
+	<div class="home-team-emblem"></div>
+	<div class="away-team-emblem"></div>
+</div>
