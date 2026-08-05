@@ -15,7 +15,13 @@ class ResolutionOptionComponent {
 
 		return `
 			<label class="${`resolution-option${activeClass}${finishedClass}`}">
-				<input type="radio" name="resolution" value="${this.index}" ${checked} />
+				<input
+					type="radio"
+					name="resolution"
+					value="${this.index}"
+					data-resolution-index="${this.index}"
+					${checked}
+				/>
 				<span>${this.width}x${this.height}</span>
 			</label>
 		`;

@@ -103,7 +103,7 @@ Object.assign(GridDesigner.prototype, {
 				height: res.height,
 				isActive,
 				isFinished: Boolean(resolutionState?.finished),
-				onChange: () => this.setCurrentResolution(res),
+				onChange: () => this.setCurrentResolution(res, false, index),
 			}).toElement();
 
 			if (option) {
@@ -132,7 +132,7 @@ Object.assign(GridDesigner.prototype, {
 		}
 	},
 
-	setCurrentResolution(res, isInitialLoad = false) {
+	setCurrentResolution(res, isInitialLoad = false, resolutionIndex = null) {
 		if (!res) return;
 		if (!isInitialLoad) {
 			this.saveResolutionState(this.state.currentResolutionIndex);
@@ -144,16 +144,36 @@ Object.assign(GridDesigner.prototype, {
 		};
 
 		this.currentResolution = res;
-		this.state.currentResolutionIndex =
-			this.resolutions[this.state.currentLayoutName].indexOf(res);
+		const hasProvidedIndex =
+			resolutionIndex !== null &&
+			resolutionIndex !== undefined &&
+			Number.isInteger(Number(resolutionIndex));
+		const providedIndex = hasProvidedIndex ? Number(resolutionIndex) : -1;
+		const group = this.resolutions[this.state.currentLayoutName] || [];
+		let nextIndex = hasProvidedIndex ? providedIndex : group.indexOf(res);
+
+		if (nextIndex < 0) {
+			const signature = this.getResolutionSignature(res);
+			nextIndex = group.findIndex(
+				(candidate) => this.getResolutionSignature(candidate) === signature,
+			);
+		}
+
+		if (nextIndex < 0) return;
+		this.state.currentResolutionIndex = nextIndex;
 		const radios = this.containerElement.querySelectorAll(
 			"#resolutionTabs input[type='radio']",
 		);
 		const labels = this.containerElement.querySelectorAll("#resolutionTabs label");
 		const index = this.state.currentResolutionIndex;
-		if (index >= 0 && radios[index]) radios[index].checked = true;
-		labels.forEach((label, labelIndex) => {
-			label.classList.toggle("active", labelIndex === index);
+		radios.forEach((radio) => {
+			const radioIndex = Number(radio.value);
+			radio.checked = Number.isInteger(radioIndex) && radioIndex === index;
+		});
+		labels.forEach((label) => {
+			const radio = label.querySelector("input[type='radio']");
+			const labelIndex = Number(radio?.value);
+			label.classList.toggle("active", Number.isInteger(labelIndex) && labelIndex === index);
 		});
 		const resolvedState = this.getResolutionState(index);
 		const patternKey = this.getCurrentPatternKey();

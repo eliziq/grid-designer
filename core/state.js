@@ -26,8 +26,10 @@ Object.assign(GridDesigner.prototype, {
 	updateResolutionTabState() {
 		if (!this.resolutionTabs) return;
 		const labels = this.resolutionTabs.querySelectorAll("label");
-		labels.forEach((label, index) => {
-			const resolutionState = this.getResolutionState(index);
+		labels.forEach((label) => {
+			const radio = label.querySelector("input[type='radio']");
+			const index = Number(radio?.value);
+			const resolutionState = Number.isInteger(index) ? this.getResolutionState(index) : null;
 			label.classList.toggle("finished", Boolean(resolutionState?.finished));
 		});
 	},
@@ -76,8 +78,10 @@ Object.assign(GridDesigner.prototype, {
 				const areaId = "Event_TeamName";
 				const presetValue = String(areas?.[areaId]?.headerPreset || "").trim();
 				if (!presetValue) return;
+				const layoutDefinition = this.layoutDefinitions?.[layoutName] || {};
 				presets.push({
 					layoutName,
+					layoutId: layoutDefinition.id,
 					resolutionIndex,
 					areaId,
 					preset: presetValue,
