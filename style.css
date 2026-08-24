@@ -169,6 +169,44 @@
 	border-color: #3c6edc;
 	color: #1a2b6f;
 }
+.grid-layer--col-widths {
+	z-index: 3;
+	pointer-events: none;
+}
+.col-width-cell {
+	position: relative;
+	pointer-events: none;
+}
+.col-width-btn {
+	position: absolute;
+	bottom: 6px;
+	left: 50%;
+	transform: translateX(-50%);
+	pointer-events: auto;
+	background: rgba(255, 255, 255, 0.9);
+	border: 1px solid #8fa0d1;
+	border-radius: 4px;
+	font-size: 0.7rem;
+	font-weight: 700;
+	color: #1a2b6f;
+	padding: 2px 7px;
+	cursor: pointer;
+	line-height: 1.5;
+	z-index: 4;
+	transition:
+		background 0.15s,
+		border-color 0.15s;
+	white-space: nowrap;
+}
+.col-width-btn:hover {
+	background: #dce8ff;
+	border-color: #3c6edc;
+}
+.col-width-btn--max {
+	background: rgba(220, 232, 255, 0.95);
+	border-color: #3c6edc;
+	color: #1a2b6f;
+}
 .cell {
 	pointer-events: auto;
 	border: 1px dashed #bbb;
@@ -205,6 +243,9 @@
 	justify-self: stretch;
 	min-width: 0;
 	min-height: 0;
+	/* isolates label content from ancestor grid track sizing (fixes max-content columns/rows
+	   being inflated by long spanning text) — box is still sized normally via grid placement */
+	contain: inline-size;
 	overflow: visible;
 	background: rgba(100, 160, 255, 0.15);
 	border: 2px solid #3c6edc;
@@ -217,12 +258,13 @@
 	-webkit-user-drag: none;
 }
 .area-block__label {
+	width: 100%;
 	max-width: 100%;
 	min-width: 0;
 	padding: 4px 26px 4px 6px;
 	white-space: pre-wrap;
-	overflow-wrap: normal;
-	word-break: normal;
+	overflow-wrap: anywhere;
+	word-break: break-word;
 	display: -webkit-box;
 	-webkit-box-orient: vertical;
 	-webkit-line-clamp: 4;
@@ -378,8 +420,6 @@
 	height: 52px;
 	object-fit: cover;
 }
-
-
 
 .area-block.edge-top,
 .area-block.edge-bottom {

@@ -27,18 +27,31 @@ Object.assign(GridDesigner.prototype, {
 		this.updateGridScaling();
 	},
 
-	getGridTemplateRows() {
-		return Array.from({ length: this.state.rows }, (_, rowIndex) => {
-			const rowHeight = this.state.rowHeights[rowIndex] || "1fr";
-			return rowHeight === "max-content"
-				? "minmax(var(--grid-row-min, 30px), max-content)"
-				: "minmax(var(--grid-row-min, 30px), 1fr)";
+	getGridTemplateTracks(axis) {
+		const isRow = axis === "row";
+		const count = isRow ? this.state.rows : this.state.cols;
+		const sizes = isRow ? this.state.rowHeights : this.state.colWidths;
+		const minVar = isRow ? "--grid-row-min" : "--grid-col-min";
+		return Array.from({ length: count }, (_, index) => {
+			const size = sizes[index] || "1fr";
+			return size === "max-content"
+				? `minmax(var(${minVar}, 30px), max-content)`
+				: `minmax(var(${minVar}, 30px), 1fr)`;
 		}).join(" ");
+	},
+
+	getGridTemplateRows() {
+		return this.getGridTemplateTracks("row");
+	},
+
+	getGridTemplateColumns() {
+		return this.getGridTemplateTracks("col");
 	},
 
 	refreshGridView() {
 		this.renderGrid();
 		this.renderRowControls();
+		this.renderColControls();
 		this.renderElementList();
 		this.renderTagSelectionPanel();
 		this.updateCssPreview();
@@ -48,6 +61,7 @@ Object.assign(GridDesigner.prototype, {
 		this.renderGrid();
 		this.renderElementList();
 		this.renderRowControls();
+		this.renderColControls();
 		this.renderTagSelectionPanel();
 		this.updateCssPreview();
 	},
@@ -64,7 +78,7 @@ Object.assign(GridDesigner.prototype, {
 
 		this.grid.innerHTML = "";
 		this.applyGridBaseStyles();
-		const gridTemplateColumns = `repeat(${this.state.cols}, 1fr)`;
+		const gridTemplateColumns = this.getGridTemplateColumns();
 		const gridTemplateRows = this.getGridTemplateRows();
 		const cellLayer = document.createElement("div");
 		cellLayer.className = "grid-layer grid-layer--cells";
@@ -90,6 +104,7 @@ Object.assign(GridDesigner.prototype, {
 		this.grid.appendChild(overlayLayer);
 		this.renderAreas(overlayLayer);
 		this.renderRowControls();
+		this.renderColControls();
 		const lateReapply = () => {
 			if (!this.grid?.isConnected || !this.gridWrapper?.isConnected) this.cacheDomElements();
 			this.applyGridBaseStyles();
@@ -139,41 +154,60 @@ Object.assign(GridDesigner.prototype, {
 	},
 
 	renderRowControls() {
-		if (!this.grid) return;
+		this.renderTrackControls("row");
+	},
 
-		const existingLayer = this.grid.querySelector(".grid-layer--row-heights");
+	renderColControls() {
+		this.renderTrackControls("col");
+	},
+
+	renderTrackControls(axis) {
+		if (!this.grid) return;
+		const isRow = axis === "row";
+		const layerClass = isRow ? "grid-layer--row-heights" : "grid-layer--col-widths";
+		const cellClass = isRow ? "row-height-cell" : "col-width-cell";
+		const btnClass = isRow ? "row-height-btn" : "col-width-btn";
+		const sizes = isRow ? this.state.rowHeights : this.state.colWidths;
+		const count = isRow ? this.state.rows : this.state.cols;
+		const label = isRow ? "Row height" : "Column width";
+
+		const existingLayer = this.grid.querySelector(`.${layerClass}`);
 		if (existingLayer) existingLayer.remove();
 
-		const gridTemplateColumns = `repeat(${this.state.cols}, 1fr)`;
+		const gridTemplateColumns = this.getGridTemplateColumns();
 		const gridTemplateRows = this.getGridTemplateRows();
 
 		const layer = document.createElement("div");
-		layer.className = "grid-layer grid-layer--row-heights";
+		layer.className = `grid-layer ${layerClass}`;
 		layer.style.gridTemplateColumns = gridTemplateColumns;
 		layer.style.gridTemplateRows = gridTemplateRows;
 
-		for (let i = 0; i < this.state.rows; i++) {
+		for (let i = 0; i < count; i++) {
 			const cell = document.createElement("div");
-			cell.className = "row-height-cell";
-			cell.style.gridRow = String(i + 1);
-			cell.style.gridColumn = "1 / -1";
+			cell.className = cellClass;
+			if (isRow) {
+				cell.style.gridRow = String(i + 1);
+				cell.style.gridColumn = "1 / -1";
+			} else {
+				cell.style.gridColumn = String(i + 1);
+				cell.style.gridRow = "1 / -1";
+			}
 
-			const currentValue = this.state.rowHeights[i] || "1fr";
+			const currentValue = sizes[i] || "1fr";
 			const isMax = currentValue === "max-content";
 
 			const btn = document.createElement("span");
-			btn.className = "row-height-btn" + (isMax ? " row-height-btn--max" : "");
-			btn.dataset.rowIndex = String(i);
+			btn.className = btnClass + (isMax ? ` ${btnClass}--max` : "");
+			btn.dataset.index = String(i);
 			btn.textContent = isMax ? "max-c" : "1fr";
 			btn.title = isMax
-				? "Row height: max-content — click to set 1fr"
-				: "Row height: 1fr — click to set max-content";
+				? `${label}: max-content — click to set 1fr`
+				: `${label}: 1fr — click to set max-content`;
 
 			btn.addEventListener("click", (e) => {
 				e.stopPropagation();
-				const rowIndex = parseInt(btn.dataset.rowIndex, 10);
-				this.state.rowHeights[rowIndex] =
-					this.state.rowHeights[rowIndex] === "max-content" ? "1fr" : "max-content";
+				const index = parseInt(btn.dataset.index, 10);
+				sizes[index] = sizes[index] === "max-content" ? "1fr" : "max-content";
 				this.refreshGridView();
 			});
 
@@ -238,10 +272,10 @@ Object.assign(GridDesigner.prototype, {
 		this.gridWrapper.style.setProperty("--grid-margin-top", "0px");
 
 		if (this.grid) {
-			const rowMinPxAtDesignScale = 60;
-			const rowMinCqw =
-				this.gridWidth > 0 ? (rowMinPxAtDesignScale / this.gridWidth) * 100 : 3.9;
-			this.grid.style.setProperty("--grid-row-min", `${rowMinCqw}cqw`);
+			const minPxAtDesignScale = 60;
+			const minCqw = this.gridWidth > 0 ? (minPxAtDesignScale / this.gridWidth) * 100 : 3.9;
+			this.grid.style.setProperty("--grid-row-min", `${minCqw}cqw`);
+			this.grid.style.setProperty("--grid-col-min", `${minCqw}cqw`);
 		}
 	},
 

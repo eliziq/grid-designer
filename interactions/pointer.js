@@ -34,28 +34,19 @@ Object.assign(GridDesigner.prototype, {
 		const scale = parseFloat(
 			getComputedStyle(this.gridWrapper).getPropertyValue("--grid-scale") || "1",
 		);
-		const { colWidth, gap } = this.getGridMetrics();
-		const stepX = colWidth + gap;
 		const pointerX = (event.clientX - gridRect.left) / scale;
 		const pointerY = (event.clientY - gridRect.top) / scale;
-		const snapDelta = (pixelDelta, step) => {
-			const halfStep = step * 0.5;
-			if (pixelDelta > halfStep) {
-				return Math.floor((pixelDelta - halfStep) / step) + 1;
-			}
-			if (pixelDelta < -halfStep) {
-				return Math.ceil((pixelDelta + halfStep) / step) - 1;
-			}
-			return 0;
-		};
 
 		if (mode === "move") {
 			const existingArea = this.state.areas[id] || {};
 			const startPointerX = this.resizeState.startPointerX;
 			const startPointerY = this.resizeState.startPointerY;
-			const desiredColShift = snapDelta(pointerX - startPointerX, stepX);
+			const desiredColShift =
+				this.nearestLineIndex("col", pointerX) -
+				this.nearestLineIndex("col", startPointerX);
 			const desiredRowShift =
-				this.nearestRowLineIndex(pointerY) - this.nearestRowLineIndex(startPointerY);
+				this.nearestLineIndex("row", pointerY) -
+				this.nearestLineIndex("row", startPointerY);
 			const shiftedArea = this.getShiftedAreaByFreeEdge(
 				startArea,
 				id,
@@ -90,25 +81,21 @@ Object.assign(GridDesigner.prototype, {
 		let { rowStart, rowEnd, colStart, colEnd } = startArea;
 
 		if (edge.top) {
-			rowStart = Math.max(0, Math.min(rowEnd, this.nearestRowLineIndex(pointerY)));
+			rowStart = Math.max(0, Math.min(rowEnd, this.nearestLineIndex("row", pointerY)));
 		}
 		if (edge.bottom) {
 			rowEnd = Math.min(
 				this.state.rows - 1,
-				Math.max(rowStart, this.nearestRowLineIndex(pointerY) - 1),
+				Math.max(rowStart, this.nearestLineIndex("row", pointerY) - 1),
 			);
 		}
 		if (edge.left) {
-			const startEdgeX = startArea.colStart * stepX;
-			const deltaCols = snapDelta(pointerX - startEdgeX, stepX);
-			colStart = Math.max(0, Math.min(colEnd, startArea.colStart + deltaCols));
+			colStart = Math.max(0, Math.min(colEnd, this.nearestLineIndex("col", pointerX)));
 		}
 		if (edge.right) {
-			const startEdgeX = (startArea.colEnd + 1) * stepX;
-			const deltaCols = snapDelta(pointerX - startEdgeX, stepX);
 			colEnd = Math.min(
 				this.state.cols - 1,
-				Math.max(colStart, startArea.colEnd + deltaCols),
+				Math.max(colStart, this.nearestLineIndex("col", pointerX) - 1),
 			);
 		}
 

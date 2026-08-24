@@ -89,25 +89,25 @@ Object.assign(GridDesigner.prototype, {
 				return [
 					"grid-template-columns: 1fr auto 1fr;",
 					"grid-template-rows: 1fr auto;",
-					'grid-template-areas: "hometeamemblem versus awayteamemblem" "hometeamneme versus awayteamname";',
+					'grid-template-areas: "hometeamemblem versus awayteamemblem" "hometeamname versus awayteamname";',
 				];
 			case "preset2":
 				return [
 					"grid-template-columns: 1fr auto 1fr;",
 					"grid-template-rows: auto 1fr;",
-					'grid-template-areas: "hometeamneme versus awayteamname" "hometeamemblem versus awayteamemblem";',
+					'grid-template-areas: "hometeamname versus awayteamname" "hometeamemblem versus awayteamemblem";',
 				];
 			case "preset3":
 				return [
 					"grid-template-columns: auto 1fr auto 1fr auto;",
 					"grid-template-rows: auto;",
-					'grid-template-areas: "hometeamneme hometeamemblem versus awayteamemblem awayteamname";',
+					'grid-template-areas: "hometeamname hometeamemblem versus awayteamemblem awayteamname";',
 				];
 			case "preset4":
 				return [
 					"grid-template-columns: 1fr auto auto auto 1fr;",
 					"grid-template-rows: auto;",
-					'grid-template-areas: "hometeamemblem hometeamneme versus awayteamname awayteamemblem";',
+					'grid-template-areas: "hometeamemblem hometeamname versus awayteamname awayteamemblem";',
 				];
 			default:
 				return [];
@@ -138,6 +138,9 @@ Object.assign(GridDesigner.prototype, {
 		);
 		const cols = Math.max(1, Number(state?.cols) || 1);
 		const rowHeights = Array.isArray(state?.rowHeights) ? state.rowHeights : ["1fr"];
+		const colWidths = Array.isArray(state?.colWidths)
+			? state.colWidths
+			: Array.from({ length: cols }, () => "1fr");
 		const inputRows = Array.isArray(state?.gridMatrix) ? state.gridMatrix : [];
 		const rows = inputRows.length > 0 ? inputRows : [Array.from({ length: cols }, () => ".")];
 
@@ -154,7 +157,7 @@ Object.assign(GridDesigner.prototype, {
 
 		return [
 			`${indent}display: grid;`,
-			`${indent}grid-template-columns: repeat(${cols}, 1fr);`,
+			`${indent}grid-template-columns: ${colWidths.join(" ")};`,
 			`${indent}grid-template-rows: ${rowHeights.join(" ")};`,
 			`${indent}gap: 8px;`,
 			`${indent}grid-template-areas:`,
@@ -239,9 +242,11 @@ Object.assign(GridDesigner.prototype, {
 		const minWidth = hasAreaOverrideMinWidth ? Number(areaOverrideMinWidth) : NaN;
 		const areaOverrides =
 			rawAreaOverrides && Number.isFinite(minWidth)
-				? [`${indent}@media (min-width: ${minWidth}px) {`, rawAreaOverrides.replace(/^/gm, `${indent}  `), `${indent}}`].join(
-					"\n",
-				)
+				? [
+						`${indent}@media (min-width: ${minWidth}px) {`,
+						rawAreaOverrides.replace(/^/gm, `${indent}  `),
+						`${indent}}`,
+					].join("\n")
 				: rawAreaOverrides;
 
 		return [
@@ -279,7 +284,14 @@ Object.assign(GridDesigner.prototype, {
 			.join("\n\n");
 	},
 
-	renderCssWidthGroup(rootSelector, widthGroup, widthIndex, widthItems, indent = "", areaOverrideMinWidth = null) {
+	renderCssWidthGroup(
+		rootSelector,
+		widthGroup,
+		widthIndex,
+		widthItems,
+		indent = "",
+		areaOverrideMinWidth = null,
+	) {
 		const widthQuery = this.buildCssRangeQuery(
 			"container box",
 			widthItems,

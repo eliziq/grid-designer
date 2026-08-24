@@ -187,6 +187,9 @@ Object.assign(GridDesigner.prototype, {
 		if (this.state.rowHeights.length !== this.state.rows) {
 			this.state.rowHeights = Array(this.state.rows).fill("1fr");
 		}
+		if (this.state.colWidths.length !== this.state.cols) {
+			this.state.colWidths = Array(this.state.cols).fill("1fr");
+		}
 		this.initMatrix();
 		this.state.areas = {};
 		this.refreshWorkspaceView();
@@ -241,6 +244,7 @@ Object.assign(GridDesigner.prototype, {
 			elements: [...this.state.elements],
 			areas: GridDesigner.cloneData(this.state.areas, {}) || {},
 			rowHeights: [...this.state.rowHeights],
+			colWidths: [...this.state.colWidths],
 		};
 		this.savedPatterns[key] = pattern;
 		this.savePatternsToStorage();

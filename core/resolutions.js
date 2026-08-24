@@ -366,6 +366,7 @@ Object.assign(GridDesigner.prototype, {
 			justifyContent: "center",
 			alignItems: "center",
 			rowHeights: Array(4).fill("1fr"),
+			colWidths: Array(cols).fill("1fr"),
 			areas: {},
 			finished: false,
 			gridMatrix: Array.from({ length: 4 }, () => Array(cols).fill(null)),
@@ -384,6 +385,9 @@ Object.assign(GridDesigner.prototype, {
 			rowHeights: Array.isArray(source?.rowHeights)
 				? source.rowHeights.map((row) => row || "1fr")
 				: Array(rows).fill("1fr"),
+			colWidths: Array.isArray(source?.colWidths)
+				? source.colWidths.map((col) => col || "1fr")
+				: Array(cols).fill("1fr"),
 			areas: GridDesigner.cloneData(source?.areas, {}) || {},
 			gridMatrix: Array.isArray(source?.gridMatrix)
 				? source.gridMatrix.map((row) => [...row])
@@ -397,6 +401,7 @@ Object.assign(GridDesigner.prototype, {
 		this.state.justifyContent = snapshot.justifyContent || "center";
 		this.state.alignItems = snapshot.alignItems || "center";
 		this.state.rowHeights = [...snapshot.rowHeights];
+		this.state.colWidths = [...snapshot.colWidths];
 		this.state.areas = GridDesigner.cloneData(snapshot.areas, {}) || {};
 		this.state.gridMatrix = snapshot.gridMatrix.map((row) => [...row]);
 		if (this.colCountInput) this.colCountInput.value = this.state.cols;
@@ -450,6 +455,7 @@ Object.assign(GridDesigner.prototype, {
 			justifyContent: this.state.justifyContent,
 			alignItems: this.state.alignItems,
 			rowHeights: this.state.rowHeights,
+			colWidths: this.state.colWidths,
 			areas: this.state.areas,
 			gridMatrix: this.state.gridMatrix,
 		});

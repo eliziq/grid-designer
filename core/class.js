@@ -13,6 +13,7 @@ class GridDesigner {
 			alignItems: "center",
 			areas: {},
 			rowHeights: Array(4).fill("1fr"),
+			colWidths: Array(12).fill("1fr"),
 			gridMatrix: [],
 			resolutionStates: [],
 			elements: [],

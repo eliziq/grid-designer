@@ -153,38 +153,42 @@ Object.assign(GridDesigner.prototype, {
 		};
 	},
 
-	// Grid-line pixel offsets (0..rows) using each row's actual rendered track size,
-	// so max-content rows don't get treated as if they were the average/1fr height.
+	// Grid-line pixel offsets (0..count) using each track's actual rendered size, so
+	// max-content rows/columns don't get treated as if they were the average/1fr size.
 	// #grid itself has no track sizing — the real grid tracks live on the .grid-layer--cells
 	// child layer, so that's what must be measured.
-	getRowLineOffsets() {
+	getTrackLineOffsets(axis) {
 		const gap = 8;
-		const { rows } = this.state;
-		const fallbackHeight = this.getGridMetrics().rowHeight;
+		const isRow = axis === "row";
+		const count = isRow ? this.state.rows : this.state.cols;
+		const fallbackSize = isRow
+			? this.getGridMetrics().rowHeight
+			: this.getGridMetrics().colWidth;
 		const cellLayer = this.grid?.querySelector(".grid-layer--cells");
 		let trackSizes = null;
 		if (cellLayer) {
+			const cssProperty = isRow ? "gridTemplateRows" : "gridTemplateColumns";
 			const parsed = getComputedStyle(cellLayer)
-				.gridTemplateRows.split(" ")
+				[cssProperty].split(" ")
 				.map((value) => parseFloat(value));
-			if (parsed.length === rows && parsed.every((value) => Number.isFinite(value))) {
+			if (parsed.length === count && parsed.every((value) => Number.isFinite(value))) {
 				trackSizes = parsed;
 			}
 		}
 		const offsets = [0];
-		for (let i = 0; i < rows; i++) {
-			const size = trackSizes ? trackSizes[i] : fallbackHeight;
-			offsets.push(offsets[i] + size + (i < rows - 1 ? gap : 0));
+		for (let i = 0; i < count; i++) {
+			const size = trackSizes ? trackSizes[i] : fallbackSize;
+			offsets.push(offsets[i] + size + (i < count - 1 ? gap : 0));
 		}
 		return offsets;
 	},
 
-	nearestRowLineIndex(y) {
-		const offsets = this.getRowLineOffsets();
+	nearestLineIndex(axis, position) {
+		const offsets = this.getTrackLineOffsets(axis);
 		let nearest = 0;
 		let minDist = Infinity;
 		offsets.forEach((offset, index) => {
-			const dist = Math.abs(y - offset);
+			const dist = Math.abs(position - offset);
 			if (dist < minDist) {
 				minDist = dist;
 				nearest = index;
