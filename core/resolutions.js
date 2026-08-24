@@ -111,7 +111,6 @@ Object.assign(GridDesigner.prototype, {
 			}
 		});
 
-
 		if (!hasCustom) {
 			groups.custom.closest(".resolution-group")?.remove();
 		}

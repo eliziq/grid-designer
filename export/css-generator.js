@@ -83,6 +83,52 @@ Object.assign(GridDesigner.prototype, {
 		return rules.join("\n");
 	},
 
+	getHeaderPresetStyleLines(preset) {
+		switch (preset) {
+			case "preset1":
+				return [
+					"grid-template-columns: 1fr auto 1fr;",
+					"grid-template-rows: 1fr auto;",
+					'grid-template-areas: "hometeamemblem versus awayteamemblem" "hometeamneme versus awayteamname";',
+				];
+			case "preset2":
+				return [
+					"grid-template-columns: 1fr auto 1fr;",
+					"grid-template-rows: auto 1fr;",
+					'grid-template-areas: "hometeamneme versus awayteamname" "hometeamemblem versus awayteamemblem";',
+				];
+			case "preset3":
+				return [
+					"grid-template-columns: auto 1fr auto 1fr auto;",
+					"grid-template-rows: auto;",
+					'grid-template-areas: "hometeamneme hometeamemblem versus awayteamemblem awayteamname";',
+				];
+			case "preset4":
+				return [
+					"grid-template-columns: 1fr auto auto auto 1fr;",
+					"grid-template-rows: auto;",
+					'grid-template-areas: "hometeamemblem hometeamneme versus awayteamname awayteamemblem";',
+				];
+			default:
+				return [];
+		}
+	},
+
+	renderHeaderPresetRules(rootSelector, state, indent = "") {
+		const preset = this.getResolutionHeaderPreset(state);
+		if (!preset) return "";
+
+		const selector = this.buildAreaContentSelector(rootSelector, "name-emblem");
+		const styleLines = this.getHeaderPresetStyleLines(preset);
+		if (!selector || !styleLines.length) return "";
+
+		return [
+			`${indent}${selector} {`,
+			...styleLines.map((line) => `${indent}  ${line}`),
+			`${indent}}`,
+		].join("\n");
+	},
+
 	generateGridTemplate(state, indent = "") {
 		const areaNameById = new Map(
 			(this.state.elements || []).map((element) => [
@@ -178,6 +224,11 @@ Object.assign(GridDesigner.prototype, {
 	renderCssResolutionBlock(rootSelector, resolution, indent = "", areaOverrideMinWidth = null) {
 		const justifyItems = resolution?.state?.justifyContent || "center";
 		const alignItems = resolution?.state?.alignItems || "center";
+		const headerPresetRules = this.renderHeaderPresetRules(
+			rootSelector,
+			resolution.state,
+			indent,
+		);
 		const rawAreaOverrides = this.renderGridItemAlignmentRule(
 			rootSelector,
 			resolution.state,
@@ -199,6 +250,7 @@ Object.assign(GridDesigner.prototype, {
 			`${indent}  justify-items: ${justifyItems};`,
 			`${indent}  align-items: ${alignItems};`,
 			`${indent}}`,
+			headerPresetRules,
 			areaOverrides,
 		]
 			.filter(Boolean)

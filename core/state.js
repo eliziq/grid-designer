@@ -68,23 +68,30 @@ Object.assign(GridDesigner.prototype, {
 		return this.generateCss();
 	},
 
+	getResolutionHeaderPreset(source) {
+		return String(source?.areas?.Event_TeamName?.headerPreset || "").trim();
+	},
+
 	getSavedPresets() {
 		this.saveResolutionState(this.state.currentResolutionIndex);
 		const presets = [];
 
 		Object.entries(this.state.resolutionStates || {}).forEach(([layoutName, states]) => {
 			(states || []).forEach((resolutionState, resolutionIndex) => {
-				const areas = resolutionState?.areas || {};
-				const areaId = "Event_TeamName";
-				const presetValue = String(areas?.[areaId]?.headerPreset || "").trim();
-				if (!presetValue) return;
+				const preset = this.getResolutionHeaderPreset(resolutionState);
+				if (!preset) return;
+
 				const layoutDefinition = this.layoutDefinitions?.[layoutName] || {};
+				const resolution = this.getResolutionSignature(
+					this.resolutions?.[layoutName]?.[resolutionIndex],
+				);
 				presets.push({
 					layoutName,
 					layoutId: layoutDefinition.id,
 					resolutionIndex,
-					areaId,
-					preset: presetValue,
+					resolution,
+					areaId: "Event_TeamName",
+					preset,
 				});
 			});
 		});
