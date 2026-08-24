@@ -34,9 +34,8 @@ Object.assign(GridDesigner.prototype, {
 		const scale = parseFloat(
 			getComputedStyle(this.gridWrapper).getPropertyValue("--grid-scale") || "1",
 		);
-		const { colWidth, rowHeight, gap } = this.getGridMetrics();
+		const { colWidth, gap } = this.getGridMetrics();
 		const stepX = colWidth + gap;
-		const stepY = rowHeight + gap;
 		const pointerX = (event.clientX - gridRect.left) / scale;
 		const pointerY = (event.clientY - gridRect.top) / scale;
 		const snapDelta = (pixelDelta, step) => {
@@ -55,7 +54,8 @@ Object.assign(GridDesigner.prototype, {
 			const startPointerX = this.resizeState.startPointerX;
 			const startPointerY = this.resizeState.startPointerY;
 			const desiredColShift = snapDelta(pointerX - startPointerX, stepX);
-			const desiredRowShift = snapDelta(pointerY - startPointerY, stepY);
+			const desiredRowShift =
+				this.nearestRowLineIndex(pointerY) - this.nearestRowLineIndex(startPointerY);
 			const shiftedArea = this.getShiftedAreaByFreeEdge(
 				startArea,
 				id,
@@ -90,16 +90,12 @@ Object.assign(GridDesigner.prototype, {
 		let { rowStart, rowEnd, colStart, colEnd } = startArea;
 
 		if (edge.top) {
-			const startEdgeY = startArea.rowStart * stepY;
-			const deltaRows = snapDelta(pointerY - startEdgeY, stepY);
-			rowStart = Math.max(0, Math.min(rowEnd, startArea.rowStart + deltaRows));
+			rowStart = Math.max(0, Math.min(rowEnd, this.nearestRowLineIndex(pointerY)));
 		}
 		if (edge.bottom) {
-			const startEdgeY = (startArea.rowEnd + 1) * stepY;
-			const deltaRows = snapDelta(pointerY - startEdgeY, stepY);
 			rowEnd = Math.min(
 				this.state.rows - 1,
-				Math.max(rowStart, startArea.rowEnd + deltaRows),
+				Math.max(rowStart, this.nearestRowLineIndex(pointerY) - 1),
 			);
 		}
 		if (edge.left) {
