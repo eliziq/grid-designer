@@ -177,6 +177,9 @@ Object.assign(GridDesigner.prototype, {
 		this.state.cols = Math.max(1, parseInt(this.colCountInput?.value, 10) || 1);
 		this.state.rows = Math.max(1, parseInt(this.rowCountInput?.value, 10) || 1);
 		const maxRows = this.getMaxRowsForHeight?.(this.currentResolution?.height);
+		if (this.rowCountInput && Number.isFinite(maxRows)) {
+			this.rowCountInput.max = String(maxRows);
+		}
 		if (Number.isFinite(maxRows) && this.state.rows > maxRows) {
 			this.state.rows = maxRows;
 			if (this.rowCountInput) this.rowCountInput.value = String(maxRows);

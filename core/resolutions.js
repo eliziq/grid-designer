@@ -196,12 +196,16 @@ Object.assign(GridDesigner.prototype, {
 
 	getMaxRowsForHeight(height) {
 		const numericHeight = Number(height) || 0;
-		if (numericHeight <= 0) return Infinity;
-		return Math.max(1, Math.floor(numericHeight / 64));
+		const minRowHeight = 50;
+		if (numericHeight <= 0) return 10;
+		return Math.max(1, Math.min(10, Math.floor(numericHeight / minRowHeight)));
 	},
 
 	clampRowsToCurrentResolutionHeight() {
 		const maxRows = this.getMaxRowsForHeight(this.currentResolution?.height);
+		if (this.rowCountInput && Number.isFinite(maxRows)) {
+			this.rowCountInput.max = String(maxRows);
+		}
 		if (!Number.isFinite(maxRows)) return;
 		if (this.state.rows <= maxRows) return;
 

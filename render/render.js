@@ -31,8 +31,8 @@ Object.assign(GridDesigner.prototype, {
 		return Array.from({ length: this.state.rows }, (_, rowIndex) => {
 			const rowHeight = this.state.rowHeights[rowIndex] || "1fr";
 			return rowHeight === "max-content"
-				? "minmax(var(--grid-row-min, 60px), max-content)"
-				: "minmax(var(--grid-row-min, 60px), 1fr)";
+				? "minmax(var(--grid-row-min, 30px), max-content)"
+				: "minmax(var(--grid-row-min, 30px), 1fr)";
 		}).join(" ");
 	},
 
@@ -236,6 +236,13 @@ Object.assign(GridDesigner.prototype, {
 		this.gridWrapper.style.setProperty("--grid-aspect-ratio", String(ratio));
 		this.gridWrapper.style.setProperty("--grid-margin", "0px");
 		this.gridWrapper.style.setProperty("--grid-margin-top", "0px");
+
+		if (this.grid) {
+			const rowMinPxAtDesignScale = 60;
+			const rowMinCqw =
+				this.gridWidth > 0 ? (rowMinPxAtDesignScale / this.gridWidth) * 100 : 3.9;
+			this.grid.style.setProperty("--grid-row-min", `${rowMinCqw}cqw`);
+		}
 	},
 
 	calculateGridDimensions() {
