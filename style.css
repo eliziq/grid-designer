@@ -100,7 +100,7 @@
 	padding: 0.5rem;
 	max-width: 100%;
 	display: block;
-	width: min(100%, calc(60vh * var(--grid-aspect-ratio, 1.6) + 20px));
+	width: min(100%, calc(70vh * var(--grid-aspect-ratio, 1.6) + 20px));
 	margin-left: 0;
 	margin-top: 0;
 	container-type: inline-size;
@@ -113,7 +113,7 @@
 	aspect-ratio: var(--grid-aspect-ratio, 16 / 10);
 	--area-preview-justify: center;
 	--area-preview-align: center;
-	--grid-row-min: 60px;
+	/* --grid-row-min is set on #gridWrapper in JS (cqw-based, scales with rendered size) */
 }
 .grid-layer {
 	position: absolute;
@@ -379,23 +379,7 @@
 	object-fit: cover;
 }
 
-@container (max-width: 920px) {
-	#grid {
-		--grid-row-min: 52px;
-	}
-}
 
-@container (max-width: 760px) {
-	#grid {
-		--grid-row-min: 44px;
-	}
-}
-
-@container (max-width: 560px) {
-	#grid {
-		--grid-row-min: 36px;
-	}
-}
 
 .area-block.edge-top,
 .area-block.edge-bottom {
