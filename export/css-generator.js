@@ -65,14 +65,19 @@ Object.assign(GridDesigner.prototype, {
 				const selector = this.buildAreaContentSelector(rootSelector, groupClass);
 				if (!selector) return "";
 
+				// .name-emblem is itself a grid (see header presets), so its children need
+				// justify-items/align-items on the wrapper, not just justify-self/align-self
+				const isNestedGrid = groupClass === "name-emblem";
 				const lines = [`${indent}${selector} {`];
 				if (hasJustify) {
 					const localJustify = config.justifyContent || "center";
 					lines.push(`${indent}  justify-self: ${localJustify};`);
+					if (isNestedGrid) lines.push(`${indent}  justify-items: ${localJustify};`);
 				}
 				if (hasAlign) {
 					const localAlign = config.alignItems || "center";
 					lines.push(`${indent}  align-self: ${localAlign};`);
+					if (isNestedGrid) lines.push(`${indent}  align-items: ${localAlign};`);
 				}
 				if (lines.length === 1) return "";
 				lines.push(`${indent}}`);

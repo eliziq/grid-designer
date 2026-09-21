@@ -25,6 +25,9 @@ Object.assign(GridDesigner.prototype, {
 		);
 		this.containerElement.addEventListener("click", this.handleTagSelectionClick.bind(this));
 		this.containerElement.addEventListener("change", this.handleTagSelectionChange.bind(this));
+		this.buyModeRadios.forEach((radio) => {
+			radio.addEventListener("change", this.handleBuyModeChange.bind(this));
+		});
 		window.addEventListener("resize", this.handleResize.bind(this));
 		window.addEventListener("pointerup", this.handlePointerUp.bind(this));
 		this.editorReady = true;
@@ -90,11 +93,12 @@ Object.assign(GridDesigner.prototype, {
 		}
 	},
 
-	handleSaveSelectedTags() {
+	// Reads the current picks from the tag panel into a copy of allowedTags (tags hidden from the panel are left as is).
+	collectTagSelectionFromPanel() {
 		const panel = this.containerElement.querySelector("#tagSelectionPanel");
-		if (!panel) return;
+		if (!panel) return this.allowedTags.map((tag) => ({ ...tag }));
 
-		this.allowedTags = this.allowedTags.map((tag) => {
+		return this.allowedTags.map((tag) => {
 			const tagItem = panel.querySelector(`.tag-selector__item[data-tag-id="${tag.id}"]`);
 			if (!tagItem) return { ...tag };
 
@@ -149,6 +153,13 @@ Object.assign(GridDesigner.prototype, {
 				ctrls,
 			};
 		});
+	},
+
+	handleSaveSelectedTags() {
+		const panel = this.containerElement.querySelector("#tagSelectionPanel");
+		if (!panel) return;
+
+		this.allowedTags = this.collectTagSelectionFromPanel();
 
 		this.applySelectedTags();
 		this.syncStateWithTags();

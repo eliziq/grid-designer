@@ -3,8 +3,9 @@ Object.assign(GridDesigner.prototype, {
 		const panel = this.containerElement.querySelector("#tagSelectionPanel");
 		if (!panel) return;
 
-		const selectedCount = this.allowedTags.filter((tag) => tag.selected).length;
-		const totalCount = this.allowedTags.length;
+		const visibleTags = this.getVisibleTags();
+		const selectedCount = visibleTags.filter((tag) => tag.selected).length;
+		const totalCount = visibleTags.length;
 		const isLocked = Boolean(this.tagSelectionLocked);
 
 		const details = panel.querySelector("#tagSelectorDetails");
@@ -21,7 +22,7 @@ Object.assign(GridDesigner.prototype, {
 		if (!list) return;
 		list.innerHTML = "";
 
-		this.allowedTags.forEach((tag) => {
+		visibleTags.forEach((tag) => {
 			const item = document.createElement("div");
 			item.className = "tag-selector__item";
 			item.dataset.tagId = tag.id;

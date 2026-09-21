@@ -34,6 +34,8 @@ class GridDesigner {
 		this.tagSelectionLocked = false;
 
 		this.cacheDomElements();
+		this.buyOnBannerMode = Boolean(this.buyOnBannerRadio?.checked);
+		this.buyModeSnapshot = null;
 		this.init(editorCardId, layoutDefinitions, tags, state);
 	}
 
@@ -66,6 +68,10 @@ class GridDesigner {
 		this.tagSelectorList = this.q("tagSelectorList");
 		this.tagSelectorMeta = this.q("tagSelectorMeta");
 		this.tagSelectorDetails = this.q("tagSelectorDetails");
+		this.buyOnBannerRadio = this.q("BuyOnBannerClick");
+		this.buyModeRadios = Array.from(
+			this.containerElement.querySelectorAll('input[name="ClickBuyMode"]'),
+		);
 	}
 
 	q(id) {
@@ -209,6 +215,8 @@ class GridDesigner {
 				selected,
 				controlType,
 				ctrls,
+				excludeWhenBuyOnBanner:
+					ctrls.length > 0 && ctrls.every((ctrl) => ctrl.excludeWhenBuyOnBanner),
 			};
 		}
 		return null;
@@ -223,6 +231,10 @@ class GridDesigner {
 			class: ctrl.class != null ? String(ctrl.class) : "",
 			tag: String(ctrl.tag || ""),
 			selected: GridDesigner.normalizeBoolean(ctrl.selected, false),
+			excludeWhenBuyOnBanner: GridDesigner.normalizeBoolean(
+				ctrl.excludeWhenBuyOnBanner,
+				false,
+			),
 		};
 	}
 
@@ -260,7 +272,7 @@ class GridDesigner {
 
 	buildSelectedElements(tags = []) {
 		return tags
-			.filter((tag) => tag.selected)
+			.filter((tag) => tag.selected && !this.isTagExcludedByBuyMode(tag))
 			.map((tag) => ({
 				id: tag.id,
 				name: this.getElementDisplayName(tag),
@@ -359,6 +371,7 @@ class GridDesigner {
 		}
 
 		this.loadEditorState(state);
+		this.applyBuyOnBannerExclusions();
 		this.populatePageWidthSelect();
 		this.initializeMatrixFromState();
 		this.createResolutionTabs();
