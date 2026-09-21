@@ -95,12 +95,14 @@ Object.assign(GridDesigner.prototype, {
 					"grid-template-columns: 1fr auto 1fr;",
 					"grid-template-rows: 1fr auto;",
 					'grid-template-areas: "hometeamemblem versus awayteamemblem" "hometeamname versus awayteamname";',
+					"justify-items: center;",
 				];
 			case "preset2":
 				return [
 					"grid-template-columns: 1fr auto 1fr;",
 					"grid-template-rows: auto 1fr;",
 					'grid-template-areas: "hometeamname versus awayteamname" "hometeamemblem versus awayteamemblem";',
+					"justify-items: center;",
 				];
 			case "preset3":
 				return [

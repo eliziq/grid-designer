@@ -69,7 +69,9 @@ Object.assign(GridDesigner.prototype, {
 	},
 
 	getResolutionHeaderPreset(source) {
-		return String(source?.areas?.Event_TeamName?.headerPreset || "").trim();
+		const area = source?.areas?.Event_TeamName;
+		if (!area) return "";
+		return String(area.headerPreset || "preset1").trim();
 	},
 
 	getSavedPresets() {
