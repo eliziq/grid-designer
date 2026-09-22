@@ -13,10 +13,12 @@ Object.assign(GridDesigner.prototype, {
 
 	applyGridAlignmentPreview() {
 		if (!this.grid) return;
-		const justify = this.normalizePreviewAlignment(this.state.justifyContent);
+		const textAlign = String(this.state.justifyContent || "").trim();
+		const justify = this.normalizePreviewAlignment(textAlign);
 		const align = this.normalizePreviewAlignment(this.state.alignItems);
 		this.grid.style.setProperty("--area-preview-justify", justify);
 		this.grid.style.setProperty("--area-preview-align", align);
+		this.grid.style.setProperty("--grid-preview-text-align", textAlign);
 	},
 
 	applyGridBaseStyles() {

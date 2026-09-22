@@ -72,6 +72,10 @@ Object.assign(GridDesigner.prototype, {
 		block.style.justifyContent = hasJustifyOverride
 			? this.normalizePreviewAlignment(config.justifyContent)
 			: "var(--area-preview-justify)";
+		block.style.setProperty(
+			"--area-preview-text-align",
+			hasJustifyOverride ? config.justifyContent : "var(--grid-preview-text-align)",
+		);
 		block.style.alignItems = hasAlignOverride
 			? this.normalizePreviewAlignment(config.alignItems)
 			: "var(--area-preview-align)";

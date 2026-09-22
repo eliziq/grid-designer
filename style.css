@@ -261,6 +261,7 @@
 	max-width: 100%;
 	min-width: 0;
 	padding: 4px 26px 4px 6px;
+	text-align: var(--area-preview-text-align, var(--grid-preview-text-align));
 	white-space: pre-wrap;
 	overflow-wrap: anywhere;
 	word-break: break-word;
